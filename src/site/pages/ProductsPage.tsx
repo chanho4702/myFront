@@ -14,7 +14,7 @@ function ProductCard({ product }: { product: Product }) {
     <HairlineCard to={`/products/${product.slug}`}>
       <Stack sx={{ height: '100%' }}>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: '-0.01em' }}>
+          <Typography variant="h6" component="h3" sx={{ fontWeight: 700, letterSpacing: '-0.01em' }}>
             {product.name}
           </Typography>
           {product.badge && <Chip label={product.badge} size="small" color="primary" variant="outlined" />}
