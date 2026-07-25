@@ -4,17 +4,36 @@ import CardMedia from '@mui/material/CardMedia';
 import Chip from '@mui/material/Chip';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
+import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import SitePage from '../components/SitePage';
 import { GridSection, StatBar, MONO } from '../ui';
 import { career, caseStudies, stats } from '../content';
 
-/** 화이트 배경 다이어그램을 다크에서 튀지 않게 감싸는 프레임. */
-function DiagramFrame({ src, alt, height }: { src: string; alt: string; height: number }) {
+/**
+ * 다이어그램 프레임. 컬럼 폭을 그대로 채우고 `aspectRatio` 로 원본 비율만큼 공간을 미리
+ * 잡는다 — 고정 높이로 비율을 맞추던 이전 방식은 세로가 긴 이미지를 컬럼 폭의 13~20%로
+ * 짓눌러 조밀한 라벨을 읽을 수 없게 만들었다(리뷰 지적). `bgcolor: 'background.paper'`
+ * 는 다크모드에서 밝은 순백 여백이 남는 것을 막는다 — 수상 이미지처럼 자체 배경이 있는
+ * 이미지도 프레임과 튀지 않는다. 조밀한 다이어그램은 컬럼 폭으로도 부족하므로 원본 크기
+ * 보기 링크를 함께 둔다.
+ */
+function DiagramFrame({ src, alt, w, h }: { src: string; alt: string; w: number; h: number }) {
   return (
-    <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: '4px', overflow: 'hidden', bgcolor: 'common.white' }}>
-      <CardMedia component="img" image={src} alt={alt} loading="lazy" sx={{ width: '100%', height, objectFit: 'contain', display: 'block' }} />
+    <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: '4px', overflow: 'hidden', bgcolor: 'background.paper' }}>
+      <CardMedia
+        component="img"
+        image={src}
+        alt={alt}
+        loading="lazy"
+        sx={{ width: '100%', height: 'auto', aspectRatio: `${w} / ${h}`, display: 'block' }}
+      />
+      <Box sx={{ borderTop: '1px solid', borderColor: 'divider', px: 1.5, py: 1 }}>
+        <Link href={src} target="_blank" rel="noopener" variant="caption" sx={{ color: 'text.secondary' }}>
+          원본 크기로 보기
+        </Link>
+      </Box>
     </Box>
   );
 }
@@ -113,7 +132,7 @@ export default function AboutPage() {
                   <Grid size={{ xs: 12, md: 5 }}>
                     <Stack spacing={2}>
                       {c.images.map((img) => (
-                        <DiagramFrame key={img.src} src={img.src} alt={img.alt} height={img.src.includes('award') ? 300 : 200} />
+                        <DiagramFrame key={img.src} src={img.src} alt={img.alt} w={img.w} h={img.h} />
                       ))}
                     </Stack>
                   </Grid>

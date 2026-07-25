@@ -29,7 +29,11 @@ export interface CaseStudy {
   solution: string;
   result: string;
   tags: string[];
-  images?: { src: string; alt: string }[];
+  /**
+   * `w`/`h` 는 원본 픽셀 크기다. 이걸 넘겨야 프레임이 비율대로 공간을 미리 잡아
+   * 로딩 중 레이아웃이 밀리지 않고, 고정 높이 레터박싱도 생기지 않는다.
+   */
+  images?: { src: string; alt: string; w: number; h: number }[];
 }
 
 export const caseStudies: CaseStudy[] = [
@@ -44,8 +48,8 @@ export const caseStudies: CaseStudy[] = [
       '진행률·인력 활용률·ROI를 실시간 대시보드로 시각화. 두 개의 장관상을 수상하고, 데이터 기반 의사결정 체계로 사내에 정착시켰습니다.',
     tags: ['Elasticsearch', 'Kibana', 'Spring', 'ALM 데이터 분석'],
     images: [
-      { src: '/arms-architecture.png', alt: 'A-RMS 시스템 아키텍처 다이어그램' },
-      { src: '/arms-award.png', alt: 'A-RMS 수상 발표 공고 — SW기술 대상 · 공개SW 개발자대회 대상' },
+      { src: '/arms-architecture.png', alt: 'A-RMS 시스템 아키텍처 다이어그램', w: 1549, h: 1524 },
+      { src: '/arms-award.png', alt: 'A-RMS 수상 발표 공고 — SW기술 대상 · 공개SW 개발자대회 대상', w: 800, h: 850 },
     ],
   },
   {
@@ -65,6 +69,6 @@ export const caseStudies: CaseStudy[] = [
     result:
       '퇴근 후·주말 2주 만에 재사용 가능한 MSA 플랫폼 골격을 완성했습니다. 이 소개 페이지도 그 위에서 만들었습니다.',
     tags: ['Keycloak', 'Spring Cloud Gateway', '디자인 시스템', 'MSA'],
-    images: [{ src: '/msa-architecture.jpg', alt: 'MSA 스타터 템플릿 아키텍처 다이어그램' }],
+    images: [{ src: '/msa-architecture.jpg', alt: 'MSA 스타터 템플릿 아키텍처 다이어그램', w: 1541, h: 998 }],
   },
 ];

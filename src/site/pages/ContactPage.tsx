@@ -7,7 +7,7 @@ import EmailRoundedIcon from '@mui/icons-material/EmailRounded';
 import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
 import SitePage from '../components/SitePage';
 import { SpecTable } from '../ui';
-import { CONTACT_EMAIL, GITHUB_URL, PORTFOLIO_URL } from '../content';
+import { CONTACT_EMAIL, GITHUB_URL, PORTFOLIO_URL, career } from '../content';
 
 export default function ContactPage() {
   return (
@@ -35,8 +35,9 @@ export default function ContactPage() {
         <SpecTable
           rows={[
             { label: 'Email', value: CONTACT_EMAIL },
-            { label: 'GitHub', value: 'github.com/chanho4702' },
-            { label: '현재', value: '디무브 재직 중 — 서버리스 SaaS RMS 플랫폼 설계·구현' },
+            { label: 'GitHub', value: GITHUB_URL.replace(/^https?:\/\//, '') },
+            // career[0] 을 그대로 쓴다 — 여기서 문구를 다시 쓰면 이직·직함 변경 때 조용히 낡는다.
+            { label: '현재', value: career[0].text },
           ]}
         />
       </Container>
