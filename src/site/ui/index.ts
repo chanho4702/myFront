@@ -6,4 +6,4 @@ export { default as HairlineCard } from './HairlineCard';
 export { default as NoteBody } from './NoteBody';
 export { slugify, tableOfContents } from './slug';
 export type { TocEntry } from './slug';
-export { MONO } from './tokens';
+export { MONO, HEADER_H, ANCHOR_OFFSET } from './tokens';

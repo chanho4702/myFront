@@ -3,7 +3,7 @@ import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Box from '@mui/material/Box';
 import { slugify } from './slug';
-import { MONO } from './tokens';
+import { MONO, ANCHOR_OFFSET } from './tokens';
 
 /** 자식 노드에서 순수 텍스트만 뽑는다 — 헤딩 id 계산용. */
 function textOf(node: React.ReactNode): string {
@@ -37,8 +37,8 @@ export default function NoteBody({ markdown }: { markdown: string }) {
       sx={{
         color: 'text.primary',
         lineHeight: 1.8,
-        '& h2': { fontSize: '1.5rem', fontWeight: 700, mt: 6, mb: 2, letterSpacing: '-0.01em', scrollMarginTop: '80px' },
-        '& h3': { fontSize: '1.15rem', fontWeight: 700, mt: 4, mb: 1.5, scrollMarginTop: '80px' },
+        '& h2': { fontSize: '1.5rem', fontWeight: 700, mt: 6, mb: 2, letterSpacing: '-0.01em', scrollMarginTop: ANCHOR_OFFSET },
+        '& h3': { fontSize: '1.15rem', fontWeight: 700, mt: 4, mb: 1.5, scrollMarginTop: ANCHOR_OFFSET },
         '& p': { my: 2 },
         '& a': { color: 'primary.main', textDecorationColor: 'currentColor' },
         '& ul, & ol': { pl: 3, my: 2 },

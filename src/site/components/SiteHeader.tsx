@@ -11,8 +11,7 @@ import Drawer from '@mui/material/Drawer';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ColorModeIconDropdown from '../../context/templates/shared-theme/ColorModeIconDropdown';
-
-export const HEADER_H = 56;
+import { HEADER_H } from '../ui';
 
 const navItems = [
   { to: '/products', label: '제품' },

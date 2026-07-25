@@ -19,7 +19,7 @@ import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import ArrowRightAltRoundedIcon from '@mui/icons-material/ArrowRightAltRounded';
 import SitePage from '../site/components/SitePage';
-import { HEADER_H } from '../site/components/SiteHeader';
+import { HEADER_H } from '../site/ui';
 import {
   capabilities as services,
   ossProducts as openSourceProducts,

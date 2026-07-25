@@ -3,6 +3,7 @@ import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import SectionLabel from './SectionLabel';
+import { ANCHOR_OFFSET } from './tokens';
 
 /**
  * 좌측 고정폭 라벨 컬럼 + 우측 콘텐츠. 상단 헤어라인으로 섹션을 나눈다.
@@ -24,7 +25,7 @@ export default function GridSection({
   children: React.ReactNode;
 }) {
   return (
-    <Box component="section" id={id} sx={{ borderTop: '1px solid', borderColor: 'divider', scrollMarginTop: '60px' }}>
+    <Box component="section" id={id} sx={{ borderTop: '1px solid', borderColor: 'divider', scrollMarginTop: ANCHOR_OFFSET }}>
       <Container maxWidth="lg" sx={{ py: { xs: 7, md: 12 } }}>
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 3, md: 6 }}>
           {/* 고정폭 라벨 컬럼. flexShrink 0 이라 긴 라벨이 콘텐츠 쪽으로 넘치지 않게 줄바꿈을 허용한다. */}
