@@ -91,21 +91,30 @@ export function transformCallouts(body) {
   );
 }
 
-/** H1 앞에 붙은 번호와 구분자를 뗀다. 화면이 NO.15 를 따로 렌더하므로 중복을 막는다. */
-export function stripNumberPrefix(title) {
-  return title.replace(/^\d\d\s*(?:[—–-]\s*)?/, '').trim();
+/**
+ * H1 앞에 붙은 노트 번호와 구분자를 뗀다. 화면이 NO.15 를 따로 렌더하므로 중복을 막는다.
+ *
+ * 두 겹으로 잠근다 — 둘 중 하나만 어긋나도 원문을 그대로 돌려준다.
+ *  1) 앞 두 자리 **뒤에 공백이나 대시가 와야** 한다. `2026 회고` 가 `26 회고` 로 잘리는 것을 막는다.
+ *  2) 그 두 자리가 **이 노트의 id 와 같아야** 한다. 남의 번호를 떼지 않는다.
+ * 떼고 나서 남는 게 없으면(제목이 `00` 뿐) 원문을 유지한다 — 제목을 통째로 잃느니 중복이 낫다.
+ */
+export function stripNumberPrefix(title, id) {
+  const m = title.match(/^(\d\d)(?=[\s—–-])\s*(?:[—–-]\s*)?([\s\S]*)$/);
+  if (!m || m[1] !== id) return title.trim();
+  return m[2].trim() || title.trim();
 }
 
 /**
  * frontmatter 의 `상태` 를 배지용 짧은 라벨로 줄인다.
  * 첫 구분자(괄호 · 가운뎃점 · 대시 · 플러스) 앞까지만 취하고 마크다운/위키링크 문법을 턴다.
  * 원문(커밋 SHA·잔여 작업 메모)은 사이트에 싣지 않는다 — 배지 자리에 들어갈 정보가 아니다.
+ *
+ * 구분자로 **시작하는** 값(`(진행중) 완료`)은 첫 조각이 빈 문자열이 되어 상태가 통째로
+ * 사라진다. 그 경우 원문 전체를 정리해 쓴다 — 비어 있는 배지보다 긴 배지가 낫다.
  */
 export function statusLabel(status) {
-  return status
-    .split(/\s*\(|\s·\s|\s[—–-]\s|\s\+\s/)[0]
-    .replace(/\[\[.*?\]\]/g, '')
-    .replace(/\*\*/g, '')
-    .trim()
-    .slice(0, 24);
+  const clean = (s) => s.replace(/\[\[.*?\]\]/g, '').replace(/\*\*/g, '').trim();
+  const first = clean(status.split(/\s*\(|\s·\s|\s[—–-]\s|\s\+\s/)[0]);
+  return (first || clean(status)).slice(0, 24);
 }

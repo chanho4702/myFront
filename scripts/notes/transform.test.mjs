@@ -114,9 +114,18 @@ test('콜아웃이 아닌 인용문은 건드리지 않는다', () => {
 });
 
 test('제목 앞 번호와 구분자를 뗀다', () => {
-  assert.equal(stripNumberPrefix('15 — ALM·Wiki 백엔드 요구사항'), 'ALM·Wiki 백엔드 요구사항');
-  assert.equal(stripNumberPrefix('05 API 게이트웨이 설계'), 'API 게이트웨이 설계');
-  assert.equal(stripNumberPrefix('번호 없는 제목'), '번호 없는 제목');
+  assert.equal(stripNumberPrefix('15 — ALM·Wiki 백엔드 요구사항', '15'), 'ALM·Wiki 백엔드 요구사항');
+  assert.equal(stripNumberPrefix('05 API 게이트웨이 설계', '05'), 'API 게이트웨이 설계');
+  assert.equal(stripNumberPrefix('번호 없는 제목', '07'), '번호 없는 제목');
+});
+
+test('의미 있는 숫자로 시작하는 제목은 건드리지 않는다', () => {
+  // 두 자리 뒤에 공백/대시가 와야 번호로 본다. `2026` 은 `20` + `26` 으로 잘리면 안 된다.
+  assert.equal(stripNumberPrefix('2026 회고', '20'), '2026 회고');
+  // 남의 번호는 떼지 않는다.
+  assert.equal(stripNumberPrefix('15 — 어떤 제목', '07'), '15 — 어떤 제목');
+  // 떼면 아무것도 안 남는 제목은 원문을 유지한다. 중복이 제목 소실보다 낫다.
+  assert.equal(stripNumberPrefix('00', '00'), '00');
 });
 
 test('상태를 배지용 짧은 라벨로 줄인다', () => {
@@ -129,4 +138,11 @@ test('상태를 배지용 짧은 라벨로 줄인다', () => {
   assert.equal(statusLabel('구현·수정 완료 (커밋: my e02fdc2)'), '구현·수정 완료');
   assert.equal(statusLabel('완료 · 배포·E2E 검증 완료(2026-07-20)'), '완료');
   assert.equal(statusLabel('정리본'), '정리본');
+});
+
+test('구분자로 시작하는 상태도 라벨을 잃지 않는다', () => {
+  // 첫 조각이 빈 문자열이 되는 입력. 예전 구현은 상태를 통째로 삼켰다.
+  assert.equal(statusLabel('(진행중) 완료'), '(진행중) 완료');
+  assert.equal(statusLabel('[[17 Wave B]]'), '');
+  assert.equal(statusLabel(''), '');
 });

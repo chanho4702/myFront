@@ -47,15 +47,17 @@ async function main() {
   }
   const resolve = (target) => idByTarget.get(target) ?? idByTarget.get(`${target}.md`) ?? null;
 
-  // 생성물만 지운다 — 폴더째 지우면 안 된다(수기 파일이 섞이면 날아간다).
+  // 생성물만 지운다. `.md` 전체가 아니라 `NN.md` 형태만 — 이 폴더에 손으로 둔 README.md 같은
+  // 파일이 경고도 없이 사라지면 안 된다. 볼트에서 삭제된 노트의 스테일 산출물은 이 규칙으로도 걷힌다.
   await mkdir(OUT_DIR, { recursive: true });
   for (const f of await readdir(OUT_DIR)) {
-    if (f.endsWith('.md') || f === 'index.generated.ts') await unlink(path.join(OUT_DIR, f));
+    if (/^\d\d\.md$/.test(f) || f === 'index.generated.ts') await unlink(path.join(OUT_DIR, f));
   }
 
   const index = [];
   const brokenAll = [];
   const missingMeta = [];
+  const statusLost = [];
 
   for (const file of targets) {
     const id = noteIdOf(file);
@@ -69,11 +71,13 @@ async function main() {
     const date = typeof meta['작성일'] === 'string' ? meta['작성일'] : '';
     const rawStatus = typeof meta['상태'] === 'string' ? meta['상태'] : '';
     const status = rawStatus ? statusLabel(rawStatus) : '';
+    // "상태가 원래 없던 노트" 와 "정규식이 상태를 통째로 삼킨 노트" 를 로그에서 구분한다.
+    if (rawStatus && !status) statusLost.push(file);
     if (!tags.length || !date) missingMeta.push(file);
     broken.forEach((b) => brokenAll.push(`${file} → [[${b}]]`));
 
     await writeFile(path.join(OUT_DIR, `${id}.md`), `${body.trimEnd()}\n`, 'utf8');
-    index.push({ id, title: stripNumberPrefix(title), tags, date, status });
+    index.push({ id, title: stripNumberPrefix(title, id), tags, date, status });
   }
 
   const generated = [
@@ -90,6 +94,7 @@ async function main() {
   console.log(`[sync-notes] 노트 ${index.length}개 동기화 완료 → ${OUT_DIR}`);
   if (skipped.length) console.log(`[sync-notes] 화이트리스트 제외 ${skipped.length}개: ${skipped.join(', ')}`);
   if (missingMeta.length) console.warn(`[sync-notes] 경고 — frontmatter 누락: ${missingMeta.join(', ')}`);
+  if (statusLost.length) console.warn(`[sync-notes] 경고 — 상태 라벨이 비었다(원문은 있음): ${statusLost.join(', ')}`);
   if (brokenAll.length) {
     console.warn(`[sync-notes] 경고 — 평탄화된 외부 위키링크 ${brokenAll.length}건:`);
     brokenAll.forEach((b) => console.warn(`  - ${b}`));
