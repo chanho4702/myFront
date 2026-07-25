@@ -22,14 +22,14 @@ import ArrowRightAltRoundedIcon from '@mui/icons-material/ArrowRightAltRounded';
 import AppTheme from '../context/templates/shared-theme/AppTheme';
 import LandingHeader, { HEADER_H } from './landing/LandingHeader';
 import {
-  services,
-  openSourceProducts,
+  capabilities as services,
+  ossProducts as openSourceProducts,
   companyProducts,
   GITHUB_URL,
   CONTACT_EMAIL,
   PORTFOLIO_URL,
   type Product,
-} from './landing/content';
+} from '../site/content';
 
 // 케이스 스터디 — 문제 → 해결 → 성과. 모두 이력서·확정 콘텐츠.
 interface CaseStudy {
@@ -151,10 +151,10 @@ function ProductCard({ product }: { product: Product }) {
             {product.liveUrl && <Chip label="라이브" size="small" color="primary" variant="outlined" />}
           </Stack>
           <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.7, flexGrow: 1 }}>
-            {product.desc}
+            {product.tagline}
           </Typography>
           <Box sx={{ mt: 2, display: 'inline-flex', alignItems: 'center', gap: 0.5, fontSize: '0.8125rem', fontWeight: 600, color: 'text.secondary' }}>
-            {product.href ? (
+            {product.repoUrl ? (
               <>
                 <GitHubIcon sx={{ fontSize: 16 }} />
                 오픈소스

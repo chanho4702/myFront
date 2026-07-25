@@ -10,7 +10,7 @@ import Drawer from '@mui/material/Drawer';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ColorModeIconDropdown from '../../context/templates/shared-theme/ColorModeIconDropdown';
-import { GITHUB_URL } from './content';
+import { GITHUB_URL } from '../../site/content';
 
 export const HEADER_H = 52;
 

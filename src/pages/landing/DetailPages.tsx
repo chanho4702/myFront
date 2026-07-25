@@ -13,7 +13,7 @@ import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import AppTheme from '../../context/templates/shared-theme/AppTheme';
 import NotFoundPage from '../../app/pages/NotFoundPage';
 import LandingHeader from './LandingHeader';
-import { getService, getProduct } from './content';
+import { getCapability as getService, getProduct } from '../../site/content';
 
 // What I do / 제품 상세 공통 셸. 본문은 준비 중 플레이스홀더 + 항목별 액션.
 function DetailShell({
@@ -85,10 +85,10 @@ export function ProductDetailPage() {
   if (!product) return <NotFoundPage />;
   const eyebrow = product.badge ? '디무브' : 'OPEN SOURCE';
   return (
-    <DetailShell eyebrow={eyebrow} title={product.name} sub={product.desc}>
+    <DetailShell eyebrow={eyebrow} title={product.name} sub={product.tagline}>
       <ComingSoon />
       <Box sx={{ mt: 4 }}>
-        {product.href ? (
+        {product.repoUrl ? (
           <Stack direction="row" spacing={1.5} sx={{ flexWrap: 'wrap', gap: 1.5 }}>
             {product.liveUrl && (
               <Button variant="contained" href={product.liveUrl} startIcon={<LaunchRoundedIcon />}>
@@ -97,7 +97,7 @@ export function ProductDetailPage() {
             )}
             <Button
               variant={product.liveUrl ? 'outlined' : 'contained'}
-              href={product.href}
+              href={product.repoUrl}
               target="_blank"
               rel="noopener"
               startIcon={<GitHubIcon />}
