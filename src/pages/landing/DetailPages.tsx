@@ -1,7 +1,6 @@
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -10,9 +9,8 @@ import Chip from '@mui/material/Chip';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
-import AppTheme from '../../context/templates/shared-theme/AppTheme';
+import SitePage from '../../site/components/SitePage';
 import NotFoundPage from '../../app/pages/NotFoundPage';
-import LandingHeader from './LandingHeader';
 import { getCapability as getService, getProduct } from '../../site/content';
 
 // What I do / 제품 상세 공통 셸. 본문은 준비 중 플레이스홀더 + 항목별 액션.
@@ -28,9 +26,7 @@ function DetailShell({
   children: React.ReactNode;
 }) {
   return (
-    <AppTheme>
-      <CssBaseline enableColorScheme />
-      <LandingHeader anchorBase="/" />
+    <SitePage>
       <Container maxWidth="md" sx={{ py: { xs: 8, md: 12 } }}>
         <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 700, letterSpacing: '0.18em', display: 'block' }}>
           {eyebrow}
@@ -54,7 +50,7 @@ function DetailShell({
           홈으로
         </Button>
       </Container>
-    </AppTheme>
+    </SitePage>
   );
 }
 

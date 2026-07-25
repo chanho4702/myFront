@@ -2,7 +2,6 @@ import { Link as RouterLink } from 'react-router-dom';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -19,8 +18,8 @@ import EmailRoundedIcon from '@mui/icons-material/EmailRounded';
 import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import ArrowRightAltRoundedIcon from '@mui/icons-material/ArrowRightAltRounded';
-import AppTheme from '../context/templates/shared-theme/AppTheme';
-import LandingHeader, { HEADER_H } from './landing/LandingHeader';
+import SitePage from '../site/components/SitePage';
+import { HEADER_H } from '../site/components/SiteHeader';
 import {
   capabilities as services,
   ossProducts as openSourceProducts,
@@ -170,11 +169,9 @@ function ProductCard({ product }: { product: Product }) {
   );
 }
 
-export default function Home(props: { disableCustomTheme?: boolean }) {
+export default function Home() {
   return (
-    <AppTheme {...props}>
-      <CssBaseline enableColorScheme />
-      <LandingHeader />
+    <SitePage>
 
       {/* ── Hero — 가치 제안 ─────────────────────────── */}
       <Box
@@ -471,6 +468,6 @@ export default function Home(props: { disableCustomTheme?: boolean }) {
           </Stack>
         </Container>
       </Box>
-    </AppTheme>
+    </SitePage>
   );
 }
