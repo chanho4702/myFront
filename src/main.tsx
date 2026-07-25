@@ -24,6 +24,8 @@ import ProductsPage from './site/pages/ProductsPage';
 import ProductDetailPage from './site/pages/ProductDetailPage';
 import TechPage from './site/pages/TechPage';
 import ServiceRedirect from './site/pages/ServiceRedirect';
+import NotesIndexPage from './site/pages/NotesIndexPage';
+import NoteDetailPage from './site/pages/NoteDetailPage';
 import TemplatesHub from './pages/TemplatesHub';
 import ComponentsCatalog from './pages/ComponentsCatalog';
 import ComponentsShowcase from './pages/ComponentsShowcase';
@@ -44,6 +46,10 @@ const router = createBrowserRouter([
   // 기술 페이지. 구 랜딩의 /services/:slug 링크는 /tech 의 역량 앵커로 리다이렉트한다.
   { path: '/tech', element: <TechPage />, errorElement: <RouteErrorPage /> },
   { path: '/services/:slug', element: <ServiceRedirect /> },
+
+  // 엔지니어링 노트 인덱스·본문. /tech/notes/:id 가 /tech/notes 보다 먼저 오면 안 된다.
+  { path: '/tech/notes', element: <NotesIndexPage />, errorElement: <RouteErrorPage /> },
+  { path: '/tech/notes/:id', element: <NoteDetailPage />, errorElement: <RouteErrorPage /> },
 
   {
     path: '/login',
