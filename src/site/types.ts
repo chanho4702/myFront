@@ -18,6 +18,9 @@ export interface NoteMeta {
   tags: string[];
   /** 볼트 frontmatter 의 작성일 (YYYY-MM-DD). 없으면 빈 문자열. */
   date: string;
-  /** 볼트 frontmatter 의 상태. 없으면 빈 문자열. */
+  /**
+   * 배지용으로 줄인 상태 라벨(`statusLabel` 산출물, 최대 24자). 없으면 빈 문자열.
+   * 볼트 원문 상태는 최대 237자에 커밋 SHA·마크다운·위키링크가 섞여 있어 싣지 않는다.
+   */
   status: string;
 }

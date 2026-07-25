@@ -90,3 +90,22 @@ export function transformCallouts(body) {
     },
   );
 }
+
+/** H1 앞에 붙은 번호와 구분자를 뗀다. 화면이 NO.15 를 따로 렌더하므로 중복을 막는다. */
+export function stripNumberPrefix(title) {
+  return title.replace(/^\d\d\s*(?:[—–-]\s*)?/, '').trim();
+}
+
+/**
+ * frontmatter 의 `상태` 를 배지용 짧은 라벨로 줄인다.
+ * 첫 구분자(괄호 · 가운뎃점 · 대시 · 플러스) 앞까지만 취하고 마크다운/위키링크 문법을 턴다.
+ * 원문(커밋 SHA·잔여 작업 메모)은 사이트에 싣지 않는다 — 배지 자리에 들어갈 정보가 아니다.
+ */
+export function statusLabel(status) {
+  return status
+    .split(/\s*\(|\s·\s|\s[—–-]\s|\s\+\s/)[0]
+    .replace(/\[\[.*?\]\]/g, '')
+    .replace(/\*\*/g, '')
+    .trim()
+    .slice(0, 24);
+}

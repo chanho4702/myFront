@@ -16,6 +16,8 @@ import {
   extractTitle,
   transformWikiLinks,
   transformCallouts,
+  stripNumberPrefix,
+  statusLabel,
 } from './notes/transform.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -65,12 +67,13 @@ async function main() {
 
     const tags = Array.isArray(meta.tags) ? meta.tags : meta.tags ? [String(meta.tags)] : [];
     const date = typeof meta['작성일'] === 'string' ? meta['작성일'] : '';
-    const status = typeof meta['상태'] === 'string' ? meta['상태'] : '';
+    const rawStatus = typeof meta['상태'] === 'string' ? meta['상태'] : '';
+    const status = rawStatus ? statusLabel(rawStatus) : '';
     if (!tags.length || !date) missingMeta.push(file);
     broken.forEach((b) => brokenAll.push(`${file} → [[${b}]]`));
 
     await writeFile(path.join(OUT_DIR, `${id}.md`), `${body.trimEnd()}\n`, 'utf8');
-    index.push({ id, title, tags, date, status });
+    index.push({ id, title: stripNumberPrefix(title), tags, date, status });
   }
 
   const generated = [

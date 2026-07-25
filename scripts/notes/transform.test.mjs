@@ -7,6 +7,8 @@ import {
   extractTitle,
   transformWikiLinks,
   transformCallouts,
+  stripNumberPrefix,
+  statusLabel,
 } from './transform.mjs';
 
 test('화이트리스트는 두 자리 번호로 시작하는 파일만 통과시킨다', () => {
@@ -109,4 +111,22 @@ test('제목 없는 콜아웃도 라벨만 붙인다', () => {
 
 test('콜아웃이 아닌 인용문은 건드리지 않는다', () => {
   assert.equal(transformCallouts('> 그냥 인용'), '> 그냥 인용');
+});
+
+test('제목 앞 번호와 구분자를 뗀다', () => {
+  assert.equal(stripNumberPrefix('15 — ALM·Wiki 백엔드 요구사항'), 'ALM·Wiki 백엔드 요구사항');
+  assert.equal(stripNumberPrefix('05 API 게이트웨이 설계'), 'API 게이트웨이 설계');
+  assert.equal(stripNumberPrefix('번호 없는 제목'), '번호 없는 제목');
+});
+
+test('상태를 배지용 짧은 라벨로 줄인다', () => {
+  // 실제 볼트 15번 — 237자에 위키링크와 굵게 문법이 섞여 있다.
+  assert.equal(
+    statusLabel('설계 확정 + Wave A 완료(07-19) + **Wave B 완료(2026-07-21)** — 상세는 [[17 Wave B]] · 다음: Wave C'),
+    '설계 확정',
+  );
+  assert.equal(statusLabel('구현 완료 (2026-07-01, gateway-server :8000)'), '구현 완료');
+  assert.equal(statusLabel('구현·수정 완료 (커밋: my e02fdc2)'), '구현·수정 완료');
+  assert.equal(statusLabel('완료 · 배포·E2E 검증 완료(2026-07-20)'), '완료');
+  assert.equal(statusLabel('정리본'), '정리본');
 });
