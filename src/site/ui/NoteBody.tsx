@@ -20,18 +20,16 @@ function textOf(node: React.ReactNode): string {
  * 헤딩 id 는 slug.ts 의 slugify 로 붙인다 — 목차와 같은 규칙이어야 앵커가 맞는다.
  */
 export default function NoteBody({ markdown }: { markdown: string }) {
-  // tableOfContents 와 동일한 중복 카운팅. 렌더마다 초기화되어야 하므로 markdown 별로 만든다.
-  const heading = useMemo(() => {
-    const seen = new Map<string, number>();
-    return (tag: 'h2' | 'h3') =>
-      function Heading({ children }: { children?: React.ReactNode }) {
-        const base = slugify(textOf(children));
-        const n = seen.get(base) ?? 0;
-        seen.set(base, n + 1);
-        const id = n === 0 ? base : `${base}-${n}`;
-        return tag === 'h2' ? <h2 id={id}>{children}</h2> : <h3 id={id}>{children}</h3>;
-      };
-  }, [markdown]);
+  // 헤딩 id 는 텍스트만의 순수 함수다. 등장 순서 카운터를 두면 그 카운터가 리렌더 사이에
+  // 살아남아(useMemo 가 클로저를 캐시한다) 다크모드 토글 한 번에 모든 앵커가 밀린다.
+  // deps 를 [] 로 둬서 컴포넌트 타입도 렌더마다 새로 만들지 않는다(불필요한 리마운트 방지).
+  const components = useMemo(
+    () => ({
+      h2: ({ children }: { children?: React.ReactNode }) => <h2 id={slugify(textOf(children))}>{children}</h2>,
+      h3: ({ children }: { children?: React.ReactNode }) => <h3 id={slugify(textOf(children))}>{children}</h3>,
+    }),
+    [],
+  );
 
   return (
     <Box
@@ -76,7 +74,7 @@ export default function NoteBody({ markdown }: { markdown: string }) {
         '& hr': { border: 0, borderTop: '1px solid', borderColor: 'divider', my: 5 },
       }}
     >
-      <Markdown remarkPlugins={[remarkGfm]} components={{ h2: heading('h2'), h3: heading('h3') }}>
+      <Markdown remarkPlugins={[remarkGfm]} components={components}>
         {markdown}
       </Markdown>
     </Box>

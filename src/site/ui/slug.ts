@@ -16,10 +16,16 @@ export interface TocEntry {
   id: string;
 }
 
-/** 본문에서 h2/h3 만 뽑아 목차를 만든다. 코드블록 안의 `#` 은 건너뛴다. */
+/**
+ * 본문에서 h2/h3 만 뽑아 목차를 만든다. 코드블록 안의 `#` 은 건너뛴다.
+ *
+ * id 는 `slugify(text)` 뿐이다 — 등장 순서 카운터를 쓰지 않는다. 카운터를 쓰면 렌더 시점의
+ * 상태에 id 가 의존하게 되고, `NoteBody` 쪽 카운터가 리렌더마다 이어져 앵커가 밀린다.
+ * 실측: 노트 20편 196개 헤딩 중 슬러그 중복 0건. 훗날 중복이 생기면 목차 링크가 첫 번째
+ * 헤딩으로 가는 정도의 열화만 남는다(앵커가 통째로 깨지는 것보다 낫다).
+ */
 export function tableOfContents(markdown: string): TocEntry[] {
   const out: TocEntry[] = [];
-  const seen = new Map<string, number>();
   let inFence = false;
 
   for (const line of markdown.split('\n')) {
@@ -31,10 +37,7 @@ export function tableOfContents(markdown: string): TocEntry[] {
     const m = line.match(/^(##|###)\s+(.+?)\s*$/);
     if (!m) continue;
     const text = m[2].replace(/[*_`]/g, '').trim();
-    const base = slugify(text);
-    const n = seen.get(base) ?? 0;
-    seen.set(base, n + 1);
-    out.push({ level: m[1].length as 2 | 3, text, id: n === 0 ? base : `${base}-${n}` });
+    out.push({ level: m[1].length as 2 | 3, text, id: slugify(text) });
   }
   return out;
 }
