@@ -41,6 +41,6 @@ export const platformSpec: SpecRow[] = [
   { label: '이벤트', value: 'Redis Streams' },
   { label: '데이터', value: 'PostgreSQL' },
   { label: '관측', value: 'stdout JSON → Alloy → Loki → Grafana' },
-  { label: 'CI/CD', value: 'GitHub Actions → GHCR → 셀프호스티드 러너 배포' },
+  { label: 'CI/CD', value: 'GitHub Actions → GHCR → 셀프호스티드 러너 배포 (auth·gateway·eureka·board 적용)' },
   { label: '프론트', value: 'React 19 · 공유 디자인 시스템 · nginx 단일 오리진' },
 ];
