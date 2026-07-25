@@ -41,6 +41,16 @@ test('frontmatter 를 파싱하고 본문에서 떼어낸다', () => {
   assert.equal(body.startsWith('# 제목'), true);
 });
 
+test('CRLF 문서도 frontmatter 를 정상 파싱한다', () => {
+  // 실제 볼트 22개 중 7개가 CRLF 다. \r 을 안 털면 meta 가 통째로 빈 객체가 된다.
+  const raw = '---\r\ntags: [msa, 인증]\r\n작성일: 2026-07-19\r\n상태: 정리본\r\n---\r\n\r\n# 제목\r\n본문';
+  const { meta, body } = parseFrontmatter(raw);
+  assert.deepEqual(meta.tags, ['msa', '인증']);
+  assert.equal(meta['작성일'], '2026-07-19');
+  assert.equal(meta['상태'], '정리본');
+  assert.equal(body.startsWith('# 제목'), true);
+});
+
 test('frontmatter 가 없으면 원문을 그대로 본문으로 돌려준다', () => {
   const { meta, body } = parseFrontmatter('# 제목\n본문');
   assert.deepEqual(meta, {});
@@ -70,6 +80,12 @@ test('별칭과 헤딩 앵커를 처리한다', () => {
   const resolve = (t) => (t === '05 API 게이트웨이 설계' ? '05' : null);
   const r = transformWikiLinks('[[05 API 게이트웨이 설계#라우팅|게이트웨이]]', resolve);
   assert.equal(r.body, '[게이트웨이](/tech/notes/05)');
+});
+
+test('별칭 없이 앵커만 있으면 라벨에서 앵커를 뗀다', () => {
+  const resolve = (t) => (t === '05 API 게이트웨이 설계' ? '05' : null);
+  const r = transformWikiLinks('[[05 API 게이트웨이 설계#라우팅]]', resolve);
+  assert.equal(r.body, '[05 API 게이트웨이 설계](/tech/notes/05)');
 });
 
 test('화이트리스트 밖 위키링크는 일반 텍스트로 평탄화하고 보고한다', () => {

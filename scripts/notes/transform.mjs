@@ -15,7 +15,10 @@ export function noteIdOf(filename) {
 
 /** YAML frontmatter 의 평평한 key: value 와 [a, b] 배열만 다룬다(yaml 의존성 없음). */
 export function parseFrontmatter(raw) {
-  const normalized = raw.replace(/^﻿/, '');
+  // CRLF 정규화는 필수다. JS 정규식에서 \r 은 줄종결자라 `$` 가 그 앞에서 멈추고,
+  // `^([^:]+):\s*(.*)$` 가 CR 로 끝나는 줄에서 통째로 null 을 반환해 meta 가 조용히 비어버린다.
+  // 실제 볼트 22개 중 7개가 CRLF 다. 이후 단계는 모두 이 함수 출력을 받으므로 여기서 턴다.
+  const normalized = raw.replace(/^﻿/, '').replace(/\r\n/g, '\n');
   if (!normalized.startsWith('---')) return { meta: {}, body: normalized };
   const end = normalized.indexOf('\n---', 3);
   if (end === -1) return { meta: {}, body: normalized };
@@ -60,7 +63,8 @@ export function transformWikiLinks(body, resolve) {
   const out = body.replace(/\[\[([^\]]+)\]\]/g, (_all, inner) => {
     const [linkPart, alias] = inner.split('|').map((s) => s.trim());
     const target = linkPart.split('#')[0].trim();
-    const label = alias || linkPart;
+    // 별칭이 없으면 앵커를 뗀 target 을 라벨로 쓴다. linkPart 를 쓰면 `#섹션` 이 링크 글자에 남는다.
+    const label = alias || target;
     const id = resolve(target);
     if (id) return `[${label}](/tech/notes/${id})`;
     broken.push(target);
