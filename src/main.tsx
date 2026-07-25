@@ -22,6 +22,8 @@ import ProfileFormPage from './app/profile/ProfileFormPage';
 import Home from './pages/Home';
 import ProductsPage from './site/pages/ProductsPage';
 import ProductDetailPage from './site/pages/ProductDetailPage';
+import TechPage from './site/pages/TechPage';
+import ServiceRedirect from './site/pages/ServiceRedirect';
 import TemplatesHub from './pages/TemplatesHub';
 import ComponentsCatalog from './pages/ComponentsCatalog';
 import ComponentsShowcase from './pages/ComponentsShowcase';
@@ -38,6 +40,10 @@ const router = createBrowserRouter([
   // 제품 인덱스·상세. 조회 공개. (/services/:slug 는 Task 8에서 리다이렉트로 재도입)
   { path: '/products', element: <ProductsPage />, errorElement: <RouteErrorPage /> },
   { path: '/products/:slug', element: <ProductDetailPage />, errorElement: <RouteErrorPage /> },
+
+  // 기술 페이지. 구 랜딩의 /services/:slug 링크는 /tech 의 역량 앵커로 리다이렉트한다.
+  { path: '/tech', element: <TechPage />, errorElement: <RouteErrorPage /> },
+  { path: '/services/:slug', element: <ServiceRedirect /> },
 
   {
     path: '/login',
