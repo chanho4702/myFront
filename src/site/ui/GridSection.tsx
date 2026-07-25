@@ -27,7 +27,8 @@ export default function GridSection({
     <Box component="section" id={id} sx={{ borderTop: '1px solid', borderColor: 'divider', scrollMarginTop: '60px' }}>
       <Container maxWidth="lg" sx={{ py: { xs: 7, md: 12 } }}>
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 3, md: 6 }}>
-          <Box sx={{ width: { md: 180 }, flexShrink: 0, pt: { md: 0.5 } }}>
+          {/* 고정폭 라벨 컬럼. flexShrink 0 이라 긴 라벨이 콘텐츠 쪽으로 넘치지 않게 줄바꿈을 허용한다. */}
+          <Box sx={{ width: { md: 180 }, flexShrink: 0, pt: { md: 0.5 }, overflowWrap: 'anywhere' }}>
             <SectionLabel index={index} label={label} />
           </Box>
           <Box sx={{ flexGrow: 1, minWidth: 0 }}>

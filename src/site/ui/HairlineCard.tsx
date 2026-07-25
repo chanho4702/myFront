@@ -6,6 +6,9 @@ import CardContent from '@mui/material/CardContent';
 /**
  * 그림자 없는 아웃라인 카드. hover 는 border-color 만 바꾼다 —
  * transform 이동을 쓰지 않아 레이아웃이 흔들리지 않는다.
+ *
+ * hover 규칙은 링크일 때만 건다. to/href 가 없으면 클릭도 포커스도 안 되는 정적 카드인데,
+ * hover 에 반응하면 마우스 사용자에게 누를 수 있다는 잘못된 신호를 준다.
  */
 export default function HairlineCard({
   to,
@@ -16,6 +19,7 @@ export default function HairlineCard({
   href?: string;
   children: React.ReactNode;
 }) {
+  const interactive = Boolean(to || href);
   const body = <CardContent sx={{ p: { xs: 2.5, md: 3 }, height: '100%' }}>{children}</CardContent>;
   return (
     <Card
@@ -26,7 +30,7 @@ export default function HairlineCard({
         boxShadow: 'none',
         borderColor: 'divider',
         transition: (theme) => theme.transitions.create('border-color', { duration: 150 }),
-        '&:hover': { borderColor: 'primary.main' },
+        ...(interactive && { '&:hover': { borderColor: 'primary.main' } }),
         '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
       }}
     >
