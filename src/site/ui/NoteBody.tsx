@@ -3,6 +3,7 @@ import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Box from '@mui/material/Box';
 import { slugify } from './slug';
+import { MONO } from './tokens';
 
 /** 자식 노드에서 순수 텍스트만 뽑는다 — 헤딩 id 계산용. */
 function textOf(node: React.ReactNode): string {
@@ -51,7 +52,7 @@ export default function NoteBody({ markdown }: { markdown: string }) {
           color: 'text.secondary',
         },
         '& code': {
-          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+          fontFamily: MONO,
           fontSize: '0.875em',
           bgcolor: 'action.hover',
           px: 0.75,

@@ -2,6 +2,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import type { SpecRow } from '../types';
+import { MONO } from './tokens';
 
 /** key/value 스펙 테이블. 값이 빈 행은 렌더하지 않는다(미확인 사실 금지 규칙). */
 export default function SpecTable({ rows }: { rows: SpecRow[] }) {
@@ -20,7 +21,7 @@ export default function SpecTable({ rows }: { rows: SpecRow[] }) {
             sx={{
               width: { sm: 148 },
               flexShrink: 0,
-              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+              fontFamily: MONO,
               fontSize: '0.75rem',
               letterSpacing: '0.08em',
               color: 'text.secondary',
