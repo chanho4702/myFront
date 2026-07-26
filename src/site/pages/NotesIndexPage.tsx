@@ -55,6 +55,8 @@ export default function NotesIndexPage() {
               variant={tag === null ? 'filled' : 'outlined'}
               color={tag === null ? 'primary' : 'default'}
               onClick={() => setTag(null)}
+              // 선택 상태를 색·variant 로만 전달하면 스크린리더 사용자는 무엇이 켜졌는지 모른다.
+              aria-pressed={tag === null}
               sx={{ borderRadius: '4px' }}
             />
             {tags.map((t) => (
@@ -65,6 +67,7 @@ export default function NotesIndexPage() {
                 variant={tag === t ? 'filled' : 'outlined'}
                 color={tag === t ? 'primary' : 'default'}
                 onClick={() => setTag(tag === t ? null : t)}
+                aria-pressed={tag === t}
                 sx={{ borderRadius: '4px' }}
               />
             ))}

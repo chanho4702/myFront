@@ -1,3 +1,4 @@
+import { Link as RouterLink } from 'react-router-dom';
 import { useMemo } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -28,6 +29,17 @@ export default function NoteBody({ markdown }: { markdown: string }) {
     () => ({
       h2: ({ children }: { children?: React.ReactNode }) => <h2 id={slugify(textOf(children))}>{children}</h2>,
       h3: ({ children }: { children?: React.ReactNode }) => <h3 id={slugify(textOf(children))}>{children}</h3>,
+      // 노트끼리 서로를 참조하는 링크가 20편에 걸쳐 127개 있다 — 이 사이트의 주 동선이다.
+      // plain <a> 로 두면 클릭할 때마다 전체 페이지가 리로드되어 번들을 다시 받는다.
+      // 사이트 내부 절대경로만 라우터로 넘기고, 외부·앵커·mailto 는 그대로 둔다.
+      a: ({ href, children }: { href?: string; children?: React.ReactNode }) =>
+        href && href.startsWith('/') ? (
+          <RouterLink to={href}>{children}</RouterLink>
+        ) : (
+          <a href={href} target="_blank" rel="noopener noreferrer">
+            {children}
+          </a>
+        ),
     }),
     [],
   );
@@ -57,7 +69,7 @@ export default function NoteBody({ markdown }: { markdown: string }) {
           bgcolor: 'action.hover',
           px: 0.75,
           py: 0.25,
-          borderRadius: 0.5,
+          borderRadius: '4px',
         },
         '& pre': {
           overflowX: 'auto',
