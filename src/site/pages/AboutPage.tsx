@@ -8,8 +8,8 @@ import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import SitePage from '../components/SitePage';
-import { GridSection, StatBar, MONO } from '../ui';
-import { career, caseStudies, stats } from '../content';
+import { GridSection, MONO } from '../ui';
+import { career, caseStudies } from '../content';
 
 /**
  * 다이어그램 프레임. 컬럼 폭을 그대로 채우고 `aspectRatio` 로 원본 비율만큼 공간을 미리
@@ -70,11 +70,7 @@ export default function AboutPage() {
         </Typography>
       </Container>
 
-      <GridSection index="01" label="RECORD" title="숫자로 본 기록">
-        <StatBar items={stats} />
-      </GridSection>
-
-      <GridSection index="02" label="CAREER" title="커리어">
+      <GridSection index="01" label="CAREER" title="커리어">
         <Box>
           {career.map((h, i) => (
             <Stack
@@ -92,7 +88,7 @@ export default function AboutPage() {
         </Box>
       </GridSection>
 
-      <GridSection index="03" label="CASE STUDIES" title="문제를 어떻게 시스템으로 바꿨는가" caption="문제 → 해결 → 성과.">
+      <GridSection index="02" label="CASE STUDIES" title="문제를 어떻게 시스템으로 바꿨는가" caption="문제 → 해결 → 성과.">
         <Stack spacing={{ xs: 6, md: 9 }}>
           {caseStudies.map((c) => (
             <Box key={c.title}>
