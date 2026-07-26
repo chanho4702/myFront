@@ -9,8 +9,8 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import SitePage from '../site/components/SitePage';
-import { GridSection, StatBar, HairlineCard, MONO } from '../site/ui';
-import { stats, ossProducts, capabilities, notes } from '../site/content';
+import { GridSection, HairlineCard, MONO } from '../site/ui';
+import { ossProducts, capabilities, notes } from '../site/content';
 
 export default function Home() {
   const latest = notes.slice(-3).reverse();
@@ -58,11 +58,6 @@ export default function Home() {
           </Stack>
         </Container>
       </Box>
-
-      {/* 신뢰 바 */}
-      <Container maxWidth="lg" sx={{ pb: { xs: 2, md: 4 } }}>
-        <StatBar items={stats} />
-      </Container>
 
       <GridSection index="01" label="PRODUCTS" title="만든 것들" caption="직접 설계하고 공개한 제품들.">
         <Grid container spacing={{ xs: 2, md: 2.5 }}>
