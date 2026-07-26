@@ -10,7 +10,7 @@ import Link from '@mui/material/Link';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import SitePage from '../components/SitePage';
-import { NoteBody, tableOfContents, MONO } from '../ui';
+import { NoteBody, tableOfContents, MONO, ANCHOR_OFFSET } from '../ui';
 import { notes, getNote, getNoteBody } from '../content';
 import NotFoundPage from '../../app/pages/NotFoundPage';
 
@@ -22,7 +22,7 @@ function Toc({ markdown }: { markdown: string }) {
     <Box
       component="nav"
       aria-label="이 노트의 목차"
-      sx={{ display: { xs: 'none', lg: 'block' }, position: 'sticky', top: 88, width: 220, flexShrink: 0 }}
+      sx={{ display: { xs: 'none', lg: 'block' }, position: 'sticky', top: `calc(${ANCHOR_OFFSET} + 8px)`, width: 220, flexShrink: 0 }}
     >
       <Typography sx={{ fontFamily: MONO, fontSize: '0.7rem', letterSpacing: '0.14em', color: 'text.secondary', mb: 1.5 }}>
         CONTENTS
