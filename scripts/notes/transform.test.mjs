@@ -96,6 +96,36 @@ test('화이트리스트 밖 위키링크는 일반 텍스트로 평탄화하고
   assert.deepEqual(r.broken, ['내 목표']);
 });
 
+test('인라인 코드 스팬 안의 위키링크는 문법 예시이므로 손대지 않는다', () => {
+  const resolve = () => '05';
+  const r = transformWikiLinks('`[[대상]]` 이 화이트리스트 안이면', resolve);
+  assert.equal(r.body, '`[[대상]]` 이 화이트리스트 안이면');
+  assert.deepEqual(r.broken, []);
+});
+
+test('코드 스팬 밖의 링크는 같은 줄에 있어도 정상 변환된다', () => {
+  const resolve = (t) => (t === '05 게이트웨이' ? '05' : null);
+  const r = transformWikiLinks('`[[예시]]` 는 예시, [[05 게이트웨이]] 는 링크', resolve);
+  assert.equal(r.body, '`[[예시]]` 는 예시, [05 게이트웨이](/tech/notes/05) 는 링크');
+  assert.deepEqual(r.broken, []);
+});
+
+test('펜스 코드블록 안의 위키링크는 손대지 않는다 (``` 과 ~~~ 둘 다)', () => {
+  const resolve = () => '05';
+  const backtick = '```md\n[[대상]]\n```\n뒤 [[내 목표]]';
+  assert.equal(
+    transformWikiLinks(backtick, () => null).body,
+    '```md\n[[대상]]\n```\n뒤 내 목표',
+  );
+  const tilde = '~~~\n[[대상]]\n~~~';
+  assert.equal(transformWikiLinks(tilde, resolve).body, tilde);
+});
+
+test('미종결 펜스는 문서 끝까지 코드로 본다 — 렌더러와 같은 판단', () => {
+  const body = '```\n[[대상]]\n아직 안 닫힘';
+  assert.equal(transformWikiLinks(body, () => null).body, body);
+});
+
 test('콜아웃은 라벨이 굵게 붙은 인용문이 된다', () => {
   const input = ['> [!warning] 주의', '> 본문 줄', '', '다음 문단'].join('\n');
   const out = transformCallouts(input);

@@ -22,4 +22,8 @@ export const noteIndex: NoteMeta[] = [
   {"id":"17","title":"Wave B: wiki-backend 구현기록 — 과정과 원리 해설 (2026-07-21)","tags":["msa","template","wiki","redis-streams","grpc","낙관적잠금","리비전","구현기록","해설"],"date":"2026-07-21","status":"Wave B 완료"},
   {"id":"18","title":"배포 로그인·로그아웃 사건 — KC iss-호스트 대조와 split-horizon의 한계 (2026-07-19)","tags":["msa","template","keycloak","oidc","split-horizon","userinfo","backchannel-logout","kc-hostname","구현기록","사건기록"],"date":"2026-07-19","status":"해결 완료"},
   {"id":"19","title":"게이트웨이 평가 + rate-limit XFF 수정 + Loki 로그 관측 스택 (2026-07-20)","tags":["msa","template","gateway","ratelimit","x-forwarded-for","logging","observability","loki","alloy","grafana","구현기록"],"date":"2026-07-20","status":"완료"},
+  {"id":"20","title":"프론트 ↔ 백엔드 듀얼모드 연동: 경계 매퍼·낙관적 락·503 전파 (2026-07-22)","tags":["msa","template","wiki","wiki-front","듀얼모드","어댑터","경계매핑","낙관적잠금","장애전파","구현기록","해설"],"date":"2026-07-22","status":"완료"},
+  {"id":"21","title":"dev-offset 개발환경 클러스터 + 6롤 에이전트 하네스 (2026-07-22)","tags":["msa","template","개발환경","dev-offset","포트","keycloak","하네스","에이전트","스킬","운영","방법론"],"date":"2026-07-22","status":"사용 중"},
+  {"id":"22","title":"wiki-front 컨플루언스 복제 리뉴얼 + 폴더·초안·컬럼 콘텐츠 모델 (2026-07-26)","tags":["msa","template","wiki-front","디자인","충실복제","접근성","wcag","콘텐츠모델","마크다운","확장문법","구현기록","해설"],"date":"2026-07-26","status":"MVP 완료"},
+  {"id":"23","title":"myFront 기업형 리뉴얼 + 옵시디언 노트 게시 (2026-07-26)","tags":["msa","template","myfront","리뉴얼","정보구조","디자인시스템","옵시디언","빌드파이프라인","접근성","배포","구현기록","해설"],"date":"2026-07-26","status":"완료"},
 ];
