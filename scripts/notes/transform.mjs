@@ -55,12 +55,35 @@ export function extractTitle(body, filename) {
 }
 
 /**
+ * 코드 영역(펜스 블록 · 인라인 코드 스팬) 또는 위키링크 하나를 잡는 교대 패턴.
+ * 코드가 먼저 오므로 코드 안의 [[...]] 는 위키링크 가지에 도달하지 못한다.
+ *
+ * 펜스는 ``` 과 ~~~ 를 모두 받고, 같은 문자 3개 이상으로 닫힌다. 닫는 펜스가 없으면
+ * (두 번째 가지) 문서 끝까지 코드로 본다 — 미종결 펜스에서 이후 본문이 코드로 취급되는 건
+ * 마크다운 렌더러의 동작과 같으므로, 변환도 같은 판단을 해야 결과가 어긋나지 않는다.
+ */
+const CODE_OR_WIKILINK = new RegExp(
+  [
+    '^[ \\t]*(`{3,}|~{3,})[^\\n]*\\n(?:[\\s\\S]*?^[ \\t]*\\1[ \\t]*$|[\\s\\S]*)',
+    '(`+)[\\s\\S]*?\\2',
+    '(\\[\\[[^\\]]+\\]\\])',
+  ].join('|'),
+  'gm',
+);
+
+/**
  * [[대상]] / [[대상|별칭]] / [[대상#앵커]] 처리.
  * resolve 가 노트 id 를 주면 내부 링크, null 이면 텍스트로 평탄화한다(끊긴 링크 0).
+ *
+ * 코드 영역 안의 [[...]] 는 링크가 아니라 **문법 예시**이므로 손대지 않는다. 평탄화하면
+ * `[[대상]]` 을 설명하는 문장이 `대상` 이 되어 예시가 자기 의미를 잃는다(이 파이프라인을
+ * 설명하는 노트에서 실제로 그렇게 깨졌다). 평탄화 보고(broken)에서도 빠진다.
  */
 export function transformWikiLinks(body, resolve) {
   const broken = [];
-  const out = body.replace(/\[\[([^\]]+)\]\]/g, (_all, inner) => {
+  const out = body.replace(CODE_OR_WIKILINK, (all, _fence, _ticks, wikilink) => {
+    if (!wikilink) return all; // 코드 영역 — 그대로 통과
+    const inner = wikilink.slice(2, -2);
     const [linkPart, alias] = inner.split('|').map((s) => s.trim());
     const target = linkPart.split('#')[0].trim();
     // 별칭이 없으면 앵커를 뗀 target 을 라벨로 쓴다. linkPart 를 쓰면 `#섹션` 이 링크 글자에 남는다.
