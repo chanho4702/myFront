@@ -1,5 +1,11 @@
 # myFront — MSA Web Shell
 
+[![CI](https://github.com/chanho4702/myFront/actions/workflows/ci.yml/badge.svg)](https://github.com/chanho4702/myFront/actions/workflows/ci.yml)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
+![Keycloak](https://img.shields.io/badge/Keycloak-SSO-4D4D4D?logo=keycloak&logoColor=white)
+
 Spring Boot MSA 템플릿의 **React/Vite 프론트엔드 베이스**다. 게이트웨이(:8000) 주소 하나만
 바라보고, 로그인은 Keycloak 리다이렉트(OIDC), 로그아웃은 백채널 방식으로 auth-server에
 실제 연동돼 있다. 여기에 자신의 서비스 화면을 붙여 나가면 된다. 모든 UI는
