@@ -6,19 +6,18 @@ Spring Boot MSA 템플릿의 **React/Vite 프론트엔드 베이스**다. 게이
 [Material UI (MUI) v9](https://mui.com/) 기반이다.
 
 3개 프론트 SSO 체제(**myFront :5173** / wiki :5174 / alm :5175)의 하나다. 전체 토폴로지는
-상위 [`../README.md`](../README.md) 참고.
+[infra-settings](https://github.com/chanho4702/infra-settings) 참고.
 
-> 작업 공간은 네 영역으로 나뉜다.
+> 작업 공간은 다섯 영역으로 나뉜다.
 > - **`src/app`** — 실제 내 서비스 코드 (여기에 기능을 추가)
 > - **`src/auth`** — 재사용 인증 모듈 (폴더째 복사해 다른 프로젝트에서 재사용)
 > - **`src/notifications`** — 재사용 토스트 알림 모듈
+> - **`src/site`** — 공개 제품·기술·소개 사이트와 동기화된 기술 노트
 > - **`src/context`** — MUI 공식 템플릿 원본 (참고/재사용용, 수정하지 않음)
 
 ---
 
 ## 기술 스택
-
-package.json 실측.
 
 | 분류 | 사용 기술 |
 | --- | --- |
@@ -29,8 +28,9 @@ package.json 실측.
 | 라우팅 | `react-router-dom` v7 (`createBrowserRouter`) |
 | 기타 | `dayjs`, `@react-spring/web`, Emotion (`@emotion/react`·`styled`) |
 
-**요구 사항: Node 20+ (권장 24).** 테스트 러너·린터·포매터는 없다. 타입체크(`tsc -b`,
-`strict`·`noUnusedLocals`·`noUnusedParameters`)가 유일한 빌드 게이트다.
+**요구 사항: Node 20+ (권장 24).** UI 테스트 러너·린터·포매터는 없다. 타입체크(`tsc -b`,
+`strict`·`noUnusedLocals`·`noUnusedParameters`)가 빌드를 게이트하고, 노트 변환기는 Node 내장
+테스트로 검증한다.
 
 ---
 
@@ -46,10 +46,12 @@ npm run dev        # 개발 서버 → http://localhost:5173 (VSCode Live Server
 | `npm run dev` | `vite` | 개발 서버 (HMR). |
 | `npm run build` | `tsc -b && vite build` | 타입체크가 빌드를 게이트한다 |
 | `npm run preview` | `vite preview` | 프로덕션 빌드 미리보기 |
+| `npm run test:scripts` | `node --test ...` | 기술 노트 변환기 테스트 |
+| `npm run sync:notes` | `node scripts/sync-notes.mjs` | Obsidian 기술 노트를 `src/site/content/notes`로 동기화 |
 
 > **원커맨드 기동:** 상위 `../scripts/dev-up.ps1` 이 인프라(docker compose)를 올리고 프론트
-> 3개를 Windows Terminal 탭(:5173 / :5174 / :5175, `--strictPort`)으로 연다. 백엔드 4개는
-> IntelliJ의 `.run/bootRun.run.xml` 공유 Run Config로 기동한다. 상세는 상위 README 참고.
+> 3개를 Windows Terminal 탭(:5173 / :5174 / :5175, `--strictPort`)으로 연다. 백엔드는
+> 각 repo의 IntelliJ 공유 Run Config로 기동한다. 상세는 상위 README 참고.
 
 > **백엔드가 필요하다.** 인증·게시판이 실제로 동작하려면 게이트웨이(:8000) 뒤로
 > auth-server(:9000)·board-service(:9100)가 떠 있어야 한다. 연동 주소는 `.env` 의
@@ -156,11 +158,15 @@ auth-server의 OIDC 시작점으로 통째로 리다이렉트한다.
 > `/app` 이하는 미로그인 시 `/login` 으로 리다이렉트된다. `/designs`·`/profile` 은 조회는
 > 공개, 작성/수정만 개별 라우트에서 `ProtectedRoute` 로 보호한다.
 
-### 랜딩 / 허브 (`src/pages`)
+### 공개 사이트 (`src/site`, `src/pages`)
 | 경로 | 화면 |
 | --- | --- |
-| `/` | 랜딩 홈 — 케이스 스터디·서비스·제품 카드 (`Home`) |
-| `/services/:slug` · `/products/:slug` | 랜딩 카드 상세 (조회 공개) |
+| `/` | 랜딩 홈 — 제품·기술·프로필 요약 |
+| `/products` · `/products/:slug` | 제품 목록·상세 |
+| `/tech` | 기술 스택과 아키텍처 소개 |
+| `/tech/notes` · `/tech/notes/:id` | 동기화된 기술 노트 목록·상세 |
+| `/about` · `/contact` | 소개·연락처 |
+| `/services/:slug` | 기존 서비스 URL을 제품 상세로 연결하는 호환 리다이렉트 |
 | `/templates` | 템플릿 허브 — MUI 템플릿·쇼케이스·카탈로그 통합 진입점 |
 | `/showcase` | 라이브 컴포넌트 쇼케이스 — 동작하는 MUI 예제 |
 | `/components` | 컴포넌트 카탈로그 — 전체 MUI 목록 + 공식 문서 링크 |
@@ -203,6 +209,12 @@ src/
 │  ├─ board/                 #   게시판 CRUD (boardStore → 게이트웨이 REST + List/Detail/Form)
 │  ├─ designs/               #   설계 문서 (중첩 레이아웃 + designsStore, localStorage 데모)
 │  └─ profile/               #   자기소개/이력 (profileStore, localStorage 데모)
+│
+├─ site/                     # 공개 제품·기술·소개 사이트
+│  ├─ components/            #   SiteHeader·SiteFooter·공통 페이지 셸
+│  ├─ pages/                 #   Products·Tech·Notes·About·Contact
+│  ├─ content/               #   제품·스택·프로필 데이터 + 동기화된 기술 노트
+│  └─ ui/                    #   공개 사이트 전용 표시 컴포넌트
 │
 ├─ context/templates/        # ★ MUI 공식 템플릿 원본 (참고용, 수정 금지)
 │  ├─ shared-theme/          #   AppTheme, 색상모드, 테마 커스터마이즈
