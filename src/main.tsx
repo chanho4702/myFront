@@ -26,7 +26,6 @@ import TechPage from './site/pages/TechPage';
 import ServiceRedirect from './site/pages/ServiceRedirect';
 import NotesIndexPage from './site/pages/NotesIndexPage';
 import NoteDetailPage from './site/pages/NoteDetailPage';
-import AboutPage from './site/pages/AboutPage';
 import ContactPage from './site/pages/ContactPage';
 import TemplatesHub from './pages/TemplatesHub';
 import ComponentsCatalog from './pages/ComponentsCatalog';
@@ -54,7 +53,6 @@ const router = createBrowserRouter([
   { path: '/tech/notes/:id', element: <NoteDetailPage />, errorElement: <RouteErrorPage /> },
 
   // 소개 · 연락
-  { path: '/about', element: <AboutPage />, errorElement: <RouteErrorPage /> },
   { path: '/contact', element: <ContactPage />, errorElement: <RouteErrorPage /> },
 
   {

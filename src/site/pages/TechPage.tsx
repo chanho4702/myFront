@@ -8,8 +8,8 @@ import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import SitePage from '../components/SitePage';
-import { GridSection, SpecTable, HairlineCard, MONO, ANCHOR_OFFSET } from '../ui';
-import { platformSpec, capabilities, techGroups, notes } from '../content';
+import { GridSection, SpecTable, HairlineCard, MONO } from '../ui';
+import { platformSpec, designSystemSpec, techGroups, notes } from '../content';
 
 export default function TechPage() {
   const latest = notes.slice(-3).reverse();
@@ -25,33 +25,12 @@ export default function TechPage() {
         </Typography>
       </Container>
 
-      <GridSection index="01" label="PLATFORM" title="플랫폼 구성" caption="chanho.dev · WIKI · ALM 이 공유하는 골격.">
+      <GridSection index="01" label="PLATFORM" title="플랫폼 구성" caption="WIKI · ALM · 이 사이트가 공유하는 골격.">
         <SpecTable rows={platformSpec} />
       </GridSection>
 
-      <GridSection index="02" label="CAPABILITIES" title="무엇을 해드리는가">
-        <Grid container spacing={{ xs: 2, md: 2.5 }}>
-          {capabilities.map((c) => (
-            <Grid key={c.slug} size={{ xs: 12, sm: 6 }}>
-              <Box id={`cap-${c.slug}`} sx={{ height: '100%', scrollMarginTop: ANCHOR_OFFSET }}>
-                <HairlineCard>
-                  <Typography
-                    variant="caption"
-                    sx={{ fontFamily: MONO, letterSpacing: '0.1em', color: 'text.secondary' }}
-                  >
-                    {c.title}
-                  </Typography>
-                  <Typography variant="h6" component="h3" sx={{ fontWeight: 700, mt: 0.5, mb: 1.5 }}>
-                    {c.lead}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.75 }}>
-                    {c.evidence}
-                  </Typography>
-                </HairlineCard>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
+      <GridSection index="02" label="DESIGN SYSTEM" title="공유 디자인 시스템" caption="세 프론트가 같은 얼굴을 갖게 하는 레이어. 값(토큰)과 그 값을 쓰는 컴포넌트를 따로 버전 관리한다.">
+        <SpecTable rows={designSystemSpec} />
       </GridSection>
 
       <GridSection

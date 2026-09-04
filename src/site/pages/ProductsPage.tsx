@@ -7,7 +7,7 @@ import Chip from '@mui/material/Chip';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import SitePage from '../components/SitePage';
 import { GridSection, HairlineCard, MONO } from '../ui';
-import { ossProducts, companyProducts, type Product } from '../content';
+import { products, type Product } from '../content';
 
 function ProductCard({ product }: { product: Product }) {
   return (
@@ -17,22 +17,15 @@ function ProductCard({ product }: { product: Product }) {
           <Typography variant="h6" component="h3" sx={{ fontWeight: 700, letterSpacing: '-0.01em' }}>
             {product.name}
           </Typography>
-          {/*
-            `liveUrl` 이 있으면 지금 바로 열어볼 수 있다는 뜻이다. 이 신호가 인덱스에 없으면
-            방문자는 상세로 들어가 봐야 구동 여부를 알 수 있다 — 구 랜딩에 있던 표기를 유지한다.
-          */}
+          {/* `liveUrl` 이 있으면 지금 바로 열어볼 수 있다는 뜻이다 — 인덱스에서 바로 보이게 한다. */}
           {product.liveUrl && <Chip label="라이브" size="small" color="primary" variant="outlined" sx={{ borderRadius: '4px' }} />}
-          {product.badge && <Chip label={product.badge} size="small" color="primary" variant="outlined" sx={{ borderRadius: '4px' }} />}
         </Stack>
         <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.7, flexGrow: 1 }}>
           {product.tagline}
         </Typography>
         <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', mt: 2, color: 'text.secondary' }}>
-          <Typography
-            variant="caption"
-            sx={{ fontFamily: MONO, letterSpacing: '0.08em' }}
-          >
-            {product.repoUrl ? 'OPEN SOURCE' : '사내·고객사 제품 · 비공개'}
+          <Typography variant="caption" sx={{ fontFamily: MONO, letterSpacing: '0.08em' }}>
+            OPEN SOURCE
           </Typography>
           <ArrowForwardRoundedIcon sx={{ fontSize: 14 }} />
         </Stack>
@@ -49,24 +42,14 @@ export default function ProductsPage() {
           제품
         </Typography>
         <Typography sx={{ mt: 2.5, color: 'text.secondary', maxWidth: 620, fontSize: '1.1rem', lineHeight: 1.7 }}>
-          직접 만들어 공개한 오픈소스와, 재직 중 만든 사내 제품.
+          문서, 이슈, 그리고 둘이 올라가는 플랫폼. 셋이 한 계정으로 이어집니다.
         </Typography>
       </Container>
 
-      <GridSection index="01" label="OPEN SOURCE" title="공개한 제품">
+      <GridSection index="01" label="PRODUCTS" title="세 가지 제품">
         <Grid container spacing={{ xs: 2, md: 2.5 }}>
-          {ossProducts.map((p) => (
-            <Grid key={p.slug} size={{ xs: 12, sm: 6, md: 3 }}>
-              <ProductCard product={p} />
-            </Grid>
-          ))}
-        </Grid>
-      </GridSection>
-
-      <GridSection index="02" label="COMPANY" title="재직 중 개발">
-        <Grid container spacing={{ xs: 2, md: 2.5 }}>
-          {companyProducts.map((p) => (
-            <Grid key={p.slug} size={{ xs: 12, sm: 6 }}>
+          {products.map((p) => (
+            <Grid key={p.slug} size={{ xs: 12, sm: 6, md: 4 }}>
               <ProductCard product={p} />
             </Grid>
           ))}

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
@@ -10,19 +9,28 @@ import IconButton from '@mui/material/IconButton';
 import Drawer from '@mui/material/Drawer';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import ColorModeIconDropdown from '../../context/templates/shared-theme/ColorModeIconDropdown';
 import { HEADER_H } from '../ui';
+import { BRAND, BRAND_TAGLINE, GITHUB_URL, START_URL, hero } from '../content';
+import BrandLogo from './BrandLogo';
 
 const navItems = [
   { to: '/products', label: '제품' },
   { to: '/tech', label: '기술' },
-  { to: '/about', label: '소개' },
+  { to: '/tech/notes', label: '노트' },
+  { to: '/contact', label: '문의' },
 ];
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
-  const isActive = (to: string) => pathname === to || pathname.startsWith(`${to}/`);
+  // /tech 는 /tech/notes 의 접두다 — 더 구체적인 메뉴가 있으면 그쪽만 활성으로 칠한다.
+  const isActive = (to: string) => {
+    if (pathname === to) return true;
+    if (!pathname.startsWith(`${to}/`)) return false;
+    return !navItems.some((i) => i.to !== to && i.to.startsWith(`${to}/`) && (pathname === i.to || pathname.startsWith(`${i.to}/`)));
+  };
 
   const navLink = (to: string, label: string, onClick?: () => void, big?: boolean) => (
     <Link
@@ -53,27 +61,26 @@ export default function SiteHeader() {
           zIndex: (theme) => theme.zIndex.appBar,
           backdropFilter: 'saturate(180%) blur(20px)',
           WebkitBackdropFilter: 'saturate(180%) blur(20px)',
-          bgcolor: (theme) => alpha(theme.palette.background.default, 0.78),
+          // CSS 변수 테마라 팔레트 값에 alpha() 를 씌우면 라이트 값에 고정된다 — 채널 변수로 현재 스킴을 따라간다.
+          bgcolor: (t) => `rgba(${t.vars!.palette.background.defaultChannel} / 0.78)`,
           borderBottom: '1px solid',
           borderColor: 'divider',
         }}
       >
         <Container maxWidth="lg">
           <Stack direction="row" sx={{ height: HEADER_H, alignItems: 'center', justifyContent: 'space-between' }}>
-            <Link
-              component={RouterLink}
-              to="/"
-              underline="none"
-              sx={{ fontWeight: 700, letterSpacing: '-0.02em', color: 'text.primary', fontSize: '1rem' }}
-            >
-              chanho.dev
+            <Link component={RouterLink} to="/" underline="none" aria-label={`${BRAND} 홈 — ${BRAND_TAGLINE}`} sx={{ display: 'flex' }}>
+              <BrandLogo />
             </Link>
 
             <Stack direction="row" spacing={3.5} sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
               {navItems.map((i) => navLink(i.to, i.label))}
+              <IconButton component="a" href={GITHUB_URL} target="_blank" rel="noopener" aria-label="GitHub" size="small">
+                <GitHubIcon fontSize="small" />
+              </IconButton>
               <ColorModeIconDropdown size="small" />
-              <Button component={RouterLink} to="/contact" variant="contained" size="small" sx={{ borderRadius: '4px' }}>
-                문의하기
+              <Button href={START_URL} variant="contained" size="small" sx={{ borderRadius: 999, px: 2.25 }}>
+                {hero.cta}
               </Button>
             </Stack>
 
@@ -96,8 +103,11 @@ export default function SiteHeader() {
           </Stack>
           <Stack spacing={2.5} sx={{ p: 2, pt: 1 }}>
             {navItems.map((i) => navLink(i.to, i.label, () => setOpen(false), true))}
-            <Button component={RouterLink} to="/contact" variant="contained" onClick={() => setOpen(false)} sx={{ borderRadius: '4px' }}>
-              문의하기
+            <Link href={GITHUB_URL} target="_blank" rel="noopener" underline="none" sx={{ fontSize: '1.05rem', fontWeight: 500, color: 'text.secondary' }}>
+              GitHub
+            </Link>
+            <Button href={START_URL} variant="contained" onClick={() => setOpen(false)} sx={{ borderRadius: 999 }}>
+              {hero.cta}
             </Button>
           </Stack>
         </Box>
