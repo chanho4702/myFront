@@ -25,6 +25,8 @@ const VAULT = process.env.OBSIDIAN_VAULT ?? 'C:/myBrain/내 로컬';
 const SOURCE_DIR = path.join(VAULT, 'msa', 'MSA_TEMPLATE 정리');
 const NOTES_MAPPING_FILE = path.join(ROOT, 'scripts', 'docs-pages.json');
 const DEV_MAPPING_FILE = path.join(ROOT, 'scripts', 'dev-docs-pages.json');
+/** 문서 위키 사이트맵의 원천. 빌드(scripts/prerender.mjs)가 읽어 docs-sitemap.xml 을 만든다 — 커밋한다. */
+const SITEMAP_FILE = path.join(ROOT, 'scripts', 'docs-sitemap.json');
 const DOCS_API = process.env.DOCS_API ?? 'http://127.0.0.1:19910';
 const TOKEN_FILE = process.env.DOCS_TOKEN_FILE ?? `${PLATFORM_ROOT}/infra/keycloak/.env`;
 
@@ -47,6 +49,26 @@ async function readToken() {
 const readJson = async (file) => (existsSync(file) ? JSON.parse(await readFile(file, 'utf8')) : {});
 const writeJson = (file, obj) => writeFile(file, `${JSON.stringify(obj, null, 2)}\n`, 'utf8');
 
+/**
+ * 사이트맵 원천 갱신. 이번에 돈 스페이스의 항목만 갈아 끼우고 나머지는 그대로 둔다 —
+ * `--only=notes` 로 한쪽만 돌렸을 때 다른 스페이스의 URL 이 사라지면 안 되기 때문이다.
+ * lastmod 는 이번 실행에서 실제로 바뀐 페이지만 오늘로 올리고, 안 바뀐 페이지는 이전 값을 지킨다
+ * (매번 전부 오늘로 찍으면 크롤러에게 거짓말을 하는 셈이 된다).
+ */
+async function writeSitemapEntries(spaceId, entries) {
+  const today = new Date().toISOString().slice(0, 10);
+  const existing = await readJson(SITEMAP_FILE);
+  const before = Array.isArray(existing) ? existing : [];
+  const prev = new Map(before.map((e) => [e.url, e]));
+  const prefix = `/docs/spaces/${spaceId}/`;
+  const merged = [
+    ...before.filter((e) => !String(e.url).startsWith(prefix)),
+    ...entries.map((e) => ({ url: e.url, title: e.title, lastmod: e.changed ? today : (prev.get(e.url)?.lastmod ?? today) })),
+  ].sort((a, b) => a.url.localeCompare(b.url));
+  await writeJson(SITEMAP_FILE, merged);
+  log(`사이트맵 원천 갱신 — 스페이스 ${spaceId} ${entries.length}건 (전체 ${merged.length}건) → ${path.relative(ROOT, SITEMAP_FILE)}`);
+}
+
 async function runNotes(client) {
   if (!existsSync(SOURCE_DIR)) throw new Error(`볼트를 찾지 못했습니다: ${SOURCE_DIR}`);
   const all = await readdir(SOURCE_DIR);
@@ -60,6 +82,7 @@ async function runNotes(client) {
   const result = await syncDocs({ notes, mapping: await readJson(NOTES_MAPPING_FILE), client, log });
   // 매핑은 성공했을 때만 쓴다. 중간에 실패하면 다음 실행이 제목 lookup 으로 다시 찾는다.
   await writeJson(NOTES_MAPPING_FILE, result.mapping);
+  await writeSitemapEntries(result.spaceId, result.entries);
 
   const { created, updated, skipped, broken, stale } = result.summary;
   log(`notes 완료 — 스페이스 ${result.spaceId} · 생성 ${created} · 갱신 ${updated} · 동일 ${skipped} (노트 ${notes.length}편)`);
@@ -117,6 +140,7 @@ async function runDev(client) {
 
   const result = await syncDevDocs({ collections, mapping: await readJson(DEV_MAPPING_FILE), client, log });
   await writeJson(DEV_MAPPING_FILE, result.mapping);
+  await writeSitemapEntries(result.spaceId, result.entries);
 
   log(`dev 완료 — 스페이스 ${result.spaceId}`);
   for (const [id, s] of Object.entries(result.summary)) {

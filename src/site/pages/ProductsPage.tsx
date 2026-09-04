@@ -6,8 +6,9 @@ import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import SitePage from '../components/SitePage';
-import { GridSection, HairlineCard, MONO } from '../ui';
-import { products, type Product } from '../content';
+import { GridSection, HairlineCard, ComparisonTable, MONO } from '../ui';
+import { products, comparison, type Product } from '../content';
+import { useSeo } from '../seo';
 
 function ProductCard({ product }: { product: Product }) {
   return (
@@ -35,6 +36,12 @@ function ProductCard({ product }: { product: Product }) {
 }
 
 export default function ProductsPage() {
+  useSeo({
+    title: '제품 — WIKI · ALM · MSA 플랫폼 | chanho',
+    description:
+      '문서 위키(WIKI), 이슈·스프린트 트래커(ALM), 그리고 둘이 올라가는 MSA 플랫폼 템플릿. 셋 다 오픈소스이고 도커로 셀프호스팅합니다.',
+    canonicalPath: '/products',
+  });
   return (
     <SitePage>
       <Container maxWidth="lg" sx={{ pt: { xs: 7, md: 12 }, pb: { xs: 5, md: 8 } }}>
@@ -55,6 +62,11 @@ export default function ProductsPage() {
           ))}
         </Grid>
       </GridSection>
+      {/* 대조표 — 답변 엔진이 "Confluence 대안" 질문에 인용할 사실을 한 표에 모아 둔다. */}
+      <GridSection index="02" label="COMPARISON" title={comparison.title} caption={comparison.sub}>
+        <ComparisonTable columns={comparison.columns} rows={comparison.rows} caption="비교 대상 제품의 정보는 널리 알려진 공개 사실만 적었습니다. 요금·기능은 각 제품의 공식 페이지에서 확인하세요." />
+      </GridSection>
+
       <Box sx={{ borderTop: '1px solid', borderColor: 'divider' }} />
     </SitePage>
   );

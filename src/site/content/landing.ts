@@ -4,10 +4,20 @@
  * 여기 적힌 사실은 전부 products.ts / stack.ts 와 같은 사실이어야 한다(수치 날조 금지).
  */
 
+/**
+ * chanho 가 무엇인지 한 문단으로 못 박은 정의문. **이 문자열이 정의의 유일한 원본이다.**
+ * 히어로 부제 · 홈 메타 설명 · FAQ 첫 답변 · llms.txt 가 전부 이걸 그대로 쓴다 —
+ * 답변 엔진(LLM 검색)이 인용할 문장은 사이트 안에서 한 가지 표현이어야 하고,
+ * 사람이 읽는 화면과 크롤러가 읽는 메타가 다른 말을 하면 안 되기 때문이다.
+ * 문구를 고치면 `scripts/seo/site.mjs` 의 사본도 같이 고쳐야 한다(드리프트 테스트가 잡는다).
+ */
+export const definition =
+  'chanho 는 문서 위키(WIKI)와 이슈 트래커(ALM)를 하나의 로그인·게이트웨이 위에 올린 오픈소스 협업 플랫폼입니다. Confluence 와 Jira 가 나눠 하던 일을 한 플랫폼에서 합니다.';
+
 export const hero = {
   /** 줄바꿈 위치를 카피가 정한다 — 화면 폭에 따라 임의로 끊기면 리듬이 깨진다. */
   headline: ['쓰고, 추적하고,', '협업하기를 한 곳에서.'],
-  sub: 'chanho 는 문서·이슈·인증이 하나로 이어진 오픈소스 협업 플랫폼입니다.\n한 번 로그인하면 위키와 이슈 트래커를 오갈 필요가 없습니다.',
+  sub: definition,
   cta: '시작하기',
   secondary: 'GitHub 에서 보기',
 };
@@ -76,7 +86,7 @@ export const openSource = {
 export const faq = [
   {
     q: 'chanho 는 무엇인가요?',
-    a: '문서 위키(WIKI)와 이슈 트래커(ALM)를 하나의 로그인·게이트웨이 위에 올린 오픈소스 협업 플랫폼입니다. Confluence 와 Jira 가 나눠 하던 일을 한 플랫폼에서 합니다.',
+    a: definition,
   },
   {
     q: 'WIKI 와 ALM 은 따로 써도 되나요?',

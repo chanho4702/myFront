@@ -147,7 +147,20 @@ const router = createBrowserRouter([
   { path: '*', element: <NotFoundPage /> },
 ]);
 
-createRoot(document.getElementById('root')!).render(
+/*
+ * 프리렌더(scripts/prerender.mjs)가 구운 정적 HTML 위에서 뜨기 때문에 `#root` 는 비어 있지 않다.
+ *
+ * hydrateRoot 가 아니라 **createRoot + 수동 비우기**를 쓴다. 프리렌더 결과물은 SSR 마크업이 아니라
+ * "브라우저에서 한 번 돌린 뒤 떠낸 DOM" 이라, Emotion 이 런타임에 만든 클래스 이름·MUI 색상 모드
+ * 초기화 같은 것들이 하이드레이션 시점의 마크업과 결정적으로 일치한다는 보장이 없다. 어긋나면
+ * React 는 조용히 트리를 버리거나(경고 폭탄) 화면이 이중으로 남는다. 컨테이너를 먼저 비우면
+ * 항상 깨끗한 첫 렌더 한 번으로 끝난다 — 크롤러는 구운 HTML 을, 사람은 정상 SPA 를 본다.
+ * (createRoot 도 첫 커밋에서 컨테이너를 비우지만, 명시적으로 비워 순서를 고정한다.)
+ */
+const rootEl = document.getElementById('root')!;
+rootEl.replaceChildren();
+
+createRoot(rootEl).render(
   <StrictMode>
     <NotificationProvider>
       <AuthProvider>

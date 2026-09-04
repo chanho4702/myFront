@@ -9,13 +9,29 @@ import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import SitePage from '../components/SitePage';
 import { GridSection, SpecTable } from '../ui';
-import { getProduct } from '../content';
+import { getProduct, type Product } from '../content';
+import { useSeo, productJsonLd } from '../seo';
 import NotFoundPage from '../../app/pages/NotFoundPage';
 
+/**
+ * 라우트 진입점. SEO 훅은 제품이 있을 때만 도는 안쪽 컴포넌트에 둔다 —
+ * 훅은 조기 반환보다 먼저 불러야 하는데, 없는 제품(404)에 canonical 과 JSON-LD 를 심으면
+ * 존재하지 않는 URL 을 색인해 달라고 크롤러에 말하는 셈이 되기 때문이다.
+ */
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const product = getProduct(slug);
   if (!product) return <NotFoundPage />;
+  return <ProductDetail product={product} />;
+}
+
+function ProductDetail({ product }: { product: Product }) {
+  useSeo({
+    title: `${product.name} — ${product.tagline} | chanho`,
+    description: product.summary,
+    canonicalPath: `/products/${product.slug}`,
+    jsonLd: productJsonLd(product),
+  });
 
   return (
     <SitePage>

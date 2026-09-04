@@ -180,7 +180,8 @@ export async function ensureSpace(client, spec = NOTES_SPACE) {
  *
  * @param notes   [{ file, raw }] — 번호순으로 정렬돼 있다고 가정
  * @param mapping { "00": pageId, ... } — 입력은 바꾸지 않는다
- * @returns { mapping, summary: { created, updated, skipped, broken: [], stale: [] } }
+ * @returns { spaceId, mapping, entries, summary: { created, updated, skipped, broken: [], stale: [] } }
+ *          entries 는 사이트맵용 [{ url, title, changed }] — changed 는 이번 실행에서 실제로 바뀐 페이지.
  */
 export async function syncDocs({ notes, mapping, client, log = () => {} }) {
   const files = notes.map((n) => n.file);
@@ -240,11 +241,14 @@ export async function syncDocs({ notes, mapping, client, log = () => {} }) {
   let updated = 0;
   let skipped = 0;
   const broken = [];
+  const entries = [];
   for (const { file, raw } of notes) {
     const final = renderNote(file, raw, hrefOf);
     final.broken.forEach((b) => broken.push(`${file} → [[${b}]]`));
     const page = pages.get(final.id);
-    if (!needsUpdate(page, final)) {
+    const changed = needsUpdate(page, final);
+    entries.push({ url: pageHref(space.id, page.id), title: final.title, changed });
+    if (!changed) {
       skipped += 1;
       continue;
     }
@@ -263,6 +267,7 @@ export async function syncDocs({ notes, mapping, client, log = () => {} }) {
   return {
     spaceId: space.id,
     mapping: map,
+    entries,
     summary: { created, updated, skipped, broken, stale },
   };
 }

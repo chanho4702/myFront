@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" font-family="Pretendard, 'Pretendard Variable', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif">
+  <!--
+    소셜 공유 카드(Open Graph). BrandMark(src/site/components/BrandLogo.tsx) 와 같은 마크 + 워드마크 + 태그라인.
+    이 파일이 원본이고, prerender.mjs 가 헤드리스 크롬으로 같은 크기의 PNG(public/og-image.png)를 굽는다 —
+    SVG 를 OG 이미지로 받아 주지 않는 플랫폼(슬랙·카카오 등)이 있어 실제로 참조하는 건 PNG 쪽이다.
+    글자를 시스템 폰트로 그리는 이유: OG 이미지는 외부 폰트를 못 불러오는 렌더러에서도 열려야 한다.
+  -->
+  <rect width="1200" height="630" fill="#ffffff"/>
+  <rect x="0" y="0" width="1200" height="8" fill="#1B66C9"/>
+
+  <g transform="translate(96, 210) scale(3.5)">
+    <rect width="32" height="32" rx="8" fill="#1B66C9"/>
+    <g fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M13 8h6"/>
+      <path d="M9 13.5h14"/>
+      <path d="M16 15.5 9.5 25.5M16 15.5l6.5 10"/>
+    </g>
+  </g>
+
+  <text x="240" y="272" font-size="96" font-weight="800" letter-spacing="-4" fill="#101418">chanho</text>
+  <text x="98" y="392" font-size="44" font-weight="600" fill="#3d4650">문서·이슈·협업을 한 곳에서</text>
+  <text x="98" y="452" font-size="28" font-weight="400" fill="#6b7684">오픈소스 협업 플랫폼 — 위키 · 이슈 트래커 · 단일 로그인</text>
+
+  <g transform="translate(98, 508)" font-size="24" font-weight="600" fill="#1B66C9">
+    <text x="0" y="20">WIKI</text>
+    <text x="96" y="20">ALM</text>
+    <text x="184" y="20">MSA Platform Template</text>
+  </g>
+</svg>

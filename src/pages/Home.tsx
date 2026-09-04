@@ -18,7 +18,8 @@ import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
 import SitePage from '../site/components/SitePage';
 import { WorkspaceMock, WikiMock, AlmMock, PlatformMock } from '../site/components/ProductMocks';
 import { HairlineCard, MONO } from '../site/ui';
-import { hero, pain, features, composition, openSource, faq, finalCta, GITHUB_URL, START_URL, getProduct, type Feature } from '../site/content';
+import { hero, pain, features, composition, openSource, faq, finalCta, definition, GITHUB_URL, START_URL, getProduct, type Feature } from '../site/content';
+import { useSeo, softwareApplicationJsonLd, faqPageJsonLd } from '../site/seo';
 
 const PILL = { borderRadius: 999, px: 3 } as const;
 
@@ -95,6 +96,13 @@ function FeatureBlock({ feature, flip }: { feature: Feature; flip: boolean }) {
 }
 
 export default function Home() {
+  useSeo({
+    title: 'chanho — 문서·이슈·협업을 한 곳에서 | 오픈소스 Confluence·Jira 대안',
+    description: definition,
+    canonicalPath: '/',
+    // 홈은 "제품이 무엇인가"와 "자주 묻는 질문" 둘 다를 답한다 — 답변 엔진이 두 스키마를 각각 쓴다.
+    jsonLd: [softwareApplicationJsonLd(), faqPageJsonLd(faq)],
+  });
   return (
     <SitePage>
       {/* Hero — 중앙 정렬, 큰 헤드라인, 단일 주 CTA */}

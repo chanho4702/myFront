@@ -8,9 +8,16 @@ import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import SitePage from '../components/SitePage';
 import { GridSection, SpecTable, HairlineCard } from '../ui';
 import { platformSpec, designSystemSpec, techGroups } from '../content';
+import { useSeo } from '../seo';
 import { DOCS_URL } from './DocsRedirect';
 
 export default function TechPage() {
+  useSeo({
+    title: '기술 — 플랫폼 구성과 스택 | chanho',
+    description:
+      'chanho 를 떠받치는 플랫폼의 실제 구성 — Keycloak SSO · Spring Cloud Gateway · Redis Streams · PostgreSQL · MinIO, 그리고 stdout JSON → Loki → Grafana 관측까지.',
+    canonicalPath: '/tech',
+  });
   return (
     <SitePage>
       <Container maxWidth="lg" sx={{ pt: { xs: 7, md: 12 }, pb: { xs: 5, md: 8 } }}>

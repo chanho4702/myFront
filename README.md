@@ -52,7 +52,9 @@ npm run dev        # 개발 서버 → http://localhost:5173 (VSCode Live Server
 | `npm run dev` | `vite` | 개발 서버 (HMR). |
 | `npm run build` | `tsc -b && vite build` | 타입체크가 빌드를 게이트한다 |
 | `npm run preview` | `vite preview` | 프로덕션 빌드 미리보기 |
-| `npm run test:scripts` | `node --test ...` | 노트 변환기·문서 임포터 단위 테스트 |
+| `npm run build:site` | `build` → `prerender` | **배포용 빌드.** 빌드 후 공개 라우트를 정적 HTML 로 굽고 sitemap·robots·llms.txt 를 만든다. CI 가 쓰는 명령 |
+| `npm run prerender` | `node scripts/prerender.mjs` | 이미 있는 `dist` 에 프리렌더/SEO 산출물만 다시 만든다 |
+| `npm run test:scripts` | `node --test ...` | 노트 변환기·문서 임포터·SEO 생성기 단위 테스트 |
 | `npm run sync:docs` | `node scripts/sync-docs.mjs` | 공개 문서 위키(`/docs/`, docs 인스턴스)에 멱등 동기화 — **notes**(Obsidian 기술 노트 → 스페이스 `docs`, 매핑 `scripts/docs-pages.json`) 다음 **dev**(플랫폼 리포의 개발 문서 → 스페이스 `dev`, 대상은 `scripts/docs/collections.mjs`, 매핑 `scripts/dev-docs-pages.json`). `-- --only=notes\|dev` 로 하나만. `DOCS_API`(기본 `http://127.0.0.1:19910`)·`DOCS_IMPORT_TOKEN`(없으면 `DOCS_TOKEN_FILE`, 기본 `../infra/keycloak/.env` 에서 읽음)·`OBSIDIAN_VAULT` 환경변수. 매핑 파일은 커밋한다 |
 
 > **원커맨드 기동:** 상위 `../scripts/dev-up.ps1` 이 인프라(docker compose)를 올리고 프론트
@@ -77,6 +79,66 @@ npm run dev        # 개발 서버 → http://localhost:5173 (VSCode Live Server
 
 프로덕션에서 값을 비우면 요청이 `/api/...` 상대경로로 나가, nginx가 단일 오리진에서
 게이트웨이로 프록시하는 통합배포 구조에 맞는다.
+
+`VITE_SITE_URL` 은 공개 사이트의 정규 오리진(canonical·OG·sitemap·llms.txt 의 절대 URL)이다.
+빌드 시점 값이며 기본값은 `http://localhost`. 자세한 것은 아래 [SEO / GEO](#seo--geo-검색답변-엔진-대응) 절.
+
+---
+
+## SEO / GEO (검색·답변 엔진 대응)
+
+공개 사이트(`/`, `/products`, `/products/:slug`, `/tech`, `/contact`)는 검색엔진과 **답변 엔진**
+(ChatGPT·Claude·Perplexity 같은 LLM 검색)이 자바스크립트 없이도 읽을 수 있게 마감한다.
+
+| 무엇 | 어디 |
+| --- | --- |
+| 라우트별 `<title>`·description·canonical·Open Graph·트위터 카드 | `src/site/seo/useSeo.ts` — 각 공개 페이지가 호출 |
+| JSON-LD (`SoftwareApplication`·`FAQPage`·`SoftwareSourceCode`) | `src/site/seo/jsonLd.ts` — 순수 함수, `useSeo({ jsonLd })` 로 주입 |
+| 정의문 (사이트에서 한 문장만 쓴다) | `src/site/content/landing.ts` 의 `definition` — 히어로·메타·FAQ·llms.txt 가 공유 |
+| 제품 대조표 | `src/site/content/comparison.ts` + `src/site/ui/ComparisonTable.tsx` (`/products`) |
+| 프리렌더·sitemap·robots·llms.txt | `scripts/prerender.mjs` + `scripts/seo/` |
+
+**`VITE_SITE_URL`** 하나가 절대 URL 의 오리진이다(기본 `http://localhost`, 끝 슬래시 제거).
+canonical·OG·JSON-LD 는 **빌드 시점**에 이 값으로 박히고, sitemap·robots·llms.txt 는 프리렌더
+스크립트가 같은 값을 읽는다. CI 는 리포 변수 `vars.SITE_URL` 을 넣어 준다(Settings → Variables).
+
+```bash
+VITE_SITE_URL=https://example.com npm run build:site
+```
+
+**프리렌더** — 이 앱은 CSR 이라 크롤러에게는 빈 `<div id="root">` 만 보인다. `scripts/prerender.mjs`
+가 `vite preview`(127.0.0.1:4173)를 띄우고 헤드리스 크롬으로 라우트를 하나씩 열어, 렌더된 DOM 을
+`dist/<route>/index.html` 로 굽는다. 라우트마다 `<title>`·description·H1 이 실제로 박혔는지 검증하고,
+하나라도 비면 빌드를 깨뜨린다(빈 셸을 구워 놓고 성공했다고 하지 않기 위해).
+
+- 크롬은 `CHROME_BIN` → OS 표준 설치 경로 → PATH 순으로 찾는다. **못 찾으면 프리렌더와 OG PNG 만
+  건너뛰고** sitemap·robots·llms.txt 는 그대로 만든다 — 크롬 없는 개발자의 빌드를 깨지 않는다.
+- 굽는 것은 SSR 마크업이 아니므로 앱은 `hydrateRoot` 가 아니라 **`createRoot` + `#root` 비우기**로
+  뜬다(`src/main.tsx`). 하이드레이션 불일치로 화면이 이중으로 남는 사고를 원천 차단한 선택이다.
+- nginx 는 `try_files $uri $uri/index.html /index.html` 이어야 `dist/products/index.html` 이 실제로
+  나간다(디렉터리 index 폴백이 없으면 프리렌더 결과 대신 SPA 셸이 나간다).
+- `dist/index.html` 은 이제 **홈의 정적 HTML** 이다. SPA 폴백도 같은 파일이라 `/app` 같은 비프리렌더
+  경로에서 홈 마크업이 잠깐 스친다. 거슬리면 폴백만 `/shell.html`(프리렌더가 남겨 두는 원본 빈 셸)로
+  바꾸면 된다.
+
+**사이트맵** — `dist/sitemap.xml` 은 인덱스이고, 공개 라우트(`sitemap-site.xml`)와 공개 문서
+위키(`docs-sitemap.xml`)를 가리킨다. 문서 쪽 URL·제목은 `scripts/docs-sitemap.json` 에서 오고,
+그 파일은 **문서 임포터(`npm run sync:docs`)가 갱신해 커밋한다** — CI 에는 볼트도 토큰도 없어
+빌드 때 위키를 조회할 수 없기 때문이다. 파일이 없으면 문서 사이트맵만 빠진 채 빌드는 통과한다.
+
+**robots.txt** 는 전부 허용하되 로그인이 필요한 앱 화면과 참고용 템플릿(`/app`·`/login`·`/designs`·
+`/profile`·`/templates`·`/components`·`/showcase`·`/sign-in`·`/sign-up`·`/dashboard`)을 막고,
+GPTBot·ClaudeBot·Claude-Web·PerplexityBot·Google-Extended·CCBot 을 이름으로 허용한다. robots 규칙은
+**가장 구체적인 그룹 하나만** 적용되므로 각 봇 그룹에 Disallow 를 복사한다.
+**llms.txt** 는 [llmstxt.org](https://llmstxt.org) 형식 — H1 + 정의 인용문 + 제품·문서·소스 링크만 둔다.
+
+**OG 이미지** — `public/og-image.svg` 가 원본이고, 프리렌더가 같은 크롬으로 1200x630 PNG
+(`dist/og-image.png`)를 굽는다. SVG 를 안 받는 공유 플랫폼이 있어 실제로 참조하는 것은 PNG 이며,
+크롬이 없는 환경을 위해 `public/og-image.png` 사본을 커밋해 둔다.
+
+> **카피를 고칠 때:** 스크립트(`.mjs`)는 앱(`.ts`)을 import 할 수 없어 정의문·제품 이름/태그라인이
+> `scripts/seo/site.mjs` 에 한 번 더 있다. 두 곳이 어긋나면 `npm run test:scripts` 의 드리프트
+> 테스트가 실패한다 — 한쪽만 고치고 지나갈 수 없다.
 
 ---
 

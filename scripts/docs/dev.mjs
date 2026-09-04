@@ -263,7 +263,8 @@ const emptyStats = () => ({ created: 0, updated: 0, same: 0, flattened: [], imag
  *
  * @param collections [{ collection, files: [{ relpath, raw }] }]
  * @param mapping     { "<id>/<relpath>": pageId } — 입력은 바꾸지 않는다
- * @returns { spaceId, mapping, summary: { [collection.id]: stats }, stale }
+ * @returns { spaceId, mapping, entries, summary: { [collection.id]: stats }, stale }
+ *          entries 는 사이트맵용 [{ url, title, changed }] — 폴더 노드는 폴더 URL 로 나간다.
  */
 export async function syncDevDocs({ collections, mapping, client, log = () => {} }) {
   const { space, created: spaceCreated } = await ensureSpace(client, DEV_SPACE);
@@ -341,6 +342,7 @@ export async function syncDevDocs({ collections, mapping, client, log = () => {}
     }
   }
 
+  const entries = [];
   for (const tree of trees) {
     const stats = summary[tree.collection.id];
     for (const node of tree.nodes) {
@@ -349,7 +351,9 @@ export async function syncDevDocs({ collections, mapping, client, log = () => {}
       final.flattened.forEach((t) => stats.flattened.push(`${node.key} → ${t}`));
       final.images.forEach((t) => stats.images.push(`${node.key}: ${t}`));
       const page = pages.get(node.key);
-      if (!needsDevUpdate(page, final)) {
+      const changed = needsDevUpdate(page, final);
+      entries.push({ url: hrefOfKey(node.key), title: final.title, changed });
+      if (!changed) {
         stats.same += 1;
         continue;
       }
@@ -365,5 +369,5 @@ export async function syncDevDocs({ collections, mapping, client, log = () => {}
     }
   }
 
-  return { spaceId: space.id, mapping: map, summary, stale: staleMappingKeys(map, trees) };
+  return { spaceId: space.id, mapping: map, entries, summary, stale: staleMappingKeys(map, trees) };
 }

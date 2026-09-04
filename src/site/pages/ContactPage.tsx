@@ -7,8 +7,14 @@ import EmailRoundedIcon from '@mui/icons-material/EmailRounded';
 import SitePage from '../components/SitePage';
 import { SpecTable } from '../ui';
 import { CONTACT_EMAIL, GITHUB_URL, openSource } from '../content';
+import { useSeo } from '../seo';
 
 export default function ContactPage() {
+  useSeo({
+    title: '문의 — 도입·협업·버그 제보 | chanho',
+    description: 'chanho 도입·협업 문의는 이메일로, 기능 제안과 버그 제보는 각 저장소의 GitHub 이슈로 받습니다.',
+    canonicalPath: '/contact',
+  });
   return (
     <SitePage>
       <Container maxWidth="md" sx={{ py: { xs: 8, md: 14 } }}>

@@ -10,6 +10,10 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # 사이트의 정규 오리진. 리포 변수(Settings → Variables → SITE_URL)에 넣으면 canonical·OG·
+      # sitemap·llms.txt 의 절대 URL 이 그 값으로 박힌다. 없으면 http://localhost 로 빌드된다.
+      VITE_SITE_URL: ${{ vars.SITE_URL || 'http://localhost' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,7 +21,20 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run build   # tsc -b가 타입 검증 겸함 (test 스크립트 없음 — 있으면 test 스텝 추가)
+      - run: npm run test:scripts   # 노트/문서 임포터 + SEO 생성기 단위 테스트
+      # tsc -b 가 타입 검증 겸함. prerender 는 ubuntu-latest 에 깔려 있는 google-chrome 을 쓴다
+      # (없으면 프리렌더만 건너뛰고 sitemap/robots/llms.txt 는 그대로 생성된다).
+      - run: npm run build:site
+      - name: Verify SEO output
+        run: |
+          set -e
+          for f in dist/index.html dist/products/index.html dist/products/wiki/index.html \
+                   dist/tech/index.html dist/contact/index.html \
+                   dist/sitemap.xml dist/sitemap-site.xml dist/docs-sitemap.xml dist/robots.txt dist/llms.txt; do
+            test -s "$f" || { echo "빠진 산출물: $f"; exit 1; }
+          done
+          grep -q '<link rel="canonical"' dist/index.html
+          grep -q 'application/ld+json' dist/index.html
       - uses: actions/upload-artifact@v4
         with:
           name: dist
