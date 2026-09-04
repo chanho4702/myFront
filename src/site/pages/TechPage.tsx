@@ -1,19 +1,16 @@
-import { Link as RouterLink } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import SitePage from '../components/SitePage';
-import { GridSection, SpecTable, HairlineCard, MONO } from '../ui';
-import { platformSpec, designSystemSpec, techGroups, notes } from '../content';
+import { GridSection, SpecTable, HairlineCard } from '../ui';
+import { platformSpec, designSystemSpec, techGroups } from '../content';
+import { DOCS_URL } from './DocsRedirect';
 
 export default function TechPage() {
-  const latest = notes.slice(-3).reverse();
-
   return (
     <SitePage>
       <Container maxWidth="lg" sx={{ pt: { xs: 7, md: 12 }, pb: { xs: 5, md: 8 } }}>
@@ -33,39 +30,14 @@ export default function TechPage() {
         <SpecTable rows={designSystemSpec} />
       </GridSection>
 
-      <GridSection
-        index="03"
-        label="NOTES"
-        title="엔지니어링 노트"
-        caption={`플랫폼을 만들며 남긴 기록 ${notes.length}편. 인증·게이트웨이·통합배포·관측까지 시간순으로 이어진다.`}
-      >
-        <Stack spacing={1.5}>
-          {latest.map((n) => (
-            <HairlineCard key={n.id} to={`/tech/notes/${n.id}`}>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 0.5, sm: 2 }} sx={{ alignItems: { sm: 'baseline' } }}>
-                <Typography
-                  sx={{
-                    fontFamily: MONO,
-                    fontSize: '0.75rem',
-                    color: 'primary.main',
-                    fontVariantNumeric: 'tabular-nums',
-                    width: { sm: 64 },
-                    flexShrink: 0,
-                  }}
-                >
-                  NO.{n.id}
-                </Typography>
-                <Typography sx={{ fontWeight: 600, flexGrow: 1 }}>{n.title}</Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
-                  {n.date}
-                </Typography>
-              </Stack>
-            </HairlineCard>
-          ))}
-        </Stack>
-        <Button component={RouterLink} to="/tech/notes" endIcon={<ArrowForwardRoundedIcon />} sx={{ mt: 2.5, ml: -1 }}>
-          노트 전체 보기
-        </Button>
+      {/* 노트 본문은 공개 문서 위키(/docs/)에 산다 — 이 사이트가 만든 WIKI 제품 위에 올린 것이 곧 데모다. */}
+      <GridSection index="03" label="NOTES" title="엔지니어링 노트" caption="플랫폼을 만들며 남긴 기록. 인증·게이트웨이·통합배포·관측까지 시간순으로 이어진다.">
+        <HairlineCard href={DOCS_URL}>
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography sx={{ fontWeight: 600 }}>엔지니어링 노트 — 위키 문서 사이트에서 읽기</Typography>
+            <ArrowForwardRoundedIcon fontSize="small" sx={{ color: 'primary.main', flexShrink: 0 }} />
+          </Stack>
+        </HairlineCard>
       </GridSection>
 
       <GridSection index="04" label="STACK" title="기술 스택">

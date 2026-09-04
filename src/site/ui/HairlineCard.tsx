@@ -9,7 +9,12 @@ import CardContent from '@mui/material/CardContent';
  *
  * hover 규칙은 링크일 때만 건다. to/href 가 없으면 클릭도 포커스도 안 되는 정적 카드인데,
  * hover 에 반응하면 마우스 사용자에게 누를 수 있다는 잘못된 신호를 준다.
+ *
+ * href 는 새 탭을 여는 게 기본이지만, 같은 오리진의 형제 앱(`/docs/` 같은 라우터 밖 SPA)은
+ * 같은 탭에서 이동한다 — 사이트 안을 돌아다니는데 탭이 늘어나면 안 된다.
  */
+const isExternal = (href: string) => /^[a-z]+:/i.test(href);
+
 export default function HairlineCard({
   to,
   href,
@@ -39,7 +44,12 @@ export default function HairlineCard({
           {body}
         </CardActionArea>
       ) : href ? (
-        <CardActionArea component="a" href={href} target="_blank" rel="noopener" sx={{ height: '100%' }}>
+        <CardActionArea
+          component="a"
+          href={href}
+          {...(isExternal(href) ? { target: '_blank', rel: 'noopener' } : {})}
+          sx={{ height: '100%' }}
+        >
           {body}
         </CardActionArea>
       ) : (

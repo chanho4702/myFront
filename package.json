@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "sync:notes": "node scripts/sync-notes.mjs",
-    "test:scripts": "node --test scripts/notes/transform.test.mjs"
+    "sync:docs": "node scripts/sync-docs.mjs",
+    "test:scripts": "node --test scripts/notes/transform.test.mjs scripts/sync-docs.test.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

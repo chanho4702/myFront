@@ -24,8 +24,7 @@ import ProductsPage from './site/pages/ProductsPage';
 import ProductDetailPage from './site/pages/ProductDetailPage';
 import TechPage from './site/pages/TechPage';
 import ServiceRedirect from './site/pages/ServiceRedirect';
-import NotesIndexPage from './site/pages/NotesIndexPage';
-import NoteDetailPage from './site/pages/NoteDetailPage';
+import DocsRedirect from './site/pages/DocsRedirect';
 import ContactPage from './site/pages/ContactPage';
 import TemplatesHub from './pages/TemplatesHub';
 import ComponentsCatalog from './pages/ComponentsCatalog';
@@ -48,9 +47,9 @@ const router = createBrowserRouter([
   { path: '/tech', element: <TechPage />, errorElement: <RouteErrorPage /> },
   { path: '/services/:slug', element: <ServiceRedirect /> },
 
-  // 엔지니어링 노트 인덱스·본문. /tech/notes/:id 가 /tech/notes 보다 먼저 오면 안 된다.
-  { path: '/tech/notes', element: <NotesIndexPage />, errorElement: <RouteErrorPage /> },
-  { path: '/tech/notes/:id', element: <NoteDetailPage />, errorElement: <RouteErrorPage /> },
+  // 엔지니어링 노트는 공개 문서 위키(/docs/, 라우터 밖 SPA)로 옮겼다. 구 링크가 살아 있도록 둘 다 유지.
+  { path: '/tech/notes', element: <DocsRedirect /> },
+  { path: '/tech/notes/:id', element: <DocsRedirect /> },
 
   // 소개 · 연락
   { path: '/contact', element: <ContactPage />, errorElement: <RouteErrorPage /> },

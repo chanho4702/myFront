@@ -52,8 +52,8 @@ npm run dev        # 개발 서버 → http://localhost:5173 (VSCode Live Server
 | `npm run dev` | `vite` | 개발 서버 (HMR). |
 | `npm run build` | `tsc -b && vite build` | 타입체크가 빌드를 게이트한다 |
 | `npm run preview` | `vite preview` | 프로덕션 빌드 미리보기 |
-| `npm run test:scripts` | `node --test ...` | 기술 노트 변환기 테스트 |
-| `npm run sync:notes` | `node scripts/sync-notes.mjs` | Obsidian 기술 노트를 `src/site/content/notes`로 동기화 |
+| `npm run test:scripts` | `node --test ...` | 노트 변환기·문서 임포터 단위 테스트 |
+| `npm run sync:docs` | `node scripts/sync-docs.mjs` | Obsidian 기술 노트를 공개 문서 위키(`/docs/`, docs 인스턴스)에 멱등 동기화. `DOCS_API`(기본 `http://127.0.0.1:19110`)·`DOCS_IMPORT_TOKEN`·`OBSIDIAN_VAULT` 환경변수, 매핑은 `scripts/docs-pages.json`(커밋) |
 
 > **원커맨드 기동:** 상위 `../scripts/dev-up.ps1` 이 인프라(docker compose)를 올리고 프론트
 > 3개를 Windows Terminal 탭(:5173 / :5174 / :5175, `--strictPort`)으로 연다. 백엔드는
@@ -170,7 +170,7 @@ auth-server의 OIDC 시작점으로 통째로 리다이렉트한다.
 | `/` | 제품 소개 홈 — 히어로·3대 제품 블록·오픈소스·FAQ |
 | `/products` · `/products/:slug` | 제품 목록·상세 |
 | `/tech` | 기술 스택과 아키텍처 소개 |
-| `/tech/notes` · `/tech/notes/:id` | 동기화된 기술 노트 목록·상세 |
+| `/tech/notes` · `/tech/notes/:id` | 구 노트 URL — 공개 문서 위키 `/docs/` 로 보내는 호환 리다이렉트 |
 | `/contact` | 문의(이메일·GitHub) |
 | `/services/:slug` | 기존 서비스 URL을 `/tech` 로 보내는 호환 리다이렉트 |
 | `/templates` | 템플릿 허브 — MUI 템플릿·쇼케이스·카탈로그 통합 진입점 |
@@ -218,8 +218,8 @@ src/
 │
 ├─ site/                     # 공개 제품·기술·소개 사이트
 │  ├─ components/            #   SiteHeader·SiteFooter·공통 페이지 셸
-│  ├─ pages/                 #   Products·Tech·Notes·About·Contact
-│  ├─ content/               #   제품·스택·프로필 데이터 + 동기화된 기술 노트
+│  ├─ pages/                 #   Products·Tech·Contact (+ /docs/ 리다이렉트)
+│  ├─ content/               #   제품·스택·랜딩 데이터
 │  └─ ui/                    #   공개 사이트 전용 표시 컴포넌트
 │
 ├─ context/templates/        # ★ MUI 공식 템플릿 원본 (참고용, 수정 금지)

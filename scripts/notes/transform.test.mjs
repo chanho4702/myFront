@@ -6,6 +6,7 @@ import {
   parseFrontmatter,
   extractTitle,
   transformWikiLinks,
+  siteNoteHref,
   transformCallouts,
   stripNumberPrefix,
   statusLabel,
@@ -90,6 +91,17 @@ test('별칭 없이 앵커만 있으면 라벨에서 앵커를 뗀다', () => {
   assert.equal(r.body, '[05 API 게이트웨이 설계](/tech/notes/05)');
 });
 
+test('링크 목적지는 href 함수가 정한다 — 임포터는 위키 페이지 URL 을 넘긴다', () => {
+  const resolve = (t) => (t === '05 API 게이트웨이 설계' ? '05' : null);
+  const href = (id) => `/docs/spaces/7/pages/${id === '05' ? 'p42' : '?'}`;
+  const r = transformWikiLinks('앞 [[05 API 게이트웨이 설계|게이트웨이]] 뒤 [[내 목표]]', resolve, href);
+  assert.equal(r.body, '앞 [게이트웨이](/docs/spaces/7/pages/p42) 뒤 내 목표');
+  assert.deepEqual(r.broken, ['내 목표']);
+  // 기본 href 는 사이트 시절 경로다.
+  assert.equal(siteNoteHref('05'), '/tech/notes/05');
+  assert.equal(transformWikiLinks('[[05 API 게이트웨이 설계]]', resolve, siteNoteHref).body, '[05 API 게이트웨이 설계](/tech/notes/05)');
+});
+
 test('화이트리스트 밖 위키링크는 일반 텍스트로 평탄화하고 보고한다', () => {
   const r = transformWikiLinks('앞 [[내 목표]] 뒤', () => null);
   assert.equal(r.body, '앞 내 목표 뒤');
@@ -147,6 +159,8 @@ test('제목 앞 번호와 구분자를 뗀다', () => {
   assert.equal(stripNumberPrefix('15 — ALM·Wiki 백엔드 요구사항', '15'), 'ALM·Wiki 백엔드 요구사항');
   assert.equal(stripNumberPrefix('05 API 게이트웨이 설계', '05'), 'API 게이트웨이 설계');
   assert.equal(stripNumberPrefix('번호 없는 제목', '07'), '번호 없는 제목');
+  // 볼트 29·30·32 의 H1 은 `29. 제목` 형태다.
+  assert.equal(stripNumberPrefix('29. 위키 동등성 스프린트', '29'), '위키 동등성 스프린트');
 });
 
 test('의미 있는 숫자로 시작하는 제목은 건드리지 않는다', () => {

@@ -1,4 +1,4 @@
-// 옵시디언 볼트 마크다운 → 사이트용 마크다운. 순수 함수만 둔다(I/O 는 sync-notes.mjs).
+// 옵시디언 볼트 마크다운 → 게시용 마크다운. 순수 함수만 둔다(I/O 는 sync-docs.mjs).
 
 const NUMBERED = /^(\d\d)\s.+\.md$/;
 
@@ -71,15 +71,19 @@ const CODE_OR_WIKILINK = new RegExp(
   'gm',
 );
 
+/** 사이트 시절의 기본 목적지. 임포터는 위키 페이지 URL 을 만드는 함수를 대신 넘긴다. */
+export const siteNoteHref = (id) => `/tech/notes/${id}`;
+
 /**
  * [[대상]] / [[대상|별칭]] / [[대상#앵커]] 처리.
  * resolve 가 노트 id 를 주면 내부 링크, null 이면 텍스트로 평탄화한다(끊긴 링크 0).
+ * 링크 목적지는 href(id) 가 정한다 — 기본은 사이트 경로, 임포터는 `/docs/spaces/…/pages/…`.
  *
  * 코드 영역 안의 [[...]] 는 링크가 아니라 **문법 예시**이므로 손대지 않는다. 평탄화하면
  * `[[대상]]` 을 설명하는 문장이 `대상` 이 되어 예시가 자기 의미를 잃는다(이 파이프라인을
  * 설명하는 노트에서 실제로 그렇게 깨졌다). 평탄화 보고(broken)에서도 빠진다.
  */
-export function transformWikiLinks(body, resolve) {
+export function transformWikiLinks(body, resolve, href = siteNoteHref) {
   const broken = [];
   const out = body.replace(CODE_OR_WIKILINK, (all, _fence, _ticks, wikilink) => {
     if (!wikilink) return all; // 코드 영역 — 그대로 통과
@@ -89,7 +93,7 @@ export function transformWikiLinks(body, resolve) {
     // 별칭이 없으면 앵커를 뗀 target 을 라벨로 쓴다. linkPart 를 쓰면 `#섹션` 이 링크 글자에 남는다.
     const label = alias || target;
     const id = resolve(target);
-    if (id) return `[${label}](/tech/notes/${id})`;
+    if (id) return `[${label}](${href(id)})`;
     broken.push(target);
     return label;
   });
@@ -118,12 +122,13 @@ export function transformCallouts(body) {
  * H1 앞에 붙은 노트 번호와 구분자를 뗀다. 화면이 NO.15 를 따로 렌더하므로 중복을 막는다.
  *
  * 두 겹으로 잠근다 — 둘 중 하나만 어긋나도 원문을 그대로 돌려준다.
- *  1) 앞 두 자리 **뒤에 공백이나 대시가 와야** 한다. `2026 회고` 가 `26 회고` 로 잘리는 것을 막는다.
+ *  1) 앞 두 자리 **뒤에 공백·대시·마침표가 와야** 한다. `2026 회고` 가 `26 회고` 로 잘리는 것을 막는다.
+ *     마침표는 볼트 29·30·32 의 `29. 제목` 형태 때문이다.
  *  2) 그 두 자리가 **이 노트의 id 와 같아야** 한다. 남의 번호를 떼지 않는다.
  * 떼고 나서 남는 게 없으면(제목이 `00` 뿐) 원문을 유지한다 — 제목을 통째로 잃느니 중복이 낫다.
  */
 export function stripNumberPrefix(title, id) {
-  const m = title.match(/^(\d\d)(?=[\s—–-])\s*(?:[—–-]\s*)?([\s\S]*)$/);
+  const m = title.match(/^(\d\d)(?=[\s—–.-])\s*(?:[—–.-]\s*)?([\s\S]*)$/);
   if (!m || m[1] !== id) return title.trim();
   return m[2].trim() || title.trim();
 }

@@ -15,41 +15,45 @@ import { HEADER_H } from '../ui';
 import { BRAND, BRAND_TAGLINE, GITHUB_URL, START_URL, hero } from '../content';
 import BrandLogo from './BrandLogo';
 
-const navItems = [
+/** `to` 는 라우터 내부, `href` 는 라우터 밖 형제 앱(/docs/ 같은 별도 SPA)으로의 전체 페이지 이동. */
+type NavItem = { label: string; to: string; href?: never } | { label: string; href: string; to?: never };
+
+const navItems: NavItem[] = [
   { to: '/products', label: '제품' },
   { to: '/tech', label: '기술' },
-  { to: '/tech/notes', label: '노트' },
+  { href: '/docs/', label: '노트' },
   { to: '/contact', label: '문의' },
 ];
+const routed = navItems.filter((i): i is Extract<NavItem, { to: string }> => Boolean(i.to));
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
-  // /tech 는 /tech/notes 의 접두다 — 더 구체적인 메뉴가 있으면 그쪽만 활성으로 칠한다.
+  // 접두 관계의 메뉴가 있으면(예: /tech 와 /tech/…) 더 구체적인 쪽만 활성으로 칠한다.
   const isActive = (to: string) => {
     if (pathname === to) return true;
     if (!pathname.startsWith(`${to}/`)) return false;
-    return !navItems.some((i) => i.to !== to && i.to.startsWith(`${to}/`) && (pathname === i.to || pathname.startsWith(`${i.to}/`)));
+    return !routed.some((i) => i.to !== to && i.to.startsWith(`${to}/`) && (pathname === i.to || pathname.startsWith(`${i.to}/`)));
   };
 
-  const navLink = (to: string, label: string, onClick?: () => void, big?: boolean) => (
-    <Link
-      key={to}
-      component={RouterLink}
-      to={to}
-      underline="none"
-      onClick={onClick}
-      aria-current={isActive(to) ? 'page' : undefined}
-      sx={{
-        fontSize: big ? '1.05rem' : '0.875rem',
-        fontWeight: isActive(to) ? 700 : 500,
-        color: isActive(to) ? 'text.primary' : 'text.secondary',
-        '&:hover': { color: 'text.primary' },
-      }}
-    >
-      {label}
-    </Link>
-  );
+  const navLink = (item: NavItem, onClick?: () => void, big?: boolean) => {
+    const active = item.to ? isActive(item.to) : false;
+    const sx = {
+      fontSize: big ? '1.05rem' : '0.875rem',
+      fontWeight: active ? 700 : 500,
+      color: active ? 'text.primary' : 'text.secondary',
+      '&:hover': { color: 'text.primary' },
+    } as const;
+    return item.to ? (
+      <Link key={item.label} component={RouterLink} to={item.to} underline="none" onClick={onClick} aria-current={active ? 'page' : undefined} sx={sx}>
+        {item.label}
+      </Link>
+    ) : (
+      <Link key={item.label} href={item.href} underline="none" onClick={onClick} sx={sx}>
+        {item.label}
+      </Link>
+    );
+  };
 
   return (
     <>
@@ -74,7 +78,7 @@ export default function SiteHeader() {
             </Link>
 
             <Stack direction="row" spacing={3.5} sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
-              {navItems.map((i) => navLink(i.to, i.label))}
+              {navItems.map((i) => navLink(i))}
               <IconButton component="a" href={GITHUB_URL} target="_blank" rel="noopener" aria-label="GitHub" size="small">
                 <GitHubIcon fontSize="small" />
               </IconButton>
@@ -102,7 +106,7 @@ export default function SiteHeader() {
             </IconButton>
           </Stack>
           <Stack spacing={2.5} sx={{ p: 2, pt: 1 }}>
-            {navItems.map((i) => navLink(i.to, i.label, () => setOpen(false), true))}
+            {navItems.map((i) => navLink(i, () => setOpen(false), true))}
             <Link href={GITHUB_URL} target="_blank" rel="noopener" underline="none" sx={{ fontSize: '1.05rem', fontWeight: 500, color: 'text.secondary' }}>
               GitHub
             </Link>

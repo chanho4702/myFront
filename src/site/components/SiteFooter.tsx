@@ -22,7 +22,7 @@ const productLinks: FooterLink[] = [
 
 const resourceLinks: FooterLink[] = [
   { label: '기술 구성', to: '/tech' },
-  { label: '엔지니어링 노트', to: '/tech/notes' },
+  { label: '엔지니어링 노트', href: '/docs/' },
   { label: '문의', to: '/contact' },
 ];
 
@@ -49,7 +49,15 @@ function LinkGroup({ title, items }: { title: string; items: FooterLink[] }) {
               {l.label}
             </Link>
           ) : (
-            <Link key={l.label} href={l.href} target="_blank" rel="noopener" underline="hover" variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}>
+            // 같은 오리진의 형제 앱(/docs/ 등)은 같은 탭, 바깥 사이트만 새 탭.
+            <Link
+              key={l.label}
+              href={l.href}
+              {...(/^[a-z]+:/i.test(l.href ?? '') ? { target: '_blank', rel: 'noopener' } : {})}
+              underline="hover"
+              variant="body2"
+              sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
+            >
               {l.label}
             </Link>
           ),
