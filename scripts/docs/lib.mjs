@@ -158,16 +158,18 @@ export function createDocsClient({ baseUrl, token, fetch }) {
   };
 }
 
-/** key `docs` 스페이스를 찾고 없으면 만든다. */
-export async function ensureSpace(client) {
+export const NOTES_SPACE = {
+  key: SPACE_KEY,
+  name: SPACE_NAME,
+  description: '옵시디언 보관함의 MSA_TEMPLATE 정리 노트를 그대로 옮긴 공개 문서.',
+};
+
+/** key 로 스페이스를 찾고 없으면 만든다. 기본은 노트 스페이스(`docs`), 개발 문서는 `dev` 를 넘긴다. */
+export async function ensureSpace(client, spec = NOTES_SPACE) {
   const spaces = await client.listSpaces();
-  const found = (spaces ?? []).find((s) => s.key === SPACE_KEY);
+  const found = (spaces ?? []).find((s) => s.key === spec.key);
   if (found) return { space: found, created: false };
-  const space = await client.createSpace({
-    key: SPACE_KEY,
-    name: SPACE_NAME,
-    description: '옵시디언 보관함의 MSA_TEMPLATE 정리 노트를 그대로 옮긴 공개 문서.',
-  });
+  const space = await client.createSpace({ key: spec.key, name: spec.name, description: spec.description });
   return { space, created: true };
 }
 

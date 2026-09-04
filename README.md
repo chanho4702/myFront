@@ -53,7 +53,7 @@ npm run dev        # 개발 서버 → http://localhost:5173 (VSCode Live Server
 | `npm run build` | `tsc -b && vite build` | 타입체크가 빌드를 게이트한다 |
 | `npm run preview` | `vite preview` | 프로덕션 빌드 미리보기 |
 | `npm run test:scripts` | `node --test ...` | 노트 변환기·문서 임포터 단위 테스트 |
-| `npm run sync:docs` | `node scripts/sync-docs.mjs` | Obsidian 기술 노트를 공개 문서 위키(`/docs/`, docs 인스턴스)에 멱등 동기화. `DOCS_API`(기본 `http://127.0.0.1:19910`)·`DOCS_IMPORT_TOKEN`·`OBSIDIAN_VAULT` 환경변수, 매핑은 `scripts/docs-pages.json`(커밋) |
+| `npm run sync:docs` | `node scripts/sync-docs.mjs` | 공개 문서 위키(`/docs/`, docs 인스턴스)에 멱등 동기화 — **notes**(Obsidian 기술 노트 → 스페이스 `docs`, 매핑 `scripts/docs-pages.json`) 다음 **dev**(플랫폼 리포의 개발 문서 → 스페이스 `dev`, 대상은 `scripts/docs/collections.mjs`, 매핑 `scripts/dev-docs-pages.json`). `-- --only=notes\|dev` 로 하나만. `DOCS_API`(기본 `http://127.0.0.1:19910`)·`DOCS_IMPORT_TOKEN`(없으면 `DOCS_TOKEN_FILE`, 기본 `../infra/keycloak/.env` 에서 읽음)·`OBSIDIAN_VAULT` 환경변수. 매핑 파일은 커밋한다 |
 
 > **원커맨드 기동:** 상위 `../scripts/dev-up.ps1` 이 인프라(docker compose)를 올리고 프론트
 > 3개를 Windows Terminal 탭(:5173 / :5174 / :5175, `--strictPort`)으로 연다. 백엔드는
