@@ -38,6 +38,21 @@ async function main() {
 
   if (targets.length === 0) throw new Error('[sync-notes] 화이트리스트에 걸린 노트가 0개입니다.');
 
+  // 번호(id)가 겹치면 NN.md와 index 항목이 서로 덮어써 사이트 라우트가 깨진다(2026-09-04 실측 —
+  // 볼트에 "30 …"이 둘). 조용히 뒤의 것이 이기게 두지 말고 여기서 멈춘다.
+  const byId = new Map();
+  for (const file of targets) {
+    const id = noteIdOf(file);
+    byId.set(id, [...(byId.get(id) ?? []), file]);
+  }
+  const dupes = [...byId.entries()].filter(([, files]) => files.length > 1);
+  if (dupes.length > 0) {
+    const lines = dupes.map(([id, files]) => `  ${id}: ${files.join(' | ')}`).join('\n');
+    throw new Error(
+      `[sync-notes] 번호가 겹치는 노트가 있습니다 — 볼트에서 번호를 바로잡은 뒤 다시 실행하세요.\n${lines}`,
+    );
+  }
+
   // 대상 → id 사전. 위키링크 해석에 쓴다(확장자 유무 양쪽 허용).
   const idByTarget = new Map();
   for (const file of targets) {
