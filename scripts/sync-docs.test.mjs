@@ -111,11 +111,11 @@ test('클라이언트는 토큰 헤더를 붙이고 {"error"} 계약을 예외�
     }
     return { ok: true, status: 200, text: async () => JSON.stringify([{ id: 's1', key: SPACE_KEY }]) };
   };
-  const client = createDocsClient({ baseUrl: 'http://127.0.0.1:19110/', token: 'secret', fetch });
+  const client = createDocsClient({ baseUrl: 'http://127.0.0.1:19910/', token: 'secret', fetch });
 
   const spaces = await client.listSpaces();
   assert.deepEqual(spaces, [{ id: 's1', key: 'docs' }]);
-  assert.equal(calls[0].url, 'http://127.0.0.1:19110/api/wiki/spaces');
+  assert.equal(calls[0].url, 'http://127.0.0.1:19910/api/wiki/spaces');
   assert.equal(calls[0].init.headers['X-Docs-Import-Token'], 'secret');
 
   await assert.rejects(client.getPage('missing'), (err) => {
@@ -128,7 +128,7 @@ test('클라이언트는 토큰 헤더를 붙이고 {"error"} 계약을 예외�
   await client.lookupPages('s1', ['00 개요 — 전체 구조', '01 인증']);
   assert.equal(
     calls.at(-1).url,
-    `http://127.0.0.1:19110/api/wiki/spaces/s1/pages/lookup?title=${encodeURIComponent('00 개요 — 전체 구조')}&title=${encodeURIComponent('01 인증')}`,
+    `http://127.0.0.1:19910/api/wiki/spaces/s1/pages/lookup?title=${encodeURIComponent('00 개요 — 전체 구조')}&title=${encodeURIComponent('01 인증')}`,
   );
 });
 

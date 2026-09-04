@@ -4,7 +4,7 @@
 // CI 에서는 돌지 않는다(볼트도 토큰도 없다). 매핑 파일 scripts/docs-pages.json 은 커밋한다.
 //
 // 사용: npm run sync:docs
-//       DOCS_API=http://127.0.0.1:19110 DOCS_IMPORT_TOKEN=... node scripts/sync-docs.mjs
+//       DOCS_API=http://127.0.0.1:19910 DOCS_IMPORT_TOKEN=... node scripts/sync-docs.mjs
 //       OBSIDIAN_VAULT="D:/vault" node scripts/sync-docs.mjs
 
 import { readdir, readFile, writeFile } from 'node:fs/promises';
@@ -18,7 +18,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const VAULT = process.env.OBSIDIAN_VAULT ?? 'C:/myBrain/내 로컬';
 const SOURCE_DIR = path.join(VAULT, 'msa', 'MSA_TEMPLATE 정리');
 const MAPPING_FILE = path.join(ROOT, 'scripts', 'docs-pages.json');
-const DOCS_API = process.env.DOCS_API ?? 'http://127.0.0.1:19110';
+const DOCS_API = process.env.DOCS_API ?? 'http://127.0.0.1:19910';
 const TOKEN = process.env.DOCS_IMPORT_TOKEN ?? '';
 
 async function main() {
