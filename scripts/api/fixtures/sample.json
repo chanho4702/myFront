@@ -367,7 +367,7 @@
       "PlatformError": {
         "type": "object",
         "required": ["error"],
-        "description": "공통 오류 응답(common-starter 계약)",
+        "description": "공통 오류 응답(common-starter 계약). 메시지는 사람이 읽는 한국어다.",
         "properties": {
           "error": { "type": "string", "description": "사람이 읽는 오류 메시지", "example": "스페이스를 찾을 수 없습니다" }
         }

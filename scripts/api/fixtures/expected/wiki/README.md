@@ -28,7 +28,7 @@ Authorization: Bearer chanho_pat_…
 
 ## 공통 오류
 
-공통 오류 응답(common-starter 계약). 오류 응답 본문은 `PlatformError` 하나로 통일된다.
+공통 오류 응답(common-starter 계약). 메시지는 사람이 읽는 한국어다. 오류 응답 본문은 `PlatformError` 하나로 통일된다.
 
 | 필드 | 타입 | 필수 | 설명 | 예시 |
 | --- | --- | --- | --- | --- |

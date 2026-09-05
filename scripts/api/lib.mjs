@@ -428,6 +428,13 @@ export function renderTagPage(spec, tag, service = {}) {
   return `${head.join('\n')}\n## 엔드포인트\n\n${index}\n\n${body}`;
 }
 
+/** 설명 문장을 앞에 이어 붙일 때의 접두 — 이미 문장부호로 끝나면 공백만, 아니면 마침표를 더한다(마침표 겹침 방지). 빈 값은 ''. */
+export function leadSentence(text) {
+  const t = String(text ?? '').trim();
+  if (!t) return '';
+  return /[.!?。]$/.test(t) ? `${t} ` : `${t}. `;
+}
+
 /** 서비스 README — 개요·인증·리소스(태그) 목록·공통 오류. 태그 링크는 같은 디렉터리의 `<slug>.md`. */
 export function renderServiceReadme(spec, service) {
   const info = spec.info ?? {};
@@ -453,7 +460,7 @@ export function renderServiceReadme(spec, service) {
   if (bearer) {
     const [schemeName, scheme] = bearer;
     const global = (spec.security ?? []).some((s) => Object.hasOwn(s ?? {}, schemeName));
-    lines.push(`${scheme.description ? `${scheme.description}. ` : ''}${global ? '모든 엔드포인트가 이 인증을 요구한다.' : '인증이 필요한 엔드포인트는 각 절에 표시한다.'}`, '');
+    lines.push(`${leadSentence(scheme.description)}${global ? '모든 엔드포인트가 이 인증을 요구한다.' : '인증이 필요한 엔드포인트는 각 절에 표시한다.'}`, '');
   } else {
     lines.push('스펙에 보안 스킴이 없다. 게이트웨이 뒤에서는 세션 JWT 또는 개인 API 토큰을 붙인다.', '');
   }
@@ -469,7 +476,7 @@ export function renderServiceReadme(spec, service) {
   const error = spec.components?.schemas?.PlatformError;
   if (error) {
     lines.push('## 공통 오류', '');
-    lines.push(`${error.description ? `${error.description}. ` : ''}오류 응답 본문은 \`PlatformError\` 하나로 통일된다.`, '');
+    lines.push(`${leadSentence(error.description)}오류 응답 본문은 \`PlatformError\` 하나로 통일된다.`, '');
     const t = schemaTable({ $ref: '#/components/schemas/PlatformError' }, spec);
     if (t) lines.push(t, '');
   }

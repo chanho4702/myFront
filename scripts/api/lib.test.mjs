@@ -20,6 +20,7 @@ import {
   renderService,
   validateSpec,
   compareMethods,
+  leadSentence,
 } from './lib.mjs';
 import { SERVICES, selectServices, COMPOSE_NETWORK } from './services.mjs';
 
@@ -282,7 +283,39 @@ test('서비스 README: 개요 표, 인증, 리소스 링크(<slug>.md), 공통 
   assert.match(md, /\| 버전 \| `0\.1\.0` \|\n\| 기본 URL \| `https:\/\/<your-host>` \|\n\| 엔드포인트 \| 13 \|/);
   assert.match(md, /## 인증\n\n개인 API 토큰 `chanho_pat_…` 또는 세션 JWT\. 모든 엔드포인트가 이 인증을 요구한다\.\n\n```http\nAuthorization: Bearer chanho_pat_…\n```/);
   assert.match(md, /\| \[Attachments\]\(attachments\.md\) \| 페이지 첨부 파일 \| 3 \|\n\| \[Pages\]\(pages\.md\) \| 페이지 조회·작성·수정 \| 5 \|\n\| \[Spaces\]\(spaces\.md\) \| 스페이스\(문서 묶음\) 관리 \| 5 \|/);
-  assert.match(md, /## 공통 오류\n\n[^\n]*`PlatformError`[^\n]*\n\n\| 필드 \| 타입 \| 필수 \| 설명 \| 예시 \|\n\| --- \| --- \| --- \| --- \| --- \|\n\| `error` \| `string` \| 예 \|/);
+  // 설명이 문장부호로 끝나면 마침표를 겹치지 않는다(픽스처 PlatformError.description 은 "." 로 끝남)
+  assert.match(md, /## 공통 오류\n\n공통 오류 응답\(common-starter 계약\)\. 메시지는 사람이 읽는 한국어다\. 오류 응답 본문은 `PlatformError` 하나로 통일된다\.\n\n\| 필드 \| 타입 \| 필수 \| 설명 \| 예시 \|\n\| --- \| --- \| --- \| --- \| --- \|\n\| `error` \| `string` \| 예 \|/);
+  assert.equal(md.includes('..'), false);
+  // 설명 접두: 문장부호로 끝나는 설명 / 끝나지 않는 설명 / 빈 설명
+  assert.equal(leadSentence('이미 끝났다.'), '이미 끝났다. ');
+  assert.equal(leadSentence('물음표?'), '물음표? ');
+  assert.equal(leadSentence('전각 마침표。'), '전각 마침표。 ');
+  assert.equal(leadSentence('안 끝났다'), '안 끝났다. ');
+  assert.equal(leadSentence('  공백 포함  '), '공백 포함. ');
+  assert.equal(leadSentence(''), '');
+  assert.equal(leadSentence(undefined), '');
+  const withDots = (schemeDesc, errorDesc) =>
+    renderServiceReadme(
+      {
+        openapi: '3.1.0',
+        info: { title: 'X' },
+        paths: {},
+        security: [{ bearerAuth: [] }],
+        components: {
+          securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer', description: schemeDesc } },
+          schemas: { PlatformError: { type: 'object', description: errorDesc, properties: { error: { type: 'string' } } } },
+        },
+      },
+      { id: 'x', title: 'X API' },
+    );
+  const punct = withDots('토큰을 붙인다.', '공통 오류다.');
+  assert.match(punct, /## 인증\n\n토큰을 붙인다\. 모든 엔드포인트가 이 인증을 요구한다\.\n/);
+  assert.match(punct, /## 공통 오류\n\n공통 오류다\. 오류 응답 본문은 `PlatformError` 하나로 통일된다\.\n/);
+  assert.equal(punct.includes('..'), false);
+  const plain = withDots('토큰을 붙인다', '공통 오류다');
+  assert.match(plain, /## 인증\n\n토큰을 붙인다\. 모든 엔드포인트가 이 인증을 요구한다\.\n/);
+  assert.match(plain, /## 공통 오류\n\n공통 오류다\. 오류 응답 본문은 `PlatformError` 하나로 통일된다\.\n/);
+
   // 보안 스킴·PlatformError 가 없는 스펙
   const bare = renderServiceReadme({ openapi: '3.1.0', info: { title: 'X' }, paths: {} }, { id: 'x', title: 'X API' });
   assert.match(bare, /스펙에 보안 스킴이 없다/);
