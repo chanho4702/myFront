@@ -128,7 +128,7 @@ curl -X GET "https://<your-host>/api/alm/settings/issue-types/usage" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 이슈 타입 ID |
 
 ### 요청 본문
 
@@ -189,7 +189,7 @@ curl -X PUT "https://<your-host>/api/alm/settings/issue-types/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 이슈 타입 ID |
 
 ### 응답
 
@@ -216,7 +216,7 @@ curl -X DELETE "https://<your-host>/api/alm/settings/issue-types/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 이슈 타입 ID |
 
 ### 요청 본문
 

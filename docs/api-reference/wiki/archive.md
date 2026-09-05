@@ -20,7 +20,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -30,6 +30,7 @@
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 이미 보관된 문서입니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `PageResponse`
@@ -70,7 +71,7 @@ curl -X POST "https://<your-host>/api/wiki/pages/<id>/archive" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -80,6 +81,7 @@ curl -X POST "https://<your-host>/api/wiki/pages/<id>/archive" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 보관되지 않은 문서이거나, 상위 문서가 아직 보관 중입니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `PageResponse`
@@ -120,7 +122,7 @@ curl -X POST "https://<your-host>/api/wiki/pages/<id>/unarchive" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 
 ### 응답
 

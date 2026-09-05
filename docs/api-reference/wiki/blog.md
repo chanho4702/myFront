@@ -18,7 +18,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 
 ### 응답
 

@@ -10,7 +10,7 @@
 | --- | --- |
 | 버전 | `0.0.1-SNAPSHOT` |
 | 기본 URL | `https://<your-host>` |
-| 엔드포인트 | 105 |
+| 엔드포인트 | 95 |
 
 ## 인증
 
@@ -32,7 +32,6 @@ Authorization: Bearer chanho_pat_…
 | [Comments](comments.md) | 페이지 댓글과 본문 구간에 붙는 인라인 스레드. | 5 |
 | [Export](export.md) | 페이지 PDF 내보내기. | 1 |
 | [Labels](labels.md) | 페이지 라벨과 백링크. | 6 |
-| [Migrations](migrations.md) | 컨플루언스 이관 작업의 생성·실행·보고. | 10 |
 | [Notifications](notifications.md) | 알림함과 알림 수신 설정. | 4 |
 | [Page Restrictions](page-restrictions.md) | 페이지 단위 열람·편집 제한. | 2 |
 | [Page Tree](page-tree.md) | 스페이스 페이지 트리의 지연 조회와 경로 탐색. | 8 |
@@ -48,7 +47,7 @@ Authorization: Bearer chanho_pat_…
 
 ## 공통 오류
 
-플랫폼 공통 오류 응답. 메시지는 한국어이며 사용자에게 그대로 보인다.. 오류 응답 본문은 `PlatformError` 하나로 통일된다.
+플랫폼 공통 오류 응답. 메시지는 한국어이며 사용자에게 그대로 보인다. 오류 응답 본문은 `PlatformError` 하나로 통일된다.
 
 | 필드 | 타입 | 필수 | 설명 | 예시 |
 | --- | --- | --- | --- | --- |

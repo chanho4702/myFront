@@ -2,24 +2,26 @@
 
 # Migrations
 
-컨플루언스 이관 작업의 생성·실행·보고.
+컨플루언스 설치형(Server/DC) 원본을 위키로 옮기는 이관 작업의 생성·실행·보고.
+연결 확인과 작업 목록은 전역 관리자만, 나머지는 대상 스페이스 ADMIN만 부를 수 있다.
 
 ## 엔드포인트
 
 | 메서드 | 경로 | 요약 |
 | --- | --- | --- |
-| `GET` | `/api/wiki/migrations` | [이관 작업 목록을 최신순으로 조회한다](#get-apiwikimigrations) |
-| `POST` | `/api/wiki/migrations` | [이관 작업을 만든다](#post-apiwikimigrations) |
-| `POST` | `/api/wiki/migrations/confluence-dc/probe` | [컨플루언스 설치형 원본에 연결되는지 확인한다 — 토큰은 응답에 실리지 않는다](#post-apiwikimigrationsconfluence-dcprobe) |
-| `GET` | `/api/wiki/migrations/{jobId}` | [이관 작업의 진행 상황을 조회한다](#get-apiwikimigrationsjobid) |
-| `POST` | `/api/wiki/migrations/{jobId}/cancel` | [진행 중인 이관 작업을 취소한다](#post-apiwikimigrationsjobidcancel) |
-| `POST` | `/api/wiki/migrations/{jobId}/discover` | [원본 트리를 훑어 대기열을 채운다 — 다시 눌러도 새 항목만 늘어난다](#post-apiwikimigrationsjobiddiscover) |
-| `GET` | `/api/wiki/migrations/{jobId}/items` | [이관 항목을 상태·단계로 걸러 페이지 단위로 조회한다](#get-apiwikimigrationsjobiditems) |
-| `POST` | `/api/wiki/migrations/{jobId}/items` | [이관할 원본 문서를 대기열에 넣는다](#post-apiwikimigrationsjobiditems) |
-| `GET` | `/api/wiki/migrations/{jobId}/report` | [이관 결과 보고서를 조회한다](#get-apiwikimigrationsjobidreport) |
-| `POST` | `/api/wiki/migrations/{jobId}/start` | [이관 작업을 시작한다](#post-apiwikimigrationsjobidstart) |
+| `GET` | `/api/migration` | [이관 작업 목록을 최신순으로 조회한다](#get-apimigration) |
+| `POST` | `/api/migration` | [이관 작업을 만든다](#post-apimigration) |
+| `POST` | `/api/migration/confluence-dc/probe` | [컨플루언스 설치형 원본에 연결되는지 확인한다 — 토큰은 응답에 실리지 않는다](#post-apimigrationconfluence-dcprobe) |
+| `GET` | `/api/migration/{jobId}` | [이관 작업의 진행 상황을 조회한다](#get-apimigrationjobid) |
+| `POST` | `/api/migration/{jobId}/cancel` | [진행 중인 이관 작업을 취소한다](#post-apimigrationjobidcancel) |
+| `POST` | `/api/migration/{jobId}/discover` | [원본 트리를 훑어 대기열을 채운다 — 다시 눌러도 새 항목만 늘어난다](#post-apimigrationjobiddiscover) |
+| `GET` | `/api/migration/{jobId}/items` | [이관 항목을 상태·단계로 걸러 페이지 단위로 조회한다](#get-apimigrationjobiditems) |
+| `POST` | `/api/migration/{jobId}/items` | [이관할 원본 문서를 대기열에 넣는다](#post-apimigrationjobiditems) |
+| `POST` | `/api/migration/{jobId}/link-fixup` | [끝난 작업의 링크 정리를 다시 돌린다 — 다시 눌러도 안전하다](#post-apimigrationjobidlink-fixup) |
+| `GET` | `/api/migration/{jobId}/report` | [이관 결과 보고서를 조회한다](#get-apimigrationjobidreport) |
+| `POST` | `/api/migration/{jobId}/start` | [이관 작업을 시작한다](#post-apimigrationjobidstart) |
 
-## GET /api/wiki/migrations
+## GET /api/migration
 
 이관 작업 목록을 최신순으로 조회한다
 
@@ -48,11 +50,11 @@
 ### curl
 
 ```bash
-curl -X GET "https://<your-host>/api/wiki/migrations" \
+curl -X GET "https://<your-host>/api/migration" \
   -H "Authorization: Bearer chanho_pat_…"
 ```
 
-## POST /api/wiki/migrations
+## POST /api/migration
 
 이관 작업을 만든다
 
@@ -79,6 +81,7 @@ curl -X GET "https://<your-host>/api/wiki/migrations" \
 | `400` | 요청 검증 실패 | `PlatformError` |
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
+| `404` | 대상 없음 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **201 본문** — `MigrationJobResponse`
@@ -99,7 +102,7 @@ curl -X GET "https://<your-host>/api/wiki/migrations" \
 ### curl
 
 ```bash
-curl -X POST "https://<your-host>/api/wiki/migrations" \
+curl -X POST "https://<your-host>/api/migration" \
   -H "Authorization: Bearer chanho_pat_…" \
   -H "Content-Type: application/json" \
   -d '{
@@ -109,7 +112,7 @@ curl -X POST "https://<your-host>/api/wiki/migrations" \
   }'
 ```
 
-## POST /api/wiki/migrations/confluence-dc/probe
+## POST /api/migration/confluence-dc/probe
 
 컨플루언스 설치형 원본에 연결되는지 확인한다 — 토큰은 응답에 실리지 않는다
 
@@ -144,7 +147,7 @@ curl -X POST "https://<your-host>/api/wiki/migrations" \
 ### curl
 
 ```bash
-curl -X POST "https://<your-host>/api/wiki/migrations/confluence-dc/probe" \
+curl -X POST "https://<your-host>/api/migration/confluence-dc/probe" \
   -H "Authorization: Bearer chanho_pat_…" \
   -H "Content-Type: application/json" \
   -d '{
@@ -154,7 +157,7 @@ curl -X POST "https://<your-host>/api/wiki/migrations/confluence-dc/probe" \
   }'
 ```
 
-## GET /api/wiki/migrations/{jobId}
+## GET /api/migration/{jobId}
 
 이관 작업의 진행 상황을 조회한다
 
@@ -185,6 +188,11 @@ curl -X POST "https://<your-host>/api/wiki/migrations/confluence-dc/probe" \
 | `createdAt` | `string(date-time)` |  |  |  |
 | `id` | `integer(int64)` |  |  |  |
 | `itemCount` | `integer(int64)` |  |  |  |
+| `jobIssues` | `MigrationJobIssueResponse[]` |  |  |  |
+| `jobIssues[].code` | `string` |  | 손실 코드 | `LINK_FIXUP_FAILED` |
+| `jobIssues[].occurrences` | `integer(int32)` |  | 같은 실패가 반복된 횟수 | `1` |
+| `jobIssues[].severity` | `string enum(INFO, WARNING, ERROR)` |  | 심각도 | `ERROR` |
+| `jobIssues[].sourcePath` | `string` |  | 어디서 났는가 | `page:1042` |
 | `mode` | `string enum(DRY_RUN, IMPORT)` |  |  |  |
 | `provider` | `string enum(NOTION, CONFLUENCE_DC)` |  |  |  |
 | `source` | `MigrationSourceSummary` |  |  |  |
@@ -200,11 +208,11 @@ curl -X POST "https://<your-host>/api/wiki/migrations/confluence-dc/probe" \
 ### curl
 
 ```bash
-curl -X GET "https://<your-host>/api/wiki/migrations/<jobId>" \
+curl -X GET "https://<your-host>/api/migration/<jobId>" \
   -H "Authorization: Bearer chanho_pat_…"
 ```
 
-## POST /api/wiki/migrations/{jobId}/cancel
+## POST /api/migration/{jobId}/cancel
 
 진행 중인 이관 작업을 취소한다
 
@@ -222,6 +230,7 @@ curl -X GET "https://<your-host>/api/wiki/migrations/<jobId>" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 버전 충돌 — expectedVersion 불일치 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `MigrationJobResponse`
@@ -242,11 +251,11 @@ curl -X GET "https://<your-host>/api/wiki/migrations/<jobId>" \
 ### curl
 
 ```bash
-curl -X POST "https://<your-host>/api/wiki/migrations/<jobId>/cancel" \
+curl -X POST "https://<your-host>/api/migration/<jobId>/cancel" \
   -H "Authorization: Bearer chanho_pat_…"
 ```
 
-## POST /api/wiki/migrations/{jobId}/discover
+## POST /api/migration/{jobId}/discover
 
 원본 트리를 훑어 대기열을 채운다 — 다시 눌러도 새 항목만 늘어난다
 
@@ -261,9 +270,11 @@ curl -X POST "https://<your-host>/api/wiki/migrations/<jobId>/cancel" \
 | 상태 | 설명 | 스키마 |
 | --- | --- | --- |
 | `200` | OK | `MigrationDiscoverResponse` |
+| `400` | 요청 검증 실패 | `PlatformError` |
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 버전 충돌 — expectedVersion 불일치 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `MigrationDiscoverResponse`
@@ -277,11 +288,11 @@ curl -X POST "https://<your-host>/api/wiki/migrations/<jobId>/cancel" \
 ### curl
 
 ```bash
-curl -X POST "https://<your-host>/api/wiki/migrations/<jobId>/discover" \
+curl -X POST "https://<your-host>/api/migration/<jobId>/discover" \
   -H "Authorization: Bearer chanho_pat_…"
 ```
 
-## GET /api/wiki/migrations/{jobId}/items
+## GET /api/migration/{jobId}/items
 
 이관 항목을 상태·단계로 걸러 페이지 단위로 조회한다
 
@@ -326,11 +337,11 @@ curl -X POST "https://<your-host>/api/wiki/migrations/<jobId>/discover" \
 ### curl
 
 ```bash
-curl -X GET "https://<your-host>/api/wiki/migrations/<jobId>/items" \
+curl -X GET "https://<your-host>/api/migration/<jobId>/items" \
   -H "Authorization: Bearer chanho_pat_…"
 ```
 
-## POST /api/wiki/migrations/{jobId}/items
+## POST /api/migration/{jobId}/items
 
 이관할 원본 문서를 대기열에 넣는다
 
@@ -361,6 +372,7 @@ curl -X GET "https://<your-host>/api/wiki/migrations/<jobId>/items" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 버전 충돌 — expectedVersion 불일치 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **201 본문** — `MigrationItemResponse`
@@ -381,7 +393,7 @@ curl -X GET "https://<your-host>/api/wiki/migrations/<jobId>/items" \
 ### curl
 
 ```bash
-curl -X POST "https://<your-host>/api/wiki/migrations/<jobId>/items" \
+curl -X POST "https://<your-host>/api/migration/<jobId>/items" \
   -H "Authorization: Bearer chanho_pat_…" \
   -H "Content-Type: application/json" \
   -d '{
@@ -391,7 +403,43 @@ curl -X POST "https://<your-host>/api/wiki/migrations/<jobId>/items" \
   }'
 ```
 
-## GET /api/wiki/migrations/{jobId}/report
+## POST /api/migration/{jobId}/link-fixup
+
+끝난 작업의 링크 정리를 다시 돌린다 — 다시 눌러도 안전하다
+
+### 파라미터
+
+| 이름 | 위치 | 타입 | 필수 | 설명 |
+| --- | --- | --- | --- | --- |
+| `jobId` | path | `integer(int64)` | 예 |  |
+
+### 응답
+
+| 상태 | 설명 | 스키마 |
+| --- | --- | --- |
+| `200` | OK | `MigrationLinkFixupResponse` |
+| `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
+| `403` | 권한 없음 | `PlatformError` |
+| `404` | 대상 없음 | `PlatformError` |
+| `409` | 버전 충돌 — expectedVersion 불일치 | `PlatformError` |
+| `503` | 권한 서비스(org) 불능 | `PlatformError` |
+
+**200 본문** — `MigrationLinkFixupResponse`
+
+| 필드 | 타입 | 필수 | 설명 | 예시 |
+| --- | --- | --- | --- | --- |
+| `failed` | `integer(int32)` |  | 이번에도 정리하지 못한 문서 수 | `0` |
+| `jobId` | `integer(int64)` |  | 잡 id | `12` |
+| `touched` | `integer(int32)` |  | 본문이 실제로 바뀐 문서 수 | `3` |
+
+### curl
+
+```bash
+curl -X POST "https://<your-host>/api/migration/<jobId>/link-fixup" \
+  -H "Authorization: Bearer chanho_pat_…"
+```
+
+## GET /api/migration/{jobId}/report
 
 이관 결과 보고서를 조회한다
 
@@ -445,11 +493,11 @@ curl -X POST "https://<your-host>/api/wiki/migrations/<jobId>/items" \
 ### curl
 
 ```bash
-curl -X GET "https://<your-host>/api/wiki/migrations/<jobId>/report" \
+curl -X GET "https://<your-host>/api/migration/<jobId>/report" \
   -H "Authorization: Bearer chanho_pat_…"
 ```
 
-## POST /api/wiki/migrations/{jobId}/start
+## POST /api/migration/{jobId}/start
 
 이관 작업을 시작한다
 
@@ -464,9 +512,11 @@ curl -X GET "https://<your-host>/api/wiki/migrations/<jobId>/report" \
 | 상태 | 설명 | 스키마 |
 | --- | --- | --- |
 | `200` | OK | `MigrationJobResponse` |
+| `400` | 요청 검증 실패 | `PlatformError` |
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 버전 충돌 — expectedVersion 불일치 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `MigrationJobResponse`
@@ -487,6 +537,6 @@ curl -X GET "https://<your-host>/api/wiki/migrations/<jobId>/report" \
 ### curl
 
 ```bash
-curl -X POST "https://<your-host>/api/wiki/migrations/<jobId>/start" \
+curl -X POST "https://<your-host>/api/migration/<jobId>/start" \
   -H "Authorization: Bearer chanho_pat_…"
 ```

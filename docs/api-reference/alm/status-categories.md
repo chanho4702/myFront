@@ -100,7 +100,7 @@ curl -X POST "https://<your-host>/api/alm/settings/categories" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 상태 카테고리 ID |
 
 ### 요청 본문
 
@@ -155,7 +155,7 @@ curl -X PUT "https://<your-host>/api/alm/settings/categories/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 상태 카테고리 ID |
 
 ### 응답
 
@@ -182,7 +182,7 @@ curl -X DELETE "https://<your-host>/api/alm/settings/categories/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 상태 카테고리 ID |
 
 ### 요청 본문
 

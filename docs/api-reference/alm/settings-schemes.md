@@ -137,7 +137,7 @@ curl -X POST "https://<your-host>/api/alm/settings/schemes" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 설정 스킴 ID |
 
 ### 요청 본문
 
@@ -252,7 +252,7 @@ curl -X PUT "https://<your-host>/api/alm/settings/schemes/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 설정 스킴 ID |
 
 ### 응답
 
@@ -279,7 +279,7 @@ curl -X DELETE "https://<your-host>/api/alm/settings/schemes/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 설정 스킴 ID |
 
 ### 응답
 
@@ -306,7 +306,7 @@ curl -X POST "https://<your-host>/api/alm/settings/schemes/<id>/default" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 설정 스킴 ID |
 
 ### 응답
 

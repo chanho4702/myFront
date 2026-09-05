@@ -362,6 +362,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "첨부 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -433,6 +434,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "첨부 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -498,6 +500,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "첨부 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -612,6 +615,7 @@
           {
             "name": "boardId",
             "in": "path",
+            "description": "보드 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -682,6 +686,7 @@
           {
             "name": "boardId",
             "in": "path",
+            "description": "보드 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -772,6 +777,7 @@
           {
             "name": "boardId",
             "in": "path",
+            "description": "보드 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -837,6 +843,7 @@
           {
             "name": "boardId",
             "in": "path",
+            "description": "보드 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -912,6 +919,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "댓글 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -1002,6 +1010,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "댓글 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -1067,6 +1076,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "컴포넌트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -1157,6 +1167,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "컴포넌트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -1325,6 +1336,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "대시보드 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -1385,6 +1397,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "대시보드 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -1465,6 +1478,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "대시보드 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -1810,6 +1824,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -1880,6 +1895,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -1980,6 +1996,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -2045,6 +2062,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -2120,6 +2138,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -2192,6 +2211,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -2265,6 +2285,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -2365,6 +2386,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -2438,6 +2460,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -2530,6 +2553,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -2603,6 +2627,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -2695,6 +2720,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -2787,6 +2813,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -2878,6 +2905,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -2950,6 +2978,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -3022,6 +3051,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -3092,6 +3122,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -3164,6 +3195,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -3237,6 +3269,7 @@
           {
             "name": "issueId",
             "in": "path",
+            "description": "이슈 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -3329,6 +3362,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "이슈 연결 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -3572,6 +3606,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "알림 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -3726,6 +3761,16 @@
               }
             }
           },
+          "409": {
+            "description": "이미 존재하는 프로젝트 키입니다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
           "503": {
             "description": "권한 서비스(org) 불능",
             "content": {
@@ -3804,6 +3849,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -3874,6 +3920,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -3974,6 +4021,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -4039,6 +4087,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -4111,6 +4160,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -4184,6 +4234,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -4276,6 +4327,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -4384,6 +4436,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -4457,6 +4510,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -4549,6 +4603,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -4622,6 +4677,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -4714,6 +4770,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -4789,6 +4846,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -4881,6 +4939,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -4946,6 +5005,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -5018,6 +5078,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -5090,6 +5151,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -5182,6 +5244,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -5274,6 +5337,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -5366,6 +5430,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -5439,6 +5504,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -5531,6 +5597,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -5604,6 +5671,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -5695,6 +5763,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -5767,6 +5836,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -5840,6 +5910,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -5908,6 +5979,16 @@
               }
             }
           },
+          "409": {
+            "description": "이미 있는 버전 이름입니다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
           "503": {
             "description": "권한 서비스(org) 불능",
             "content": {
@@ -5932,6 +6013,7 @@
           {
             "name": "projectId",
             "in": "path",
+            "description": "프로젝트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -6140,6 +6222,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "상태 카테고리 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -6229,6 +6312,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "상태 카테고리 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -6293,6 +6377,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "상태 카테고리 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -6535,6 +6620,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "이슈 타입 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -6624,6 +6710,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "이슈 타입 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -6688,6 +6775,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "이슈 타입 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -6930,6 +7018,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "연결 타입 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -7019,6 +7108,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "연결 타입 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -7083,6 +7173,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "연결 타입 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -7325,6 +7416,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "우선순위 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -7414,6 +7506,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "우선순위 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -7478,6 +7571,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "우선순위 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -7675,6 +7769,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "설정 스킴 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -7764,6 +7859,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "설정 스킴 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -7828,6 +7924,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "설정 스킴 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -7892,6 +7989,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "설정 스킴 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -8115,6 +8213,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "상태 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -8204,6 +8303,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "상태 ID",
             "required": true,
             "schema": {
               "type": "string"
@@ -8268,6 +8368,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "바로 가기 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -8358,6 +8459,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "바로 가기 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -8423,6 +8525,7 @@
           {
             "name": "sprintId",
             "in": "path",
+            "description": "스프린트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -8493,6 +8596,7 @@
           {
             "name": "sprintId",
             "in": "path",
+            "description": "스프린트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -8595,6 +8699,7 @@
           {
             "name": "sprintId",
             "in": "path",
+            "description": "스프린트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -8662,6 +8767,16 @@
               }
             }
           },
+          "409": {
+            "description": "진행 중인 스프린트만 완료할 수 있습니다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
           "503": {
             "description": "권한 서비스(org) 불능",
             "content": {
@@ -8686,6 +8801,7 @@
           {
             "name": "sprintId",
             "in": "path",
+            "description": "스프린트 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -8734,6 +8850,16 @@
               }
             }
           },
+          "409": {
+            "description": "계획 상태의 스프린트만 시작할 수 있습니다 / 이미 진행 중인 스프린트가 있습니다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
           "503": {
             "description": "권한 서비스(org) 불능",
             "content": {
@@ -8758,6 +8884,7 @@
           {
             "name": "versionId",
             "in": "path",
+            "description": "버전 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -8827,7 +8954,7 @@
             }
           },
           "409": {
-            "description": "버전 충돌 — expectedVersion 불일치",
+            "description": "버전 충돌 — expectedVersion 불일치 / 이미 있는 버전 이름입니다",
             "content": {
               "application/json": {
                 "schema": {
@@ -8858,6 +8985,7 @@
           {
             "name": "versionId",
             "in": "path",
+            "description": "버전 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -8923,6 +9051,7 @@
           {
             "name": "versionId",
             "in": "path",
+            "description": "버전 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -8971,6 +9100,16 @@
               }
             }
           },
+          "409": {
+            "description": "이미 보관된 버전입니다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
           "503": {
             "description": "권한 서비스(org) 불능",
             "content": {
@@ -8995,6 +9134,7 @@
           {
             "name": "versionId",
             "in": "path",
+            "description": "버전 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -9062,6 +9202,16 @@
               }
             }
           },
+          "409": {
+            "description": "이미 릴리스된 버전입니다 / 보관된 버전은 릴리스할 수 없습니다",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
           "503": {
             "description": "권한 서비스(org) 불능",
             "content": {
@@ -9086,6 +9236,7 @@
           {
             "name": "id",
             "in": "path",
+            "description": "작업 시간 기록 ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -9723,25 +9874,35 @@
       },
       "IssueDetailsRequest": {
         "type": "object",
+        "description": "이슈의 세부 항목. 바깥 요청에서 details 자체를 생략하면 아래 값을 모두 보존하고, details를 주면 null인 필드는 명시적 해제로 본다.",
         "properties": {
           "parentId": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "description": "상위 이슈 ID. 에픽→일반 이슈→하위 작업 2단계까지만 허용한다",
+            "example": 1000
           },
           "sprintId": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "description": "옮겨 놓을 스프린트 ID. null이면 백로그",
+            "example": 12
           },
           "dueDate": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "마감일",
+            "example": "2026-09-30"
           },
           "estimateHours": {
             "type": "number",
+            "description": "예상 소요 시간(시간 단위, 소수 둘째 자리까지)",
+            "example": 3.5,
             "minimum": 0.01
           },
           "resolution": {
             "type": "string",
+            "description": "완료 사유. 정의된 값만 받고 null이면 해제한다",
             "enum": [
               "DONE",
               "WONT_DO",
@@ -9751,10 +9912,17 @@
           },
           "fixVersionId": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "description": "수정 버전 ID. 같은 프로젝트의 보관되지 않은 버전만 지정할 수 있고 null이면 해제",
+            "example": 5
           },
           "labels": {
             "type": "array",
+            "description": "라벨. 통째로 교체한다",
+            "example": [
+              "regression",
+              "frontend"
+            ],
             "items": {
               "type": "string",
               "maxLength": 80,
@@ -9765,6 +9933,10 @@
           },
           "componentIds": {
             "type": "array",
+            "description": "컴포넌트 ID 목록. null이면 그대로 두고 빈 배열이면 전부 해제한다",
+            "example": [
+              3
+            ],
             "items": {
               "type": "integer",
               "format": "int64"
@@ -11250,7 +11422,7 @@
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
-        "description": "개인 API 토큰 chanho_pat_… 또는 세션 JWT",
+        "description": "개인 API 토큰 `chanho_pat_…` 또는 세션 JWT",
         "scheme": "bearer",
         "bearerFormat": "JWT"
       }

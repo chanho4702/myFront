@@ -19,7 +19,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `issueId` | path | `integer(int64)` | 예 |  |
+| `issueId` | path | `integer(int64)` | 예 | 이슈 ID |
 
 ### 응답
 
@@ -57,7 +57,7 @@ curl -X GET "https://<your-host>/api/alm/issues/<issueId>/activity" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 | `field` | query | `string enum(STATUS, SPRINT)` |  | 바뀐 필드로 거른다(상태·담당자 등) |
 | `sprintId` | query | `integer(int64)` |  | 해당 스프린트에 속한 이슈만 본다 |
 | `since` | query | `string(date-time)` |  | 이 시각 이후 변경만 본다. ISO-8601 인스턴트(예: 2026-08-01T00:00:00Z) |

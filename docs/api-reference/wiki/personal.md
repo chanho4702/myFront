@@ -23,7 +23,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -50,7 +50,7 @@ curl -X PUT "https://<your-host>/api/wiki/pages/<pageId>/star" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -120,7 +120,7 @@ curl -X GET "https://<your-host>/api/wiki/recent" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 
 ### 응답
 
@@ -147,7 +147,7 @@ curl -X PUT "https://<your-host>/api/wiki/spaces/<spaceId>/star" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 
 ### 응답
 

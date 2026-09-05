@@ -19,7 +19,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 | `lineNo` | path | `integer(int32)` | 예 | 본문에서 그 체크박스가 있는 줄 번호 |
 
 ### 요청 본문
@@ -39,6 +39,7 @@
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 보관된 문서이거나, 그 줄이 더 이상 작업 항목이 아닙니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `TaskView`

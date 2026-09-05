@@ -23,7 +23,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 응답
 
@@ -67,7 +67,7 @@ curl -X GET "https://<your-host>/api/alm/projects/<projectId>/sprints" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 요청 본문
 
@@ -124,7 +124,7 @@ curl -X POST "https://<your-host>/api/alm/projects/<projectId>/sprints" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `sprintId` | path | `integer(int64)` | 예 |  |
+| `sprintId` | path | `integer(int64)` | 예 | 스프린트 ID |
 
 ### 응답
 
@@ -168,7 +168,7 @@ curl -X GET "https://<your-host>/api/alm/sprints/<sprintId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `sprintId` | path | `integer(int64)` | 예 |  |
+| `sprintId` | path | `integer(int64)` | 예 | 스프린트 ID |
 
 ### 요청 본문
 
@@ -231,7 +231,7 @@ curl -X PUT "https://<your-host>/api/alm/sprints/<sprintId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `sprintId` | path | `integer(int64)` | 예 |  |
+| `sprintId` | path | `integer(int64)` | 예 | 스프린트 ID |
 
 ### 요청 본문
 
@@ -251,6 +251,7 @@ curl -X PUT "https://<your-host>/api/alm/sprints/<sprintId>" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 진행 중인 스프린트만 완료할 수 있습니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `SprintResponse`
@@ -292,7 +293,7 @@ curl -X POST "https://<your-host>/api/alm/sprints/<sprintId>/complete" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `sprintId` | path | `integer(int64)` | 예 |  |
+| `sprintId` | path | `integer(int64)` | 예 | 스프린트 ID |
 
 ### 응답
 
@@ -302,6 +303,7 @@ curl -X POST "https://<your-host>/api/alm/sprints/<sprintId>/complete" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 계획 상태의 스프린트만 시작할 수 있습니다 / 이미 진행 중인 스프린트가 있습니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `SprintResponse`

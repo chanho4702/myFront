@@ -56,7 +56,7 @@ curl -X GET "https://<your-host>/api/wiki/labels" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -97,7 +97,7 @@ curl -X GET "https://<your-host>/api/wiki/pages/<pageId>/backlinks" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -124,7 +124,7 @@ curl -X GET "https://<your-host>/api/wiki/pages/<pageId>/labels" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 요청 본문
 
@@ -167,7 +167,7 @@ curl -X PUT "https://<your-host>/api/wiki/pages/<pageId>/labels" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 
 ### 응답
 
@@ -201,7 +201,7 @@ curl -X GET "https://<your-host>/api/wiki/spaces/<spaceId>/labels" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 | `name` | path | `string` | 예 | 라벨 이름 |
 
 ### 응답

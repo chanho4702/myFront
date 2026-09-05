@@ -50,10 +50,6 @@
       "name": "Labels"
     },
     {
-      "description": "컨플루언스 이관 작업의 생성·실행·보고.",
-      "name": "Migrations"
-    },
-    {
       "description": "알림함과 알림 수신 설정.",
       "name": "Notifications"
     },
@@ -108,6 +104,7 @@
         "operationId": "download",
         "parameters": [
           {
+            "description": "첨부 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -179,6 +176,7 @@
         "operationId": "delete_4",
         "parameters": [
           {
+            "description": "첨부 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -244,6 +242,7 @@
         "operationId": "inline",
         "parameters": [
           {
+            "description": "첨부 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -295,6 +294,16 @@
             },
             "description": "대상 없음"
           },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "허용되지 않는 미디어 타입"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -317,6 +326,7 @@
         "operationId": "versions",
         "parameters": [
           {
+            "description": "첨부 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -392,6 +402,7 @@
         "operationId": "downloadVersion",
         "parameters": [
           {
+            "description": "첨부 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -475,6 +486,7 @@
         "operationId": "restoreVersion",
         "parameters": [
           {
+            "description": "첨부 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -611,6 +623,7 @@
         "operationId": "update_3",
         "parameters": [
           {
+            "description": "댓글 ID",
             "in": "path",
             "name": "commentId",
             "required": true,
@@ -701,6 +714,7 @@
         "operationId": "delete_3",
         "parameters": [
           {
+            "description": "댓글 ID",
             "in": "path",
             "name": "commentId",
             "required": true,
@@ -766,6 +780,7 @@
         "operationId": "reactComment",
         "parameters": [
           {
+            "description": "댓글 ID",
             "in": "path",
             "name": "commentId",
             "required": true,
@@ -848,6 +863,7 @@
         "operationId": "unreactComment",
         "parameters": [
           {
+            "description": "댓글 ID",
             "in": "path",
             "name": "commentId",
             "required": true,
@@ -932,6 +948,7 @@
         "operationId": "setResolved",
         "parameters": [
           {
+            "description": "댓글 ID",
             "in": "path",
             "name": "commentId",
             "required": true,
@@ -1084,769 +1101,9 @@
         ]
       }
     },
-    "/api/wiki/migrations": {
-      "get": {
-        "operationId": "list_5",
-        "responses": {
-          "200": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MigrationJobSummary"
-                  }
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "인증 실패 — 토큰 없음·만료·무효"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 없음"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 서비스(org) 불능"
-          }
-        },
-        "summary": "이관 작업 목록을 최신순으로 조회한다",
-        "tags": [
-          "Migrations"
-        ]
-      },
-      "post": {
-        "operationId": "create_4",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MigrationJobCreateRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/MigrationJobResponse"
-                }
-              }
-            },
-            "description": "Created"
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "요청 검증 실패"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "인증 실패 — 토큰 없음·만료·무효"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 없음"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 서비스(org) 불능"
-          }
-        },
-        "summary": "이관 작업을 만든다",
-        "tags": [
-          "Migrations"
-        ]
-      }
-    },
-    "/api/wiki/migrations/confluence-dc/probe": {
-      "post": {
-        "operationId": "probeConfluenceDc",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ConfluenceDcProbeRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConfluenceDcProbeResponse"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "요청 검증 실패"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "인증 실패 — 토큰 없음·만료·무효"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 없음"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 서비스(org) 불능"
-          }
-        },
-        "summary": "컨플루언스 설치형 원본에 연결되는지 확인한다 — 토큰은 응답에 실리지 않는다",
-        "tags": [
-          "Migrations"
-        ]
-      }
-    },
-    "/api/wiki/migrations/{jobId}": {
-      "get": {
-        "operationId": "get_5",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "jobId",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/MigrationJobDetailResponse"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "인증 실패 — 토큰 없음·만료·무효"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 없음"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "대상 없음"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 서비스(org) 불능"
-          }
-        },
-        "summary": "이관 작업의 진행 상황을 조회한다",
-        "tags": [
-          "Migrations"
-        ]
-      }
-    },
-    "/api/wiki/migrations/{jobId}/cancel": {
-      "post": {
-        "operationId": "cancel",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "jobId",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/MigrationJobResponse"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "인증 실패 — 토큰 없음·만료·무효"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 없음"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "대상 없음"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 서비스(org) 불능"
-          }
-        },
-        "summary": "진행 중인 이관 작업을 취소한다",
-        "tags": [
-          "Migrations"
-        ]
-      }
-    },
-    "/api/wiki/migrations/{jobId}/discover": {
-      "post": {
-        "operationId": "discover",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "jobId",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/MigrationDiscoverResponse"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "인증 실패 — 토큰 없음·만료·무효"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 없음"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "대상 없음"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 서비스(org) 불능"
-          }
-        },
-        "summary": "원본 트리를 훑어 대기열을 채운다 — 다시 눌러도 새 항목만 늘어난다",
-        "tags": [
-          "Migrations"
-        ]
-      }
-    },
-    "/api/wiki/migrations/{jobId}/items": {
-      "get": {
-        "operationId": "items",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "jobId",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "description": "항목 상태 필터. 비우면 전부",
-            "in": "query",
-            "name": "status",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "PENDING",
-                "RUNNING",
-                "RETRY_WAIT",
-                "COMPLETED",
-                "DEAD_LETTER"
-              ]
-            }
-          },
-          {
-            "description": "이관 단계 필터. 비우면 전부",
-            "in": "query",
-            "name": "stage",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "EXTRACT",
-                "NORMALIZE",
-                "MEDIA_COPY",
-                "RESOLVE",
-                "VERIFY",
-                "DONE"
-              ]
-            }
-          },
-          {
-            "description": "0부터 세는 페이지 번호",
-            "in": "query",
-            "name": "page",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/MigrationItemPageResponse"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "인증 실패 — 토큰 없음·만료·무효"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 없음"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "대상 없음"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 서비스(org) 불능"
-          }
-        },
-        "summary": "이관 항목을 상태·단계로 걸러 페이지 단위로 조회한다",
-        "tags": [
-          "Migrations"
-        ]
-      },
-      "post": {
-        "operationId": "enqueue",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "jobId",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MigrationItemEnqueueRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/MigrationItemResponse"
-                }
-              }
-            },
-            "description": "Created"
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "요청 검증 실패"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "인증 실패 — 토큰 없음·만료·무효"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 없음"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "대상 없음"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 서비스(org) 불능"
-          }
-        },
-        "summary": "이관할 원본 문서를 대기열에 넣는다",
-        "tags": [
-          "Migrations"
-        ]
-      }
-    },
-    "/api/wiki/migrations/{jobId}/report": {
-      "get": {
-        "operationId": "report",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "jobId",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/MigrationReportResponse"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "인증 실패 — 토큰 없음·만료·무효"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 없음"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "대상 없음"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 서비스(org) 불능"
-          }
-        },
-        "summary": "이관 결과 보고서를 조회한다",
-        "tags": [
-          "Migrations"
-        ]
-      }
-    },
-    "/api/wiki/migrations/{jobId}/start": {
-      "post": {
-        "operationId": "start",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "jobId",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/MigrationJobResponse"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "인증 실패 — 토큰 없음·만료·무효"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 없음"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "대상 없음"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlatformError"
-                }
-              }
-            },
-            "description": "권한 서비스(org) 불능"
-          }
-        },
-        "summary": "이관 작업을 시작한다",
-        "tags": [
-          "Migrations"
-        ]
-      }
-    },
     "/api/wiki/notifications": {
       "get": {
-        "operationId": "list_11",
+        "operationId": "list_10",
         "responses": {
           "200": {
             "content": {
@@ -2132,6 +1389,16 @@
             },
             "description": "권한 없음"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "보관된 문서 아래에는 새 문서를 만들 수 없습니다"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -2223,6 +1490,7 @@
         "operationId": "get_2",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -2293,6 +1561,7 @@
         "operationId": "update_2",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -2384,7 +1653,7 @@
             "description": "권한 서비스(org) 불능"
           }
         },
-        "summary": "페이지를 수정한다 — expectedVersion이 현재 버전과 다르면 409",
+        "summary": "페이지를 수정한다 — expectedVersion이 현재 버전과 다르면 409. 보관된 문서는 수정 불가",
         "tags": [
           "Pages"
         ]
@@ -2393,6 +1662,7 @@
         "operationId": "delete_2",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -2445,6 +1715,16 @@
             },
             "description": "대상 없음"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "하위 페이지가 있습니다 — children으로 promote 또는 cascade를 지정하세요"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -2467,6 +1747,7 @@
         "operationId": "archive",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -2517,6 +1798,16 @@
             },
             "description": "대상 없음"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "이미 보관된 문서입니다"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -2539,6 +1830,7 @@
         "operationId": "commitCollaborationDraft",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -2609,6 +1901,16 @@
             },
             "description": "대상 없음"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "공동 초안이 없거나, 초안 버전이 그사이 바뀌었습니다"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -2631,6 +1933,7 @@
         "operationId": "copy",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -2722,6 +2025,7 @@
         "operationId": "export",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -2805,6 +2109,7 @@
         "operationId": "setIcon",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -2897,6 +2202,7 @@
         "operationId": "move",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -2967,6 +2273,16 @@
             },
             "description": "대상 없음"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MoveImpactError"
+                }
+              }
+            },
+            "description": "새 위치의 보기 제한이 새로 적용됩니다 — 확인 후 confirmImpact=true로 다시 요청하세요"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -2989,6 +2305,7 @@
         "operationId": "setOwner",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -3081,6 +2398,7 @@
         "operationId": "publish",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -3153,6 +2471,7 @@
         "operationId": "purge",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -3218,6 +2537,7 @@
         "operationId": "restore_1",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -3290,6 +2610,7 @@
         "operationId": "get_3",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -3360,6 +2681,7 @@
         "operationId": "replace_1",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -3452,6 +2774,7 @@
         "operationId": "share",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -3544,6 +2867,7 @@
         "operationId": "unarchive",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -3594,6 +2918,16 @@
             },
             "description": "대상 없음"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "보관되지 않은 문서이거나, 상위 문서가 아직 보관 중입니다"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -3616,6 +2950,7 @@
         "operationId": "verify",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -3705,6 +3040,7 @@
         "operationId": "unverify",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -3777,6 +3113,7 @@
         "operationId": "recordView",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -3853,6 +3190,7 @@
         "operationId": "ancestors",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -3928,6 +3266,7 @@
         "operationId": "list_4",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -4001,6 +3340,7 @@
         "operationId": "upload",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -4112,6 +3452,7 @@
         "operationId": "confirm",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -4197,6 +3538,7 @@
         "operationId": "backlinks",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -4272,6 +3614,7 @@
         "operationId": "issue",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -4344,6 +3687,7 @@
         "operationId": "list_3",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -4417,6 +3761,7 @@
         "operationId": "create_3",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -4509,6 +3854,7 @@
         "operationId": "descendants",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -4584,6 +3930,7 @@
         "operationId": "list",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -4657,6 +4004,7 @@
         "operationId": "replace",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -4752,6 +4100,7 @@
         "operationId": "page",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -4827,6 +4176,7 @@
         "operationId": "reactPage",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -4909,6 +4259,7 @@
         "operationId": "unreactPage",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -4990,9 +4341,10 @@
     },
     "/api/wiki/pages/{pageId}/revisions": {
       "get": {
-        "operationId": "list_10",
+        "operationId": "list_9",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -5068,6 +4420,7 @@
         "operationId": "get_4",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -5150,6 +4503,7 @@
         "operationId": "restore",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -5232,6 +4586,7 @@
         "operationId": "fromPage",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -5301,6 +4656,16 @@
             },
             "description": "대상 없음"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "같은 이름의 템플릿이 있거나, 스페이스당 개수 상한을 넘었습니다"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -5323,6 +4688,7 @@
         "operationId": "starPage",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -5386,6 +4752,7 @@
         "operationId": "unstarPage",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -5451,6 +4818,7 @@
         "operationId": "setDone",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -5531,6 +4899,16 @@
             },
             "description": "대상 없음"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "보관된 문서이거나, 그 줄이 더 이상 작업 항목이 아닙니다"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -5553,6 +4931,7 @@
         "operationId": "status_1",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -5626,6 +5005,7 @@
         "operationId": "watch_1",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -5699,6 +5079,7 @@
         "operationId": "unwatch_1",
         "parameters": [
           {
+            "description": "페이지 ID",
             "in": "path",
             "name": "pageId",
             "required": true,
@@ -6015,6 +5396,7 @@
         "operationId": "get_1",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -6085,6 +5467,7 @@
         "operationId": "update_1",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -6175,6 +5558,7 @@
         "operationId": "delete_1",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "id",
             "required": true,
@@ -6237,9 +5621,10 @@
     },
     "/api/wiki/spaces/{spaceId}/archive": {
       "get": {
-        "operationId": "list_9",
+        "operationId": "list_8",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -6312,9 +5697,10 @@
     },
     "/api/wiki/spaces/{spaceId}/audit": {
       "get": {
-        "operationId": "list_8",
+        "operationId": "list_7",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -6387,9 +5773,10 @@
     },
     "/api/wiki/spaces/{spaceId}/blog": {
       "get": {
-        "operationId": "list_7",
+        "operationId": "list_6",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -6465,6 +5852,7 @@
         "operationId": "inSpace",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -6540,6 +5928,7 @@
         "operationId": "pagesWithLabel",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -6624,6 +6013,7 @@
         "operationId": "byIds",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -6712,6 +6102,7 @@
         "operationId": "children",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -6797,6 +6188,7 @@
         "operationId": "lookup",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -6884,6 +6276,7 @@
         "operationId": "recent",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -6970,6 +6363,7 @@
         "operationId": "search",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -7054,6 +6448,7 @@
         "operationId": "starSpace",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -7117,6 +6512,7 @@
         "operationId": "unstarSpace",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -7182,6 +6578,7 @@
         "operationId": "list_2",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -7255,6 +6652,7 @@
         "operationId": "create_1",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -7325,6 +6723,16 @@
             },
             "description": "대상 없음"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "같은 이름의 템플릿이 있거나, 스페이스당 개수 상한을 넘었습니다"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -7344,9 +6752,10 @@
     },
     "/api/wiki/spaces/{spaceId}/trash": {
       "get": {
-        "operationId": "list_6",
+        "operationId": "list_5",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -7420,6 +6829,7 @@
         "operationId": "empty",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -7496,6 +6906,7 @@
         "operationId": "status",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -7569,6 +6980,7 @@
         "operationId": "watchViaPost",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -7642,6 +7054,7 @@
         "operationId": "watch",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -7715,6 +7128,7 @@
         "operationId": "unwatch",
         "parameters": [
           {
+            "description": "스페이스 ID",
             "in": "path",
             "name": "spaceId",
             "required": true,
@@ -7907,6 +7321,7 @@
         "operationId": "get",
         "parameters": [
           {
+            "description": "템플릿 ID",
             "in": "path",
             "name": "templateId",
             "required": true,
@@ -7977,6 +7392,7 @@
         "operationId": "update",
         "parameters": [
           {
+            "description": "템플릿 ID",
             "in": "path",
             "name": "templateId",
             "required": true,
@@ -8047,6 +7463,16 @@
             },
             "description": "대상 없음"
           },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "같은 이름의 템플릿이 이미 있습니다"
+          },
           "503": {
             "content": {
               "application/json": {
@@ -8067,6 +7493,7 @@
         "operationId": "delete",
         "parameters": [
           {
+            "description": "템플릿 ID",
             "in": "path",
             "name": "templateId",
             "required": true,
@@ -8486,46 +7913,6 @@
           }
         }
       },
-      "ConfluenceDcProbeRequest": {
-        "type": "object",
-        "properties": {
-          "baseUrl": {
-            "type": "string",
-            "maxLength": 512,
-            "minLength": 0
-          },
-          "spaceKey": {
-            "type": "string",
-            "maxLength": 255,
-            "minLength": 0
-          },
-          "token": {
-            "type": "string",
-            "maxLength": 4096,
-            "minLength": 0
-          }
-        },
-        "required": [
-          "baseUrl",
-          "spaceKey",
-          "token"
-        ]
-      },
-      "ConfluenceDcProbeResponse": {
-        "type": "object",
-        "properties": {
-          "homepageId": {
-            "type": "string"
-          },
-          "pageCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "spaceName": {
-            "type": "string"
-          }
-        }
-      },
       "CopyRequest": {
         "type": "object",
         "properties": {
@@ -8600,493 +7987,36 @@
           "labels"
         ]
       },
-      "MigrationDeadLetterResponse": {
+      "MoveImpactError": {
         "type": "object",
+        "description": "이동 영향으로 멈춘 409. 새로 적용될 보기 제한을 함께 싣는다.",
         "properties": {
-          "deadLetteredAt": {
+          "error": {
             "type": "string",
-            "format": "date-time"
+            "description": "사용자에게 보일 오류 메시지",
+            "example": "이동하면 새 위치의 보기 제한이 적용되어 일부 사용자가 접근을 잃습니다. 확인 후 다시 시도하세요"
           },
-          "externalObjectId": {
-            "type": "string"
-          },
-          "itemId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "lastErrorCode": {
-            "type": "string"
-          },
-          "retryCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "stage": {
-            "type": "string",
-            "enum": [
-              "EXTRACT",
-              "NORMALIZE",
-              "MEDIA_COPY",
-              "RESOLVE",
-              "VERIFY",
-              "DONE"
+          "impact": {
+            "type": "object",
+            "description": "확인 다이얼로그가 그릴 영향",
+            "properties": {
+              "newlyRestrictedBy": {
+                "type": "array",
+                "description": "이동 후 새로 적용되는 조상 VIEW 제한",
+                "items": {
+                  "$ref": "#/components/schemas/InheritedRestriction"
+                }
+              }
+            },
+            "required": [
+              "newlyRestrictedBy"
             ]
-          }
-        }
-      },
-      "MigrationDiscoverResponse": {
-        "type": "object",
-        "properties": {
-          "discovered": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "enqueued": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "skipped": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "MigrationIssueSummary": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string"
-          },
-          "distinctPaths": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "occurrences": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "sampleSourcePath": {
-            "type": "string"
-          },
-          "severity": {
-            "type": "string",
-            "enum": [
-              "INFO",
-              "WARNING",
-              "ERROR"
-            ]
-          }
-        }
-      },
-      "MigrationItemEnqueueRequest": {
-        "type": "object",
-        "properties": {
-          "externalObjectId": {
-            "type": "string",
-            "maxLength": 512,
-            "minLength": 0
-          },
-          "payloadRef": {
-            "type": "string",
-            "maxLength": 1024,
-            "minLength": 0
-          },
-          "siblingOrder": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "sourceChecksum": {
-            "type": "string",
-            "minLength": 1,
-            "pattern": "[a-f0-9]{64}"
-          },
-          "sourceVersion": {
-            "type": "string",
-            "maxLength": 100,
-            "minLength": 0
           }
         },
         "required": [
-          "externalObjectId",
-          "payloadRef",
-          "sourceChecksum"
+          "error",
+          "impact"
         ]
-      },
-      "MigrationItemPageResponse": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MigrationItemResponse"
-            }
-          },
-          "page": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "size": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "MigrationItemResponse": {
-        "type": "object",
-        "properties": {
-          "externalObjectId": {
-            "type": "string"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "jobId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "lastErrorCode": {
-            "type": "string"
-          },
-          "nextAttemptAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "retryCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "sourceVersion": {
-            "type": "string"
-          },
-          "stage": {
-            "type": "string",
-            "enum": [
-              "EXTRACT",
-              "NORMALIZE",
-              "MEDIA_COPY",
-              "RESOLVE",
-              "VERIFY",
-              "DONE"
-            ]
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "RUNNING",
-              "RETRY_WAIT",
-              "COMPLETED",
-              "DEAD_LETTER"
-            ]
-          },
-          "targetPageId": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "MigrationJobCounts": {
-        "type": "object",
-        "properties": {
-          "byStage": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          "byStatus": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        }
-      },
-      "MigrationJobCreateRequest": {
-        "type": "object",
-        "properties": {
-          "mode": {
-            "type": "string",
-            "enum": [
-              "DRY_RUN",
-              "IMPORT"
-            ]
-          },
-          "provider": {
-            "type": "string",
-            "enum": [
-              "NOTION",
-              "CONFLUENCE_DC"
-            ]
-          },
-          "source": {
-            "$ref": "#/components/schemas/MigrationSourceRequest"
-          },
-          "sourceInstanceId": {
-            "type": "string",
-            "maxLength": 255,
-            "minLength": 0
-          },
-          "targetSpaceId": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "required": [
-          "mode",
-          "provider",
-          "targetSpaceId"
-        ]
-      },
-      "MigrationJobDetailResponse": {
-        "type": "object",
-        "properties": {
-          "completedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "counts": {
-            "$ref": "#/components/schemas/MigrationJobCounts"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "itemCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "mode": {
-            "type": "string",
-            "enum": [
-              "DRY_RUN",
-              "IMPORT"
-            ]
-          },
-          "provider": {
-            "type": "string",
-            "enum": [
-              "NOTION",
-              "CONFLUENCE_DC"
-            ]
-          },
-          "source": {
-            "$ref": "#/components/schemas/MigrationSourceSummary"
-          },
-          "sourceInstanceId": {
-            "type": "string"
-          },
-          "startedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "RUNNING",
-              "COMPLETED",
-              "FAILED",
-              "CANCELLED"
-            ]
-          },
-          "targetSpaceId": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "MigrationJobResponse": {
-        "type": "object",
-        "properties": {
-          "completedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "itemCount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "mode": {
-            "type": "string",
-            "enum": [
-              "DRY_RUN",
-              "IMPORT"
-            ]
-          },
-          "provider": {
-            "type": "string",
-            "enum": [
-              "NOTION",
-              "CONFLUENCE_DC"
-            ]
-          },
-          "sourceInstanceId": {
-            "type": "string"
-          },
-          "startedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "RUNNING",
-              "COMPLETED",
-              "FAILED",
-              "CANCELLED"
-            ]
-          },
-          "targetSpaceId": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "MigrationJobSummary": {
-        "type": "object",
-        "properties": {
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "discoveredCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "mode": {
-            "type": "string",
-            "enum": [
-              "DRY_RUN",
-              "IMPORT"
-            ]
-          },
-          "provider": {
-            "type": "string",
-            "enum": [
-              "NOTION",
-              "CONFLUENCE_DC"
-            ]
-          },
-          "sourceSpaceKey": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "RUNNING",
-              "COMPLETED",
-              "FAILED",
-              "CANCELLED"
-            ]
-          },
-          "targetSpaceId": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "MigrationReportResponse": {
-        "type": "object",
-        "properties": {
-          "deadLetters": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MigrationDeadLetterResponse"
-            }
-          },
-          "issues": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MigrationIssueSummary"
-            }
-          },
-          "itemsByStage": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          "itemsByStatus": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          "job": {
-            "$ref": "#/components/schemas/MigrationJobResponse"
-          }
-        }
-      },
-      "MigrationSourceRequest": {
-        "type": "object",
-        "properties": {
-          "baseUrl": {
-            "type": "string",
-            "maxLength": 512,
-            "minLength": 0
-          },
-          "spaceKey": {
-            "type": "string",
-            "maxLength": 255,
-            "minLength": 0
-          },
-          "token": {
-            "type": "string",
-            "maxLength": 4096,
-            "minLength": 0
-          }
-        },
-        "required": [
-          "baseUrl",
-          "spaceKey",
-          "token"
-        ]
-      },
-      "MigrationSourceSummary": {
-        "type": "object",
-        "properties": {
-          "baseUrl": {
-            "type": "string"
-          },
-          "discoveredCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "spaceKey": {
-            "type": "string"
-          },
-          "spaceName": {
-            "type": "string"
-          }
-        }
       },
       "NotificationListResponse": {
         "type": "object",

@@ -20,7 +20,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `issueId` | path | `integer(int64)` | 예 |  |
+| `issueId` | path | `integer(int64)` | 예 | 이슈 ID |
 
 ### 응답
 
@@ -75,7 +75,7 @@ curl -X POST "https://<your-host>/api/alm/issues/<issueId>/archive" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `issueId` | path | `integer(int64)` | 예 |  |
+| `issueId` | path | `integer(int64)` | 예 | 이슈 ID |
 
 ### 응답
 
@@ -130,7 +130,7 @@ curl -X POST "https://<your-host>/api/alm/issues/<issueId>/restore" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 응답
 

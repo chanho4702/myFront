@@ -21,7 +21,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 컴포넌트 ID |
 
 ### 요청 본문
 
@@ -82,7 +82,7 @@ curl -X PUT "https://<your-host>/api/alm/components/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 컴포넌트 ID |
 
 ### 응답
 
@@ -109,7 +109,7 @@ curl -X DELETE "https://<your-host>/api/alm/components/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 응답
 
@@ -149,7 +149,7 @@ curl -X GET "https://<your-host>/api/alm/projects/<projectId>/components" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 요청 본문
 

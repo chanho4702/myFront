@@ -22,7 +22,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `commentId` | path | `integer(int64)` | 예 |  |
+| `commentId` | path | `integer(int64)` | 예 | 댓글 ID |
 
 ### 요청 본문
 
@@ -83,7 +83,7 @@ curl -X PUT "https://<your-host>/api/wiki/comments/<commentId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `commentId` | path | `integer(int64)` | 예 |  |
+| `commentId` | path | `integer(int64)` | 예 | 댓글 ID |
 
 ### 응답
 
@@ -110,7 +110,7 @@ curl -X DELETE "https://<your-host>/api/wiki/comments/<commentId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `commentId` | path | `integer(int64)` | 예 |  |
+| `commentId` | path | `integer(int64)` | 예 | 댓글 ID |
 
 ### 요청 본문
 
@@ -171,7 +171,7 @@ curl -X PUT "https://<your-host>/api/wiki/comments/<commentId>/resolved" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -219,7 +219,7 @@ curl -X GET "https://<your-host>/api/wiki/pages/<pageId>/comments" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 요청 본문
 

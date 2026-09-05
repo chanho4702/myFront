@@ -78,6 +78,8 @@
   "api-reference/alm/versions.md": 168,
   "api-reference/alm/worklogs.md": 169,
   "api-reference/migration/": 207,
+  "api-reference/migration/README.md": 208,
+  "api-reference/migration/migrations.md": 209,
   "api-reference/org/": 141,
   "api-reference/org/README.md": 144,
   "api-reference/org/avatars.md": 170,

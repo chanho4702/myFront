@@ -22,7 +22,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `commentId` | path | `integer(int64)` | 예 |  |
+| `commentId` | path | `integer(int64)` | 예 | 댓글 ID |
 | `emoji` | path | `string` | 예 | 리액션 이모지 문자 |
 
 ### 응답
@@ -58,7 +58,7 @@ curl -X PUT "https://<your-host>/api/wiki/comments/<commentId>/reactions/<emoji>
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `commentId` | path | `integer(int64)` | 예 |  |
+| `commentId` | path | `integer(int64)` | 예 | 댓글 ID |
 | `emoji` | path | `string` | 예 | 리액션 이모지 문자 |
 
 ### 응답
@@ -94,7 +94,7 @@ curl -X DELETE "https://<your-host>/api/wiki/comments/<commentId>/reactions/<emo
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -129,7 +129,7 @@ curl -X GET "https://<your-host>/api/wiki/pages/<pageId>/reactions" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 | `emoji` | path | `string` | 예 | 리액션 이모지 문자 |
 
 ### 응답
@@ -165,7 +165,7 @@ curl -X PUT "https://<your-host>/api/wiki/pages/<pageId>/reactions/<emoji>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 | `emoji` | path | `string` | 예 | 리액션 이모지 문자 |
 
 ### 응답

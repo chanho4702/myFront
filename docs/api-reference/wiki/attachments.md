@@ -26,7 +26,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 첨부 ID |
 
 ### 응답
 
@@ -53,7 +53,7 @@ curl -X GET "https://<your-host>/api/wiki/attachments/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 첨부 ID |
 
 ### 응답
 
@@ -80,7 +80,7 @@ curl -X DELETE "https://<your-host>/api/wiki/attachments/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 첨부 ID |
 
 ### 응답
 
@@ -90,6 +90,7 @@ curl -X DELETE "https://<your-host>/api/wiki/attachments/<id>" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `415` | 허용되지 않는 미디어 타입 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 ### curl
@@ -107,7 +108,7 @@ curl -X GET "https://<your-host>/api/wiki/attachments/<id>/inline" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 첨부 ID |
 
 ### 응답
 
@@ -144,7 +145,7 @@ curl -X GET "https://<your-host>/api/wiki/attachments/<id>/versions" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 첨부 ID |
 | `version` | path | `integer(int32)` | 예 | 내려받을 지난 버전 번호(1부터) |
 
 ### 응답
@@ -172,7 +173,7 @@ curl -X GET "https://<your-host>/api/wiki/attachments/<id>/versions/<version>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 첨부 ID |
 | `version` | path | `integer(int32)` | 예 | 현재로 되돌릴 지난 버전 번호 |
 
 ### 응답
@@ -212,7 +213,7 @@ curl -X POST "https://<your-host>/api/wiki/attachments/<id>/versions/<version>/r
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -251,7 +252,7 @@ curl -X GET "https://<your-host>/api/wiki/pages/<pageId>/attachments" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 | `pending` | query | `boolean` |  | 본문 저장 전 에디터가 먼저 올리는 임시 첨부. confirm 전까지 정리 대상이다 |
 
 ### 요청 본문
@@ -301,7 +302,7 @@ curl -X POST "https://<your-host>/api/wiki/pages/<pageId>/attachments" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 요청 본문
 

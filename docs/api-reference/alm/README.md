@@ -12,7 +12,7 @@
 
 ## 인증
 
-개인 API 토큰 chanho_pat_… 또는 세션 JWT. 모든 엔드포인트가 이 인증을 요구한다.
+개인 API 토큰 `chanho_pat_…` 또는 세션 JWT. 모든 엔드포인트가 이 인증을 요구한다.
 
 ```http
 Authorization: Bearer chanho_pat_…
@@ -49,7 +49,7 @@ Authorization: Bearer chanho_pat_…
 
 ## 공통 오류
 
-오류 응답. 메시지는 한국어이며 화면에 그대로 노출된다.. 오류 응답 본문은 `PlatformError` 하나로 통일된다.
+오류 응답. 메시지는 한국어이며 화면에 그대로 노출된다. 오류 응답 본문은 `PlatformError` 하나로 통일된다.
 
 | 필드 | 타입 | 필수 | 설명 | 예시 |
 | --- | --- | --- | --- | --- |

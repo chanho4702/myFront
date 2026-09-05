@@ -20,7 +20,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -57,7 +57,7 @@ curl -X GET "https://<your-host>/api/wiki/pages/<pageId>/revisions" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 | `version` | path | `integer(int32)` | 예 | 조회할 버전 번호(1부터) |
 
 ### 응답
@@ -95,7 +95,7 @@ curl -X GET "https://<your-host>/api/wiki/pages/<pageId>/revisions/<version>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 | `version` | path | `integer(int32)` | 예 | 되돌릴 버전 번호 |
 
 ### 응답

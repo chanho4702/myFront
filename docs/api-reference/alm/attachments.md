@@ -22,7 +22,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 첨부 ID |
 
 ### 응답
 
@@ -49,7 +49,7 @@ curl -X GET "https://<your-host>/api/alm/attachments/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 첨부 ID |
 
 ### 응답
 
@@ -76,7 +76,7 @@ curl -X DELETE "https://<your-host>/api/alm/attachments/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 첨부 ID |
 
 ### 응답
 
@@ -103,7 +103,7 @@ curl -X GET "https://<your-host>/api/alm/attachments/<id>/inline" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `issueId` | path | `integer(int64)` | 예 |  |
+| `issueId` | path | `integer(int64)` | 예 | 이슈 ID |
 
 ### 응답
 
@@ -142,7 +142,7 @@ curl -X GET "https://<your-host>/api/alm/issues/<issueId>/attachments" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `issueId` | path | `integer(int64)` | 예 |  |
+| `issueId` | path | `integer(int64)` | 예 | 이슈 ID |
 
 ### 요청 본문
 

@@ -82,6 +82,7 @@ curl -X GET "https://<your-host>/api/alm/projects" \
 | `400` | 요청 검증 실패 | `PlatformError` |
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
+| `409` | 이미 존재하는 프로젝트 키입니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **201 본문** — `ProjectResponse`
@@ -166,7 +167,7 @@ curl -X GET "https://<your-host>/api/alm/projects/trash" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 응답
 
@@ -214,7 +215,7 @@ curl -X GET "https://<your-host>/api/alm/projects/<projectId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 요청 본문
 
@@ -286,7 +287,7 @@ curl -X PUT "https://<your-host>/api/alm/projects/<projectId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 응답
 
@@ -313,7 +314,7 @@ curl -X DELETE "https://<your-host>/api/alm/projects/<projectId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 응답
 
@@ -361,7 +362,7 @@ curl -X POST "https://<your-host>/api/alm/projects/<projectId>/archive" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 응답
 
@@ -388,7 +389,7 @@ curl -X DELETE "https://<your-host>/api/alm/projects/<projectId>/permanent" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 응답
 
@@ -436,7 +437,7 @@ curl -X POST "https://<your-host>/api/alm/projects/<projectId>/restore" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 응답
 

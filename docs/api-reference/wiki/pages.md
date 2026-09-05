@@ -10,7 +10,7 @@
 | --- | --- | --- |
 | `POST` | `/api/wiki/pages` | [페이지를 만든다](#post-apiwikipages) |
 | `GET` | `/api/wiki/pages/{id}` | [페이지 본문과 메타데이터를 조회한다](#get-apiwikipagesid) |
-| `PUT` | `/api/wiki/pages/{id}` | [페이지를 수정한다 — expectedVersion이 현재 버전과 다르면 409](#put-apiwikipagesid) |
+| `PUT` | `/api/wiki/pages/{id}` | [페이지를 수정한다 — expectedVersion이 현재 버전과 다르면 409. 보관된 문서는 수정 불가](#put-apiwikipagesid) |
 | `DELETE` | `/api/wiki/pages/{id}` | [페이지를 휴지통으로 보낸다](#delete-apiwikipagesid) |
 | `PUT` | `/api/wiki/pages/{id}/collaboration-draft` | [공동 편집 초안을 정본으로 확정한다](#put-apiwikipagesidcollaboration-draft) |
 | `POST` | `/api/wiki/pages/{id}/copy` | [페이지를 복사한다 — 옵션을 비우면 그 페이지 하나만](#post-apiwikipagesidcopy) |
@@ -48,6 +48,7 @@
 | `400` | 요청 검증 실패 | `PlatformError` |
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
+| `409` | 보관된 문서 아래에는 새 문서를 만들 수 없습니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **201 본문** — `PageResponse`
@@ -94,7 +95,7 @@ curl -X POST "https://<your-host>/api/wiki/pages" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -138,13 +139,13 @@ curl -X GET "https://<your-host>/api/wiki/pages/<id>" \
 
 ## PUT /api/wiki/pages/{id}
 
-페이지를 수정한다 — expectedVersion이 현재 버전과 다르면 409
+페이지를 수정한다 — expectedVersion이 현재 버전과 다르면 409. 보관된 문서는 수정 불가
 
 ### 파라미터
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 요청 본문
 
@@ -214,7 +215,7 @@ curl -X PUT "https://<your-host>/api/wiki/pages/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 | `children` | query | `string` |  | 자식이 있을 때의 처리 — promote(끌어올림) 또는 cascade(함께 삭제). 미지정이면 자식이 있을 때 409 |
 
 ### 응답
@@ -225,6 +226,7 @@ curl -X PUT "https://<your-host>/api/wiki/pages/<id>" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 하위 페이지가 있습니다 — children으로 promote 또는 cascade를 지정하세요 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 ### curl
@@ -242,7 +244,7 @@ curl -X DELETE "https://<your-host>/api/wiki/pages/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 요청 본문
 
@@ -264,6 +266,7 @@ curl -X DELETE "https://<your-host>/api/wiki/pages/<id>" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 공동 초안이 없거나, 초안 버전이 그사이 바뀌었습니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `CollaborationDraftCommitResponse`
@@ -313,7 +316,7 @@ curl -X PUT "https://<your-host>/api/wiki/pages/<id>/collaboration-draft" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 요청 본문
 
@@ -378,7 +381,7 @@ curl -X POST "https://<your-host>/api/wiki/pages/<id>/copy" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 요청 본문
 
@@ -441,7 +444,7 @@ curl -X PUT "https://<your-host>/api/wiki/pages/<id>/icon" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 요청 본문
 
@@ -464,6 +467,7 @@ curl -X PUT "https://<your-host>/api/wiki/pages/<id>/icon" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 새 위치의 보기 제한이 새로 적용됩니다 — 확인 후 confirmImpact=true로 다시 요청하세요 | `MoveImpactError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `PageResponse`
@@ -512,7 +516,7 @@ curl -X POST "https://<your-host>/api/wiki/pages/<id>/move" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 요청 본문
 
@@ -575,7 +579,7 @@ curl -X PUT "https://<your-host>/api/wiki/pages/<id>/owner" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -625,7 +629,7 @@ curl -X POST "https://<your-host>/api/wiki/pages/<id>/publish" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 요청 본문
 
@@ -674,7 +678,7 @@ curl -X POST "https://<your-host>/api/wiki/pages/<id>/share" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 요청 본문
 
@@ -737,7 +741,7 @@ curl -X PUT "https://<your-host>/api/wiki/pages/<id>/verification" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -787,7 +791,7 @@ curl -X DELETE "https://<your-host>/api/wiki/pages/<id>/verification" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 

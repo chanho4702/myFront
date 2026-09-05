@@ -21,7 +21,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -48,7 +48,7 @@ curl -X DELETE "https://<your-host>/api/wiki/pages/<id>/purge" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -101,7 +101,7 @@ curl -X POST "https://<your-host>/api/wiki/pages/<id>/restore" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 
 ### 응답
 
@@ -140,7 +140,7 @@ curl -X GET "https://<your-host>/api/wiki/spaces/<spaceId>/trash" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 
 ### 응답
 

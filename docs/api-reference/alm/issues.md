@@ -25,7 +25,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `issueId` | path | `integer(int64)` | 예 |  |
+| `issueId` | path | `integer(int64)` | 예 | 이슈 ID |
 
 ### 응답
 
@@ -80,7 +80,7 @@ curl -X GET "https://<your-host>/api/alm/issues/<issueId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `issueId` | path | `integer(int64)` | 예 |  |
+| `issueId` | path | `integer(int64)` | 예 | 이슈 ID |
 
 ### 요청 본문
 
@@ -95,14 +95,14 @@ curl -X GET "https://<your-host>/api/alm/issues/<issueId>" \
 | `priority` | `string` | 예 | 우선순위 ID | `high` |
 | `assigneeId` | `integer(int64)` |  | 담당자 사용자 ID. null이면 미지정으로 바꾼다 | `42` |
 | `details` | `IssueDetailsRequest` |  | 상위 이슈·스프린트·마감일·라벨 등 세부 항목. 생략하면 기존 값을 보존한다 |  |
-| `details.parentId` | `integer(int64)` |  |  |  |
-| `details.sprintId` | `integer(int64)` |  |  |  |
-| `details.dueDate` | `string(date)` |  |  |  |
-| `details.estimateHours` | `number` |  |  |  |
-| `details.resolution` | `string enum(DONE, WONT_DO, DUPLICATE, CANNOT_REPRODUCE)` |  |  |  |
-| `details.fixVersionId` | `integer(int64)` |  |  |  |
-| `details.labels` | `string[]` |  |  |  |
-| `details.componentIds` | `integer(int64)[]` |  |  |  |
+| `details.parentId` | `integer(int64)` |  | 상위 이슈 ID. 에픽→일반 이슈→하위 작업 2단계까지만 허용한다 | `1000` |
+| `details.sprintId` | `integer(int64)` |  | 옮겨 놓을 스프린트 ID. null이면 백로그 | `12` |
+| `details.dueDate` | `string(date)` |  | 마감일 | `2026-09-30` |
+| `details.estimateHours` | `number` |  | 예상 소요 시간(시간 단위, 소수 둘째 자리까지) | `3.5` |
+| `details.resolution` | `string enum(DONE, WONT_DO, DUPLICATE, CANNOT_REPRODUCE)` |  | 완료 사유. 정의된 값만 받고 null이면 해제한다 |  |
+| `details.fixVersionId` | `integer(int64)` |  | 수정 버전 ID. 같은 프로젝트의 보관되지 않은 버전만 지정할 수 있고 null이면 해제 | `5` |
+| `details.labels` | `string[]` |  | 라벨. 통째로 교체한다 | `["regression","frontend"]` |
+| `details.componentIds` | `integer(int64)[]` |  | 컴포넌트 ID 목록. null이면 그대로 두고 빈 배열이면 전부 해제한다 | `[3]` |
 | `expectedVersion` | `integer(int32)` | 예 | 수정 직전에 읽은 이슈 버전. 서버 값과 다르면 409 | `3` |
 | `mentionedUserIds` | `integer(int64)[]` |  | 설명에서 새로 멘션한 사용자 ID. 알림 대상이다 | `[7,42]` |
 
@@ -169,7 +169,7 @@ curl -X PUT "https://<your-host>/api/alm/issues/<issueId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `issueId` | path | `integer(int64)` | 예 |  |
+| `issueId` | path | `integer(int64)` | 예 | 이슈 ID |
 
 ### 응답
 
@@ -196,7 +196,7 @@ curl -X DELETE "https://<your-host>/api/alm/issues/<issueId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `issueId` | path | `integer(int64)` | 예 |  |
+| `issueId` | path | `integer(int64)` | 예 | 이슈 ID |
 
 ### 요청 본문
 
@@ -265,7 +265,7 @@ curl -X POST "https://<your-host>/api/alm/issues/<issueId>/move" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `issueId` | path | `integer(int64)` | 예 |  |
+| `issueId` | path | `integer(int64)` | 예 | 이슈 ID |
 
 ### 요청 본문
 
@@ -335,7 +335,7 @@ curl -X POST "https://<your-host>/api/alm/issues/<issueId>/rank" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 응답
 
@@ -390,7 +390,7 @@ curl -X GET "https://<your-host>/api/alm/projects/<projectId>/issues" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 요청 본문
 
@@ -405,14 +405,14 @@ curl -X GET "https://<your-host>/api/alm/projects/<projectId>/issues" \
 | `priority` | `string` |  | 우선순위 ID. 비우면 프로젝트 기본 우선순위 | `medium` |
 | `assigneeId` | `integer(int64)` |  | 담당자 사용자 ID. 비우면 미지정 | `42` |
 | `details` | `IssueDetailsRequest` |  | 상위 이슈·스프린트·마감일·라벨 등 세부 항목 |  |
-| `details.parentId` | `integer(int64)` |  |  |  |
-| `details.sprintId` | `integer(int64)` |  |  |  |
-| `details.dueDate` | `string(date)` |  |  |  |
-| `details.estimateHours` | `number` |  |  |  |
-| `details.resolution` | `string enum(DONE, WONT_DO, DUPLICATE, CANNOT_REPRODUCE)` |  |  |  |
-| `details.fixVersionId` | `integer(int64)` |  |  |  |
-| `details.labels` | `string[]` |  |  |  |
-| `details.componentIds` | `integer(int64)[]` |  |  |  |
+| `details.parentId` | `integer(int64)` |  | 상위 이슈 ID. 에픽→일반 이슈→하위 작업 2단계까지만 허용한다 | `1000` |
+| `details.sprintId` | `integer(int64)` |  | 옮겨 놓을 스프린트 ID. null이면 백로그 | `12` |
+| `details.dueDate` | `string(date)` |  | 마감일 | `2026-09-30` |
+| `details.estimateHours` | `number` |  | 예상 소요 시간(시간 단위, 소수 둘째 자리까지) | `3.5` |
+| `details.resolution` | `string enum(DONE, WONT_DO, DUPLICATE, CANNOT_REPRODUCE)` |  | 완료 사유. 정의된 값만 받고 null이면 해제한다 |  |
+| `details.fixVersionId` | `integer(int64)` |  | 수정 버전 ID. 같은 프로젝트의 보관되지 않은 버전만 지정할 수 있고 null이면 해제 | `5` |
+| `details.labels` | `string[]` |  | 라벨. 통째로 교체한다 | `["regression","frontend"]` |
+| `details.componentIds` | `integer(int64)[]` |  | 컴포넌트 ID 목록. null이면 그대로 두고 빈 배열이면 전부 해제한다 | `[3]` |
 | `mentionedUserIds` | `integer(int64)[]` |  | 설명에서 멘션한 사용자 ID. 알림 대상이다 | `[7,42]` |
 
 ### 응답
@@ -473,7 +473,7 @@ curl -X POST "https://<your-host>/api/alm/projects/<projectId>/issues" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 요청 본문
 
@@ -489,15 +489,15 @@ curl -X POST "https://<your-host>/api/alm/projects/<projectId>/issues" \
 | `items[].status` | `string` |  |  |  |
 | `items[].priority` | `string` |  |  |  |
 | `items[].assigneeId` | `integer(int64)` |  |  |  |
-| `items[].details` | `IssueDetailsRequest` |  |  |  |
-| `items[].details.parentId` | `integer(int64)` |  |  |  |
-| `items[].details.sprintId` | `integer(int64)` |  |  |  |
-| `items[].details.dueDate` | `string(date)` |  |  |  |
-| `items[].details.estimateHours` | `number` |  |  |  |
-| `items[].details.resolution` | `string enum(DONE, WONT_DO, DUPLICATE, CANNOT_REPRODUCE)` |  |  |  |
-| `items[].details.fixVersionId` | `integer(int64)` |  |  |  |
-| `items[].details.labels` | `string[]` |  |  |  |
-| `items[].details.componentIds` | `integer(int64)[]` |  |  |  |
+| `items[].details` | `IssueDetailsRequest` |  | 이슈의 세부 항목. 바깥 요청에서 details 자체를 생략하면 아래 값을 모두 보존하고, details를 주면 null인 필드는 명시적 해제로 본다. |  |
+| `items[].details.parentId` | `integer(int64)` |  | 상위 이슈 ID. 에픽→일반 이슈→하위 작업 2단계까지만 허용한다 | `1000` |
+| `items[].details.sprintId` | `integer(int64)` |  | 옮겨 놓을 스프린트 ID. null이면 백로그 | `12` |
+| `items[].details.dueDate` | `string(date)` |  | 마감일 | `2026-09-30` |
+| `items[].details.estimateHours` | `number` |  | 예상 소요 시간(시간 단위, 소수 둘째 자리까지) | `3.5` |
+| `items[].details.resolution` | `string enum(DONE, WONT_DO, DUPLICATE, CANNOT_REPRODUCE)` |  | 완료 사유. 정의된 값만 받고 null이면 해제한다 |  |
+| `items[].details.fixVersionId` | `integer(int64)` |  | 수정 버전 ID. 같은 프로젝트의 보관되지 않은 버전만 지정할 수 있고 null이면 해제 | `5` |
+| `items[].details.labels` | `string[]` |  | 라벨. 통째로 교체한다 | `["regression","frontend"]` |
+| `items[].details.componentIds` | `integer(int64)[]` |  | 컴포넌트 ID 목록. null이면 그대로 두고 빈 배열이면 전부 해제한다 | `[3]` |
 
 ### 응답
 

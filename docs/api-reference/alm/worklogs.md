@@ -21,7 +21,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `issueId` | path | `integer(int64)` | 예 |  |
+| `issueId` | path | `integer(int64)` | 예 | 이슈 ID |
 
 ### 응답
 
@@ -60,7 +60,7 @@ curl -X GET "https://<your-host>/api/alm/issues/<issueId>/worklogs" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `issueId` | path | `integer(int64)` | 예 |  |
+| `issueId` | path | `integer(int64)` | 예 | 이슈 ID |
 
 ### 요청 본문
 
@@ -116,7 +116,7 @@ curl -X POST "https://<your-host>/api/alm/issues/<issueId>/worklogs" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 | `since` | query | `string(date)` |  | 집계 시작일(포함). 생략하면 처음부터 |
 | `until` | query | `string(date)` |  | 집계 종료일(포함). 생략하면 끝까지 |
 
@@ -157,7 +157,7 @@ curl -X GET "https://<your-host>/api/alm/projects/<projectId>/worklogs" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 작업 시간 기록 ID |
 
 ### 응답
 

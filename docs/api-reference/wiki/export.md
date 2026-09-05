@@ -18,7 +18,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `integer(int64)` | 예 |  |
+| `id` | path | `integer(int64)` | 예 | 페이지 ID |
 | `includeChildren` | query | `boolean` |  | 하위 페이지까지 한 PDF에 이어 붙인다 |
 
 ### 응답

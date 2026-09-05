@@ -124,7 +124,7 @@ curl -X GET "https://<your-host>/api/alm/settings/priorities/usage" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 우선순위 ID |
 
 ### 요청 본문
 
@@ -182,7 +182,7 @@ curl -X PUT "https://<your-host>/api/alm/settings/priorities/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 우선순위 ID |
 
 ### 응답
 
@@ -209,7 +209,7 @@ curl -X DELETE "https://<your-host>/api/alm/settings/priorities/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 우선순위 ID |
 
 ### 요청 본문
 

@@ -23,7 +23,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 요청 본문
 
@@ -45,6 +45,7 @@
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 같은 이름의 템플릿이 있거나, 스페이스당 개수 상한을 넘었습니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **201 본문** — `TemplateResponse`
@@ -78,7 +79,7 @@ curl -X POST "https://<your-host>/api/wiki/pages/<pageId>/save-as-template" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 
 ### 응답
 
@@ -117,7 +118,7 @@ curl -X GET "https://<your-host>/api/wiki/spaces/<spaceId>/templates" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 
 ### 요청 본문
 
@@ -139,6 +140,7 @@ curl -X GET "https://<your-host>/api/wiki/spaces/<spaceId>/templates" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 같은 이름의 템플릿이 있거나, 스페이스당 개수 상한을 넘었습니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **201 본문** — `TemplateResponse`
@@ -172,7 +174,7 @@ curl -X POST "https://<your-host>/api/wiki/spaces/<spaceId>/templates" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `templateId` | path | `integer(int64)` | 예 |  |
+| `templateId` | path | `integer(int64)` | 예 | 템플릿 ID |
 
 ### 응답
 
@@ -211,7 +213,7 @@ curl -X GET "https://<your-host>/api/wiki/templates/<templateId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `templateId` | path | `integer(int64)` | 예 |  |
+| `templateId` | path | `integer(int64)` | 예 | 템플릿 ID |
 
 ### 요청 본문
 
@@ -233,6 +235,7 @@ curl -X GET "https://<your-host>/api/wiki/templates/<templateId>" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 같은 이름의 템플릿이 이미 있습니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `TemplateResponse`
@@ -266,7 +269,7 @@ curl -X PUT "https://<your-host>/api/wiki/templates/<templateId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `templateId` | path | `integer(int64)` | 예 |  |
+| `templateId` | path | `integer(int64)` | 예 | 템플릿 ID |
 
 ### 응답
 

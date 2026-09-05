@@ -119,7 +119,7 @@ curl -X GET "https://<your-host>/api/alm/settings/statuses/usage" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 상태 ID |
 
 ### 요청 본문
 
@@ -175,7 +175,7 @@ curl -X PUT "https://<your-host>/api/alm/settings/statuses/<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `id` | path | `string` | 예 |  |
+| `id` | path | `string` | 예 | 상태 ID |
 
 ### 응답
 

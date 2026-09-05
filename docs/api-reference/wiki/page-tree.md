@@ -58,7 +58,7 @@ curl -X GET "https://<your-host>/api/wiki/pages/paths?id=<id>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -100,7 +100,7 @@ curl -X GET "https://<your-host>/api/wiki/pages/<pageId>/ancestors" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `pageId` | path | `integer(int64)` | 예 |  |
+| `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 
 ### 응답
 
@@ -142,7 +142,7 @@ ID 목록으로 페이지 노드를 한 번에 조회한다
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 | `id` | query | `integer(int64)[]` | 예 | 조회할 페이지 ID. 여러 번 줄 수 있다 |
 
 ### 응답
@@ -185,7 +185,7 @@ curl -X GET "https://<your-host>/api/wiki/spaces/<spaceId>/pages/by-ids?id=<id>"
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 | `parentId` | query | `integer(int64)` |  | 부모 페이지 ID. 비우면 스페이스 루트 |
 
 ### 응답
@@ -228,7 +228,7 @@ curl -X GET "https://<your-host>/api/wiki/spaces/<spaceId>/pages/children" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 | `title` | query | `string[]` | 예 | 찾을 페이지 제목. 여러 번 줄 수 있다 |
 
 ### 응답
@@ -271,7 +271,7 @@ curl -X GET "https://<your-host>/api/wiki/spaces/<spaceId>/pages/lookup?title=<t
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 | `limit` | query | `integer(int32)` |  | 최대 건수 |
 
 ### 응답
@@ -314,7 +314,7 @@ curl -X GET "https://<your-host>/api/wiki/spaces/<spaceId>/pages/recent" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `spaceId` | path | `integer(int64)` | 예 |  |
+| `spaceId` | path | `integer(int64)` | 예 | 스페이스 ID |
 | `q` | query | `string` | 예 | 제목에서 찾을 말 |
 
 ### 응답

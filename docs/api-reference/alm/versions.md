@@ -23,7 +23,7 @@
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 응답
 
@@ -66,7 +66,7 @@ curl -X GET "https://<your-host>/api/alm/projects/<projectId>/versions" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `projectId` | path | `integer(int64)` | 예 |  |
+| `projectId` | path | `integer(int64)` | 예 | 프로젝트 ID |
 
 ### 요청 본문
 
@@ -88,6 +88,7 @@ curl -X GET "https://<your-host>/api/alm/projects/<projectId>/versions" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 이미 있는 버전 이름입니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **201 본문** — `VersionResponse`
@@ -125,7 +126,7 @@ curl -X POST "https://<your-host>/api/alm/projects/<projectId>/versions" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `versionId` | path | `integer(int64)` | 예 |  |
+| `versionId` | path | `integer(int64)` | 예 | 버전 ID |
 
 ### 요청 본문
 
@@ -148,7 +149,7 @@ curl -X POST "https://<your-host>/api/alm/projects/<projectId>/versions" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
-| `409` | 버전 충돌 — expectedVersion 불일치 | `PlatformError` |
+| `409` | 버전 충돌 — expectedVersion 불일치 / 이미 있는 버전 이름입니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `VersionResponse`
@@ -187,7 +188,7 @@ curl -X PUT "https://<your-host>/api/alm/versions/<versionId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `versionId` | path | `integer(int64)` | 예 |  |
+| `versionId` | path | `integer(int64)` | 예 | 버전 ID |
 
 ### 응답
 
@@ -214,7 +215,7 @@ curl -X DELETE "https://<your-host>/api/alm/versions/<versionId>" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `versionId` | path | `integer(int64)` | 예 |  |
+| `versionId` | path | `integer(int64)` | 예 | 버전 ID |
 
 ### 응답
 
@@ -224,6 +225,7 @@ curl -X DELETE "https://<your-host>/api/alm/versions/<versionId>" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 이미 보관된 버전입니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `VersionResponse`
@@ -257,7 +259,7 @@ curl -X POST "https://<your-host>/api/alm/versions/<versionId>/archive" \
 
 | 이름 | 위치 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- | --- |
-| `versionId` | path | `integer(int64)` | 예 |  |
+| `versionId` | path | `integer(int64)` | 예 | 버전 ID |
 
 ### 요청 본문
 
@@ -277,6 +279,7 @@ curl -X POST "https://<your-host>/api/alm/versions/<versionId>/archive" \
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
+| `409` | 이미 릴리스된 버전입니다 / 보관된 버전은 릴리스할 수 없습니다 | `PlatformError` |
 | `503` | 권한 서비스(org) 불능 | `PlatformError` |
 
 **200 본문** — `VersionResponse`
