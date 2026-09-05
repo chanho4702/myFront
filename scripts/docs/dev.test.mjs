@@ -397,6 +397,7 @@ test('컬렉션 선언: id 유일·필수 필드·절대경로, API 가이드는
   const ref = COLLECTIONS_DECL.find((c) => c.id === 'api-reference');
   assert.equal(ref.title, 'API 레퍼런스');
   assert.equal(ref.dir, 'C:/MSA_TEMPLATE/myFront/docs/api-reference');
+  // migration 은 optional(배포 전)이라 폴더에서 빠진다
   assert.deepEqual(ref.folders, { wiki: 'WIKI API', alm: 'ALM API', org: 'Org API' });
   assert.equal(ref.optional, true);
   assert.ok(matchesAny('wiki/spaces.md', ref.include));

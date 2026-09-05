@@ -94,7 +94,8 @@ export const COLLECTIONS = [
     title: 'API 레퍼런스',
     dir: `${PLATFORM_ROOT}/myFront/docs/api-reference`,
     include: ['**/*.md'],
-    folders: Object.fromEntries(API_SERVICES.map((s) => [s.id, s.title])),
+    // optional(배포 전) 서비스는 문서가 없으니 폴더도 만들지 않는다 — 빈 폴더 페이지가 위키에 생기는 것을 막는다.
+    folders: Object.fromEntries(API_SERVICES.filter((s) => !s.optional).map((s) => [s.id, s.title])),
     optional: true,
   },
 ];
