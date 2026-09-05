@@ -142,7 +142,7 @@
   {
     "url": "/docs/spaces/2/pages/34",
     "title": "33 위키 UI·UX 손질 + W27 템플릿·수식·다이어그램·구독·검증 + S-03 마감 (2026-09-04)",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/2/pages/35",
@@ -197,7 +197,7 @@
   {
     "url": "/docs/spaces/3/folder/40",
     "title": "로드맵",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/folder/41",
@@ -207,7 +207,7 @@
   {
     "url": "/docs/spaces/3/folder/42",
     "title": "설계 스펙",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/folder/73",
@@ -227,7 +227,7 @@
   {
     "url": "/docs/spaces/3/folder/76",
     "title": "설계 스펙",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/100",
@@ -267,7 +267,7 @@
   {
     "url": "/docs/spaces/3/pages/107",
     "title": "2026-09-04 이슈 필드 구성 — 전역 스킴 + 프로젝트별 커스텀 (2026-09-04)",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/108",
@@ -327,12 +327,12 @@
   {
     "url": "/docs/spaces/3/pages/121",
     "title": "alm-backend",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/122",
     "title": "auth-server",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/123",
@@ -352,32 +352,62 @@
   {
     "url": "/docs/spaces/3/pages/126",
     "title": "gateway-server",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/127",
     "title": "platform-backend",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/128",
     "title": "wiki-backend",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/129",
     "title": "프론트 셸 (myFront)",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/131",
+    "title": "컨플루언스 설치형(Server/DC) 마이그레이션 모듈 — 기획 (2026-09-05) (2026-09-05)",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/132",
+    "title": "컨플루언스 DC 마이그레이션 모듈 — M1 설계 (2026-09-05) (2026-09-05)",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/133",
+    "title": "2026-09-05 아바타·프로필을 org-service로 이관 (플랫폼 공통) (2026-09-05)",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/134",
+    "title": "2026-09-05 상태 아이콘(색) · 사용자 아바타 업로드 · 샘플(더미) 데이터 (2026-09-05)",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/135",
+    "title": "API 가이드",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/136",
+    "title": "API 인증 — 개인 API 토큰",
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/36",
     "title": "플랫폼 개요",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/37",
     "title": "에이전트 규약",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/38",
@@ -387,7 +417,7 @@
   {
     "url": "/docs/spaces/3/pages/43",
     "title": "wiki-service 백엔드 요구사항 (2026-07-17)",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/44",
@@ -542,7 +572,7 @@
   {
     "url": "/docs/spaces/3/pages/78",
     "title": "화면 지도 (라우트 · 셸 · 페이지)",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/79",
@@ -552,12 +582,12 @@
   {
     "url": "/docs/spaces/3/pages/80",
     "title": "설정 스킴 · 커스텀 워크플로",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/81",
     "title": "스토어 (도메인 데이터 계층)",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/82",
@@ -567,7 +597,7 @@
   {
     "url": "/docs/spaces/3/pages/83",
     "title": "백로그",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/84",
@@ -577,7 +607,7 @@
   {
     "url": "/docs/spaces/3/pages/85",
     "title": "진행 현황",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-09-05"
   },
   {
     "url": "/docs/spaces/3/pages/86",
