@@ -46,20 +46,31 @@ test('응답 검증: JSON 아님 · OpenAPI 아님 · 정상이면 정렬된 스
   assert.deepEqual(Object.keys(spec.paths), [...Object.keys(spec.paths)].sort());
 });
 
-test('collect: 실패한 서비스는 사유를 모으고 성공한 서비스의 파일은 쓴다', () => {
+test('collect: 실패한 서비스는 사유를 모으고 성공한 서비스의 파일은 쓴다 — optional 서비스의 실패는 경고로만', () => {
   const out = tmp();
   try {
-    const fake = (cmd, args) => (args.at(-1).includes('alm-backend') ? { status: 7, stdout: '', stderr: 'Failed to connect' } : { status: 0, stdout: readFileSync(SAMPLE_FIXTURE, 'utf8'), stderr: '' });
+    // alm 은 진짜 실패, migration(optional) 은 배포 전이라 연결 자체가 안 되는 상황을 흉내 낸다
+    const fake = (cmd, args) => {
+      const url = args.at(-1);
+      if (url.includes('alm-backend')) return { status: 7, stdout: '', stderr: 'Failed to connect' };
+      if (url.includes('migration-service')) return { status: 6, stdout: '', stderr: 'Could not resolve host' };
+      return { status: 0, stdout: readFileSync(SAMPLE_FIXTURE, 'utf8'), stderr: '' };
+    };
     const origError = console.error;
+    const origWarn = console.warn;
+    const warnings = [];
     console.error = () => {};
+    console.warn = (m) => warnings.push(String(m));
     let result;
     try {
       result = collect({ services: SERVICES, fromFixture: null, outDir: out, run: fake });
     } finally {
       console.error = origError;
+      console.warn = origWarn;
     }
-    assert.equal(result.failures.length, 1);
+    assert.equal(result.failures.length, 1, 'optional 서비스는 failures 에 세지 않는다');
     assert.match(result.failures[0], /alm: .*Failed to connect/);
+    assert.equal(warnings.filter((w) => w.includes('건너뜀(optional)') && w.includes('migration')).length, 1);
     assert.deepEqual(readdirSync(out).sort(), ['org.json', 'wiki.json']);
   } finally {
     rmSync(out, { recursive: true, force: true });

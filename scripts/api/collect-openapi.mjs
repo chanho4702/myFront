@@ -77,6 +77,11 @@ export function collect({ services, fromFixture, outDir, run = spawnSync }) {
       written.push(file);
       log(`${service.id}: 경로 ${Object.keys(spec.paths).length}개 → ${path.relative(process.cwd(), file)}${fromFixture ? ' (픽스처)' : ''}`);
     } catch (err) {
+      if (service.optional) {
+        // 배포 전 서비스는 실패가 정상이다 — 경고만 남기고 다른 서비스의 수집·종료 코드에 영향을 주지 않는다.
+        console.warn(`[api:collect] 건너뜀(optional) — ${err.message}`);
+        continue;
+      }
       failures.push(err.message);
       console.error(`[api:collect] 실패 — ${err.message}`);
     }

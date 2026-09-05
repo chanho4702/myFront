@@ -5,6 +5,8 @@
 //  title  문서 제목(README H1·위키 폴더 제목). 서비스의 OpenAPI info.title 과 같게 유지한다
 //  host   컴포즈 서비스 이름(컨테이너 DNS)
 //  port   컨테이너 안에서 듣는 포트(호스트 포트가 아니다)
+//  optional  true 면 수집 실패를 경고로만 남기고 종료 코드에 반영하지 않는다 — 아직 배포 전인 서비스용.
+//            배포되면 이 플래그를 지워 실패가 다시 눈에 띄게 한다.
 
 /** 컴포즈 프로젝트 `platform` 의 기본 네트워크 — `docker network ls` 로 확인(2026-09-05). */
 export const COMPOSE_NETWORK = 'platform_default';
@@ -18,6 +20,8 @@ export const SERVICES = [
   { id: 'wiki', title: 'WIKI API', host: 'wiki-backend', port: 9110 },
   { id: 'alm', title: 'ALM API', host: 'alm-backend', port: 9120 },
   { id: 'org', title: 'Org API', host: 'org-service', port: 9130 },
+  // 이관 엔진(wiki-backend migration/** 에서 분리, X2~X4). 이미지가 GHCR에 오르기 전까지는 optional.
+  { id: 'migration', title: 'Migration API', host: 'migration-service', port: 9170, optional: true },
 ];
 
 export const serviceById = (id) => SERVICES.find((s) => s.id === id) ?? null;
