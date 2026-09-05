@@ -1,0 +1,3362 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Org API",
+    "description": "조직·멤버·팀·권한(grant) 원장. 플랫폼의 사용자와 그 사람이 무엇을 할 수 있는지를 여기 한 곳에서 관리하고, wiki·alm은 이 판정을 gRPC로 받아 쓴다.",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Avatars",
+      "description": "아바타 이미지 — 올리고 지우는 것은 본인만, 보는 것은 로그인한 누구나."
+    },
+    {
+      "name": "Grants",
+      "description": "권한(grant) 원장 — 누가 어느 리소스에서 무엇을 할 수 있는지. 조회·변경 모두 그 리소스의 ADMIN만 가능하다."
+    },
+    {
+      "name": "Invitations",
+      "description": "초대 — 이메일로 사람을 조직에 들인다. 팀·권한 프리셋을 함께 담아 두면 수락 시점에 적용된다."
+    },
+    {
+      "name": "Me",
+      "description": "내 정보 — 프로필·소속 팀·권한. 승인 대기 계정도 이 경로만은 읽을 수 있다."
+    },
+    {
+      "name": "Members",
+      "description": "조직 멤버 — 로그인한 사람은 첫 요청에 자동으로 미러링되고, 이 API는 그 원장을 조회·승인·상태 전이한다."
+    },
+    {
+      "name": "Teams",
+      "description": "팀과 팀원 — 팀은 권한(grant)의 주체가 될 수 있다. 변경은 전역 관리자 또는 그 팀 리더만 가능하다."
+    }
+  ],
+  "paths": {
+    "/api/org/grants": {
+      "get": {
+        "tags": [
+          "Grants"
+        ],
+        "summary": "리소스의 권한 목록 조회",
+        "operationId": "listByResource",
+        "parameters": [
+          {
+            "name": "resourceType",
+            "in": "query",
+            "description": "리소스 종류 — GLOBAL | SPACE | PROJECT 등",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "GLOBAL",
+                "SPACE",
+                "PROJECT"
+              ]
+            }
+          },
+          {
+            "name": "resourceId",
+            "in": "query",
+            "description": "리소스 식별자. GLOBAL이면 비워 둔다.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GrantDetailResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Grants"
+        ],
+        "summary": "권한 부여",
+        "operationId": "create_2",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrantDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/grants/audit": {
+      "get": {
+        "tags": [
+          "Grants"
+        ],
+        "summary": "리소스의 권한 변경 이력 조회",
+        "operationId": "auditByResource",
+        "parameters": [
+          {
+            "name": "resourceType",
+            "in": "query",
+            "description": "리소스 종류 — GLOBAL | SPACE | PROJECT 등",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "GLOBAL",
+                "SPACE",
+                "PROJECT"
+              ]
+            }
+          },
+          {
+            "name": "resourceId",
+            "in": "query",
+            "description": "리소스 식별자. GLOBAL이면 비워 둔다.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GrantAuditResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/grants/{id}": {
+      "patch": {
+        "tags": [
+          "Grants"
+        ],
+        "summary": "권한 역할 변경 — 마지막 전역 관리자의 강등은 409",
+        "operationId": "changeRole",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "권한 행 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantRoleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrantDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "마지막 전역 관리자는 내릴 수 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Grants"
+        ],
+        "summary": "권한 회수",
+        "operationId": "delete_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "권한 행 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/invitations": {
+      "get": {
+        "tags": [
+          "Invitations"
+        ],
+        "summary": "초대 목록 조회 — 목록의 inviteUrl은 항상 null이다",
+        "operationId": "list_1",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "상태 필터 — PENDING | ACCEPTED | REVOKED | EXPIRED. 미지정이면 전부.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "이메일 부분 검색어",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "0부터 세는 페이지 번호",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "페이지 크기",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseInvitationResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Invitations"
+        ],
+        "summary": "초대 생성 — 이메일 여러 개를 한 번에. inviteUrl은 이 응답에서만 볼 수 있다",
+        "operationId": "create_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InvitationResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "이미 활성이거나 정지된 계정의 이메일입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/invitations/{id}": {
+      "delete": {
+        "tags": [
+          "Invitations"
+        ],
+        "summary": "초대 철회 — 대기 중인 초대만 철회할 수 있다",
+        "operationId": "revoke",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "초대 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "대기 중인 초대만 철회할 수 있습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/invitations/{id}/events": {
+      "get": {
+        "tags": [
+          "Invitations"
+        ],
+        "summary": "초대 이력 조회 — 발송·재발송·수락·철회",
+        "operationId": "events_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "초대 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MemberEventResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/invitations/{id}/resend": {
+      "post": {
+        "tags": [
+          "Invitations"
+        ],
+        "summary": "초대 재발송 — 새 토큰·새 만료로 링크를 다시 만든다",
+        "operationId": "resend",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "초대 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "mail",
+            "in": "query",
+            "description": "false면 메일을 보내지 않고 링크만 응답에 담는다(링크 복사용)",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "이미 수락된 초대입니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/me": {
+      "get": {
+        "tags": [
+          "Me"
+        ],
+        "summary": "내 프로필 조회 — 이름·아바타·상태·전역 역할·소속 팀",
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/me/avatar": {
+      "put": {
+        "tags": [
+          "Avatars"
+        ],
+        "summary": "내 아바타 업로드 — multipart/form-data. 2MB를 넘으면 400",
+        "operationId": "upload",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvatarView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Avatars"
+        ],
+        "summary": "내 아바타 삭제",
+        "operationId": "remove",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/me/permissions": {
+      "get": {
+        "tags": [
+          "Me"
+        ],
+        "summary": "내 권한(grant) 목록 조회 — 프론트 메뉴·버튼 제어용",
+        "operationId": "myPermissions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GrantResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/members": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "멤버 목록 조회 — 배열. 기본 필터는 status=ACTIVE, kind=HUMAN",
+        "operationId": "list_2",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "상태 필터 — ACTIVE | PENDING | SUSPENDED | DEACTIVATED, 또는 ALL(필터 없음). 미지정이면 ACTIVE.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "description": "종류 필터 — HUMAN | AGENT, 또는 ALL(필터 없음). 미지정이면 HUMAN.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "이름·이메일 부분 검색어",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MemberResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/members/agents": {
+      "post": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "에이전트 페르소나를 멤버로 등록 — 전역 관리자 전용",
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentRegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/members/page": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "멤버 목록 페이지 조회 — 관리 화면용. 필터 규칙은 목록과 같다",
+        "operationId": "page",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "상태 필터 — ACTIVE | PENDING | SUSPENDED | DEACTIVATED, 또는 ALL. 미지정이면 ACTIVE.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "description": "종류 필터 — HUMAN | AGENT, 또는 ALL. 미지정이면 HUMAN.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "이름·이메일 부분 검색어",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "0부터 세는 페이지 번호",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "페이지 크기",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseMemberResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/members/pending": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "승인 대기 멤버 목록 조회",
+        "operationId": "pending",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MemberResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/members/{id}": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "멤버 상세 조회 — grants는 전역 관리자와 본인에게만 채워진다",
+        "operationId": "detail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "멤버 id (= auth-server user id)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "멤버 상태 전이 — 표시 이름은 여기서 바꿀 수 없다",
+        "operationId": "patch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "멤버 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberPatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "허용되지 않는 상태 전이입니다 — 자기 계정 비활성화, 마지막 전역 관리자 정지 등.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/members/{id}/approve": {
+      "post": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "승인 대기 멤버 승인 — 팀·권한 부여는 선택",
+        "operationId": "approve",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "멤버 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberApproveRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "승인 대기 중인 계정이 아닙니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/members/{id}/events": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "멤버의 초대·상태 이력 조회",
+        "operationId": "events",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "멤버 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MemberEventResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/members/{memberId}/avatar": {
+      "get": {
+        "tags": [
+          "Avatars"
+        ],
+        "summary": "멤버 아바타 이미지 조회 — 원본 타입 그대로 인라인, 5분 사적 캐시",
+        "operationId": "image",
+        "parameters": [
+          {
+            "name": "memberId",
+            "in": "path",
+            "description": "멤버 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/teams": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "팀 목록 조회 — myRole은 호출자가 그 팀 소속이 아니면 null",
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "팀 이름 부분 검색어",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "팀 생성",
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/teams/{id}": {
+      "put": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "팀 이름·설명 수정",
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "팀 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "팀 삭제",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "팀 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/teams/{id}/members": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "팀원 목록 조회 — 이름과 이메일을 함께 준다",
+        "operationId": "members",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "팀 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamMemberResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/teams/{id}/members/{memberId}": {
+      "put": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "팀원 추가 — 이미 소속이면 역할만 갱신된다",
+        "operationId": "addMember",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "팀 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "memberId",
+            "in": "path",
+            "description": "추가할 멤버 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "description": "팀 내 역할 — LEAD | MEMBER",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "MEMBER",
+              "enum": [
+                "LEAD",
+                "MEMBER"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "팀원 역할 변경 — 리더 지정·해제",
+        "operationId": "changeMemberRole",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "팀 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "memberId",
+            "in": "path",
+            "description": "대상 멤버 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamMemberRoleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamMemberResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Teams"
+        ],
+        "summary": "팀원 제외",
+        "operationId": "removeMember",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "팀 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "memberId",
+            "in": "path",
+            "description": "제외할 멤버 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AgentRegisterRequest": {
+        "type": "object",
+        "description": "에이전트 페르소나 등록 요청. 로그인하지 않는 계정이라 JIT 미러링으로는 생기지 않는다.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "에이전트 멤버 id. 사람 멤버와 같은 id 공간을 쓴다.",
+            "example": 9001
+          },
+          "displayName": {
+            "type": "string",
+            "description": "표시 이름",
+            "example": "리뷰 봇",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "description": "이메일. 에이전트는 없어도 된다.",
+            "example": "review-bot@example.com"
+          }
+        },
+        "required": [
+          "displayName",
+          "id"
+        ]
+      },
+      "AvatarView": {
+        "type": "object",
+        "description": "아바타 업로드 결과",
+        "properties": {
+          "memberId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "멤버 id",
+            "example": 42
+          },
+          "avatarUrl": {
+            "type": "string",
+            "description": "아바타 이미지 경로. 프론트는 이 값의 유무를 '아바타가 있다'는 신호로도 쓴다.",
+            "example": "/api/org/members/42/avatar?v=1757030400000"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "이 아바타를 올린 시각"
+          }
+        }
+      },
+      "GrantAssignment": {
+        "type": "object",
+        "description": "권한 배정",
+        "properties": {
+          "scope": {
+            "type": "string",
+            "description": "권한 범위",
+            "enum": [
+              "GLOBAL",
+              "SPACE",
+              "PROJECT"
+            ],
+            "example": "SPACE"
+          },
+          "resourceId": {
+            "type": "string",
+            "description": "리소스 식별자. GLOBAL이면 비워 둔다.",
+            "example": "sp-1"
+          },
+          "role": {
+            "type": "string",
+            "description": "역할",
+            "enum": [
+              "VIEWER",
+              "COMMENTER",
+              "EDITOR",
+              "ADMIN"
+            ],
+            "example": "EDITOR"
+          }
+        },
+        "required": [
+          "role",
+          "scope"
+        ]
+      },
+      "GrantAuditResponse": {
+        "type": "object",
+        "description": "권한 변경 기록 한 줄. 필드 이름은 wiki-backend의 감사 항목과 맞춰 뒀다 — 화면이 두 기록을 한 목록으로 합친다.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "기록 id. 숫자를 문자열로 낸다.",
+            "example": "108"
+          },
+          "action": {
+            "type": "string",
+            "description": "무슨 일이 있었나 — GRANT_GRANTED | GRANT_CHANGED | GRANT_REVOKED",
+            "example": "GRANT_GRANTED"
+          },
+          "targetType": {
+            "type": "string",
+            "description": "권한 주체 종류 — USER | TEAM",
+            "example": "USER"
+          },
+          "targetId": {
+            "type": "string",
+            "description": "권한 주체 id. 숫자를 문자열로 낸다.",
+            "example": "42"
+          },
+          "targetLabel": {
+            "type": "string",
+            "description": "기록 당시의 주체 이름",
+            "example": "김찬호"
+          },
+          "detail": {
+            "type": "string",
+            "description": "역할 이름",
+            "example": "EDITOR"
+          },
+          "actorId": {
+            "type": "string",
+            "description": "이 일을 한 사람의 멤버 id. 숫자를 문자열로 낸다.",
+            "example": "1"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "발생 시각(ISO-8601 문자열)",
+            "example": "2026-09-05T02:11:43Z"
+          }
+        }
+      },
+      "GrantCreateRequest": {
+        "type": "object",
+        "description": "권한 부여 요청",
+        "properties": {
+          "subjectType": {
+            "type": "string",
+            "description": "권한 주체 종류 — USER(사람) | TEAM(팀)",
+            "enum": [
+              "USER",
+              "TEAM"
+            ],
+            "example": "USER"
+          },
+          "subjectId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "권한 주체 id — 멤버 id 또는 팀 id",
+            "example": 42
+          },
+          "resourceType": {
+            "type": "string",
+            "description": "리소스 종류",
+            "enum": [
+              "GLOBAL",
+              "SPACE",
+              "PROJECT"
+            ],
+            "example": "SPACE"
+          },
+          "resourceId": {
+            "type": "string",
+            "description": "리소스 식별자. GLOBAL이면 null이나 빈 문자열로 둔다.",
+            "example": "sp-1"
+          },
+          "role": {
+            "type": "string",
+            "description": "역할. ADMIN ⊃ EDITOR ⊃ COMMENTER ⊃ VIEWER.",
+            "enum": [
+              "VIEWER",
+              "COMMENTER",
+              "EDITOR",
+              "ADMIN"
+            ],
+            "example": "EDITOR"
+          }
+        },
+        "required": [
+          "resourceType",
+          "role",
+          "subjectId",
+          "subjectType"
+        ]
+      },
+      "GrantDetailResponse": {
+        "type": "object",
+        "description": "권한 한 줄",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "권한 행 id. 역할 변경·회수의 대상이다.",
+            "example": 17
+          },
+          "subjectType": {
+            "type": "string",
+            "description": "권한 주체 종류 — USER(사람) | TEAM(팀)",
+            "enum": [
+              "USER",
+              "TEAM"
+            ],
+            "example": "USER"
+          },
+          "subjectId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "권한 주체 id — 멤버 id 또는 팀 id",
+            "example": 42
+          },
+          "subjectName": {
+            "type": "string",
+            "description": "화면에 보이는 주체 이름. 주체가 지워졌으면 id 문자열로 대신한다.",
+            "example": "김찬호"
+          },
+          "resourceType": {
+            "type": "string",
+            "description": "리소스 종류",
+            "enum": [
+              "GLOBAL",
+              "SPACE",
+              "PROJECT"
+            ],
+            "example": "SPACE"
+          },
+          "resourceId": {
+            "type": "string",
+            "description": "리소스 식별자. GLOBAL이면 null이거나 빈 문자열.",
+            "example": "sp-1"
+          },
+          "role": {
+            "type": "string",
+            "description": "역할. ADMIN ⊃ EDITOR ⊃ COMMENTER ⊃ VIEWER.",
+            "enum": [
+              "VIEWER",
+              "COMMENTER",
+              "EDITOR",
+              "ADMIN"
+            ],
+            "example": "EDITOR"
+          }
+        }
+      },
+      "GrantPreset": {
+        "type": "object",
+        "description": "권한 프리셋. GLOBAL이면 resourceId를 비워 둔다.",
+        "properties": {
+          "scope": {
+            "type": "string",
+            "description": "권한 범위",
+            "enum": [
+              "GLOBAL",
+              "SPACE",
+              "PROJECT"
+            ],
+            "example": "SPACE"
+          },
+          "resourceId": {
+            "type": "string",
+            "description": "리소스 식별자. GLOBAL이면 비워 둔다.",
+            "example": "sp-1"
+          },
+          "role": {
+            "type": "string",
+            "description": "역할",
+            "enum": [
+              "VIEWER",
+              "COMMENTER",
+              "EDITOR",
+              "ADMIN"
+            ],
+            "example": "EDITOR"
+          }
+        },
+        "required": [
+          "role",
+          "scope"
+        ]
+      },
+      "GrantPresetView": {
+        "type": "object",
+        "description": "권한 프리셋",
+        "properties": {
+          "scope": {
+            "type": "string",
+            "description": "권한 범위",
+            "enum": [
+              "GLOBAL",
+              "SPACE",
+              "PROJECT"
+            ],
+            "example": "SPACE"
+          },
+          "resourceId": {
+            "type": "string",
+            "description": "리소스 식별자. GLOBAL이면 null.",
+            "example": "sp-1"
+          },
+          "role": {
+            "type": "string",
+            "description": "역할",
+            "enum": [
+              "VIEWER",
+              "COMMENTER",
+              "EDITOR",
+              "ADMIN"
+            ],
+            "example": "EDITOR"
+          }
+        }
+      },
+      "GrantResponse": {
+        "type": "object",
+        "description": "내 권한 한 줄. 프론트가 메뉴·버튼 노출을 이 목록으로 판정한다.",
+        "properties": {
+          "resourceType": {
+            "type": "string",
+            "description": "리소스 종류",
+            "enum": [
+              "GLOBAL",
+              "SPACE",
+              "PROJECT"
+            ],
+            "example": "SPACE"
+          },
+          "resourceId": {
+            "type": "string",
+            "description": "리소스 식별자. GLOBAL이면 null이거나 빈 문자열.",
+            "example": "sp-1"
+          },
+          "role": {
+            "type": "string",
+            "description": "역할. ADMIN ⊃ EDITOR ⊃ COMMENTER ⊃ VIEWER.",
+            "enum": [
+              "VIEWER",
+              "COMMENTER",
+              "EDITOR",
+              "ADMIN"
+            ],
+            "example": "EDITOR"
+          }
+        }
+      },
+      "GrantRoleRequest": {
+        "type": "object",
+        "description": "권한 역할 변경 요청",
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "바꿀 역할. 마지막 전역 ADMIN을 내리려 하면 409.",
+            "enum": [
+              "VIEWER",
+              "COMMENTER",
+              "EDITOR",
+              "ADMIN"
+            ],
+            "example": "ADMIN"
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "GrantView": {
+        "type": "object",
+        "description": "권한 한 줄",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "권한 행 id",
+            "example": 17
+          },
+          "resourceType": {
+            "type": "string",
+            "description": "리소스 종류",
+            "example": "SPACE"
+          },
+          "resourceId": {
+            "type": "string",
+            "description": "리소스 식별자. GLOBAL이면 null.",
+            "example": "sp-1"
+          },
+          "role": {
+            "type": "string",
+            "description": "역할",
+            "enum": [
+              "VIEWER",
+              "COMMENTER",
+              "EDITOR",
+              "ADMIN"
+            ],
+            "example": "EDITOR"
+          }
+        }
+      },
+      "InvitationCreateRequest": {
+        "type": "object",
+        "description": "초대 생성 요청. 이메일 여러 개에 같은 팀·권한 프리셋을 한 번에 건다.",
+        "properties": {
+          "emails": {
+            "type": "array",
+            "description": "초대할 이메일 목록. 이미 활성이거나 정지된 계정의 이메일이면 409.",
+            "example": [
+              "chanho@example.com"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "teams": {
+            "type": "array",
+            "description": "수락 시 넣을 팀 프리셋",
+            "items": {
+              "$ref": "#/components/schemas/TeamPreset"
+            }
+          },
+          "grants": {
+            "type": "array",
+            "description": "수락 시 줄 권한 프리셋",
+            "items": {
+              "$ref": "#/components/schemas/GrantPreset"
+            }
+          },
+          "message": {
+            "type": "string",
+            "description": "초대 메일에 함께 실을 메시지. 500자까지.",
+            "example": "플랫폼팀에서 함께 일하게 됐습니다.",
+            "maxLength": 500,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "emails"
+        ]
+      },
+      "InvitationResponse": {
+        "type": "object",
+        "description": "초대 한 건",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "초대 id",
+            "example": 7
+          },
+          "email": {
+            "type": "string",
+            "description": "초대받은 이메일",
+            "example": "chanho@example.com"
+          },
+          "status": {
+            "type": "string",
+            "description": "초대 상태. PENDING만 살아 있는 초대다.",
+            "enum": [
+              "PENDING",
+              "ACCEPTED",
+              "EXPIRED",
+              "REVOKED"
+            ],
+            "example": "PENDING"
+          },
+          "invitedBy": {
+            "type": "integer",
+            "format": "int64",
+            "description": "초대한 사람의 멤버 id",
+            "example": 1
+          },
+          "invitedByName": {
+            "type": "string",
+            "description": "초대한 사람의 표시 이름",
+            "example": "김찬호"
+          },
+          "message": {
+            "type": "string",
+            "description": "초대 메일에 실은 메시지",
+            "example": "플랫폼팀에서 함께 일하게 됐습니다."
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "만료 시각. 기본 유효기간은 7일이다."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "생성 시각"
+          },
+          "acceptedMemberId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "수락한 멤버 id. 아직 수락 전이면 null.",
+            "example": 42
+          },
+          "acceptedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "수락 시각. 아직 수락 전이면 null."
+          },
+          "acceptedVia": {
+            "type": "string",
+            "description": "수락 경로 — TOKEN(초대 링크 경유) | EMAIL_MATCH(이메일 일치). 수락 전이면 null.",
+            "enum": [
+              "TOKEN",
+              "EMAIL_MATCH"
+            ],
+            "example": "TOKEN"
+          },
+          "teams": {
+            "type": "array",
+            "description": "수락 시 적용될 팀 프리셋",
+            "items": {
+              "$ref": "#/components/schemas/TeamPresetView"
+            }
+          },
+          "grants": {
+            "type": "array",
+            "description": "수락 시 적용될 권한 프리셋",
+            "items": {
+              "$ref": "#/components/schemas/GrantPresetView"
+            }
+          },
+          "inviteUrl": {
+            "type": "string",
+            "description": "초대 링크. 생성·재발송 응답에만 담기고 목록에서는 항상 null이다(토큰 원문을 저장하지 않는다).",
+            "example": "https://platform.example.com/invite/AbCd…"
+          },
+          "mailSent": {
+            "type": "boolean",
+            "description": "메일을 실제로 보냈는지. false면 화면이 링크 복사를 안내한다.",
+            "example": true
+          }
+        }
+      },
+      "MeResponse": {
+        "type": "object",
+        "description": "내 프로필. 프론트의 전역 관리자 판정은 globalRoles에 ADMIN이 있는지로 통일한다.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "내 멤버 id (= auth-server user id)",
+            "example": 42
+          },
+          "displayName": {
+            "type": "string",
+            "description": "표시 이름",
+            "example": "김찬호"
+          },
+          "email": {
+            "type": "string",
+            "description": "이메일",
+            "example": "chanho@example.com"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "description": "아바타 이미지 경로. 없으면 null.",
+            "example": "/api/org/members/42/avatar?v=1757030400000"
+          },
+          "avatarUpdatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "아바타를 마지막으로 바꾼 시각. 없으면 null."
+          },
+          "status": {
+            "type": "string",
+            "description": "계정 상태. ACTIVE가 아니면 이 경로 밖은 403이다.",
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "SUSPENDED",
+              "DEACTIVATED"
+            ],
+            "example": "ACTIVE"
+          },
+          "kind": {
+            "type": "string",
+            "description": "멤버 종류",
+            "enum": [
+              "HUMAN",
+              "AGENT"
+            ],
+            "example": "HUMAN"
+          },
+          "joinedVia": {
+            "type": "string",
+            "description": "합류 경로",
+            "enum": [
+              "INVITE",
+              "APPROVAL",
+              "BOOTSTRAP",
+              "LEGACY"
+            ],
+            "example": "INVITE"
+          },
+          "globalRoles": {
+            "type": "array",
+            "description": "GLOBAL 권한의 역할 목록. 여기에 ADMIN이 있으면 전역 관리자다.",
+            "example": [
+              "ADMIN"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "teams": {
+            "type": "array",
+            "description": "소속 팀 목록",
+            "items": {
+              "$ref": "#/components/schemas/TeamMembership"
+            }
+          }
+        }
+      },
+      "MemberApproveRequest": {
+        "type": "object",
+        "description": "승인 요청. 팀·권한은 선택이며, 비우면 '전체 구성원'에만 속한 활성 사용자가 된다.",
+        "properties": {
+          "teams": {
+            "type": "array",
+            "description": "승인과 함께 넣을 팀 목록",
+            "items": {
+              "$ref": "#/components/schemas/TeamAssignment"
+            }
+          },
+          "grants": {
+            "type": "array",
+            "description": "승인과 함께 줄 권한 목록",
+            "items": {
+              "$ref": "#/components/schemas/GrantAssignment"
+            }
+          }
+        }
+      },
+      "MemberDetailResponse": {
+        "type": "object",
+        "description": "멤버 상세",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "멤버 id (= auth-server user id)",
+            "example": 42
+          },
+          "displayName": {
+            "type": "string",
+            "description": "표시 이름",
+            "example": "김찬호"
+          },
+          "email": {
+            "type": "string",
+            "description": "이메일",
+            "example": "chanho@example.com"
+          },
+          "status": {
+            "type": "string",
+            "description": "계정 상태",
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "SUSPENDED",
+              "DEACTIVATED"
+            ],
+            "example": "ACTIVE"
+          },
+          "kind": {
+            "type": "string",
+            "description": "멤버 종류",
+            "enum": [
+              "HUMAN",
+              "AGENT"
+            ],
+            "example": "HUMAN"
+          },
+          "joinedVia": {
+            "type": "string",
+            "description": "합류 경로 — INVITE(초대 링크) | APPROVAL(관리자 승인) | BOOTSTRAP(최초 관리자 시드) | LEGACY(초대 제도 이전 계정)",
+            "enum": [
+              "INVITE",
+              "APPROVAL",
+              "BOOTSTRAP",
+              "LEGACY"
+            ],
+            "example": "INVITE"
+          },
+          "approvedBy": {
+            "type": "integer",
+            "format": "int64",
+            "description": "승인한 관리자의 멤버 id. 승인 절차를 거치지 않았으면 null.",
+            "example": 1
+          },
+          "approvedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "승인 시각"
+          },
+          "suspendedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "정지 시각. 정지된 적 없으면 null."
+          },
+          "deactivatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "비활성 시각. 비활성된 적 없으면 null."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "생성 시각"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "마지막 변경 시각"
+          },
+          "teams": {
+            "type": "array",
+            "description": "소속 팀 목록",
+            "items": {
+              "$ref": "#/components/schemas/TeamMembershipView"
+            }
+          },
+          "grants": {
+            "type": "array",
+            "description": "권한 목록. 전역 관리자와 본인에게만 채워지고, 나머지에게는 null.",
+            "items": {
+              "$ref": "#/components/schemas/GrantView"
+            }
+          }
+        }
+      },
+      "MemberEventResponse": {
+        "type": "object",
+        "description": "초대·상태 이력 한 줄. 권한 변경 이력은 /api/org/grants/audit이 따로 낸다.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "이력 id",
+            "example": 108
+          },
+          "memberId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "대상 멤버 id. 아직 멤버가 아닌 초대 단계면 null.",
+            "example": 42
+          },
+          "invitationId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "관련 초대 id. 초대와 무관한 이력이면 null.",
+            "example": 7
+          },
+          "type": {
+            "type": "string",
+            "description": "이력 종류 — INVITED · INVITE_RESENT · INVITE_REVOKED · INVITE_EXPIRED · JOINED · APPROVED · SUSPENDED · REACTIVATED · DEACTIVATED · TEAM_ADDED · TEAM_REMOVED · KEYCLOAK_DISABLED_FAILED",
+            "example": "APPROVED"
+          },
+          "actorId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "이 일을 한 사람의 멤버 id. 시스템이 한 일이면 null.",
+            "example": 1
+          },
+          "detail": {
+            "type": "string",
+            "description": "부가 설명. 종류마다 담기는 값이 다르다.",
+            "example": "team=3"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "발생 시각"
+          }
+        }
+      },
+      "MemberPatchRequest": {
+        "type": "object",
+        "description": "멤버 상태 전이 요청. 표시 이름은 여기서 바꿀 수 없다(원천은 Keycloak 프로필).",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "전이할 상태. PENDING으로 되돌리거나 자기 계정을 비활성화하면 409.",
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "SUSPENDED",
+              "DEACTIVATED"
+            ],
+            "example": "SUSPENDED"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "MemberResponse": {
+        "type": "object",
+        "description": "멤버 목록 항목",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "멤버 id (= auth-server user id)",
+            "example": 42
+          },
+          "displayName": {
+            "type": "string",
+            "description": "표시 이름. 원천은 Keycloak 프로필이다.",
+            "example": "김찬호"
+          },
+          "email": {
+            "type": "string",
+            "description": "이메일",
+            "example": "chanho@example.com"
+          },
+          "status": {
+            "type": "string",
+            "description": "계정 상태",
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "SUSPENDED",
+              "DEACTIVATED"
+            ],
+            "example": "ACTIVE"
+          },
+          "kind": {
+            "type": "string",
+            "description": "멤버 종류 — 사람인지 에이전트 페르소나인지",
+            "enum": [
+              "HUMAN",
+              "AGENT"
+            ],
+            "example": "HUMAN"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "description": "아바타 이미지 경로. 아바타를 올리지 않았으면 null.",
+            "example": "/api/org/members/42/avatar?v=1757030400000"
+          },
+          "avatarUpdatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "아바타를 마지막으로 바꾼 시각. 없으면 null."
+          }
+        }
+      },
+      "PageResponseInvitationResponse": {
+        "type": "object",
+        "description": "목록 응답 봉투. Spring Data Page의 구현 세부는 담지 않는다 — 프론트가 읽는 것은 네 개뿐이다.",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "이 페이지의 항목",
+            "items": {
+              "$ref": "#/components/schemas/InvitationResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "description": "0부터 세는 페이지 번호",
+            "example": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "description": "페이지 크기",
+            "example": 20
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "전체 항목 수",
+            "example": 137
+          }
+        }
+      },
+      "PageResponseMemberResponse": {
+        "type": "object",
+        "description": "목록 응답 봉투. Spring Data Page의 구현 세부는 담지 않는다 — 프론트가 읽는 것은 네 개뿐이다.",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "이 페이지의 항목",
+            "items": {
+              "$ref": "#/components/schemas/MemberResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "description": "0부터 세는 페이지 번호",
+            "example": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "description": "페이지 크기",
+            "example": 20
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "전체 항목 수",
+            "example": 137
+          }
+        }
+      },
+      "PlatformError": {
+        "type": "object",
+        "description": "오류 응답. 메시지는 한국어이며 화면에 그대로 노출된다.",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "사용자에게 보여 줄 오류 메시지",
+            "example": "권한이 없습니다"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "TeamAssignment": {
+        "type": "object",
+        "description": "팀 배정",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "팀 id",
+            "example": 3
+          },
+          "role": {
+            "type": "string",
+            "description": "팀 내 역할. 비우면 MEMBER.",
+            "enum": [
+              "LEAD",
+              "MEMBER"
+            ],
+            "example": "MEMBER"
+          }
+        },
+        "required": [
+          "teamId"
+        ]
+      },
+      "TeamCreateRequest": {
+        "type": "object",
+        "description": "팀 생성 요청",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "팀 이름. 100자까지.",
+            "example": "플랫폼팀",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string",
+            "description": "팀 설명",
+            "example": "게이트웨이·인증·조직 서비스를 만든다"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "TeamMemberResponse": {
+        "type": "object",
+        "description": "팀원 한 줄",
+        "properties": {
+          "memberId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "멤버 id",
+            "example": 42
+          },
+          "displayName": {
+            "type": "string",
+            "description": "표시 이름",
+            "example": "김찬호"
+          },
+          "email": {
+            "type": "string",
+            "description": "이메일 — 동명이인을 가르는 단서. 없으면 null.",
+            "example": "chanho@example.com"
+          },
+          "role": {
+            "type": "string",
+            "description": "팀 내 역할",
+            "enum": [
+              "LEAD",
+              "MEMBER"
+            ],
+            "example": "MEMBER"
+          }
+        }
+      },
+      "TeamMemberRoleRequest": {
+        "type": "object",
+        "description": "팀원 역할 변경 요청",
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "바꿀 역할 — LEAD(리더) | MEMBER",
+            "enum": [
+              "LEAD",
+              "MEMBER"
+            ],
+            "example": "LEAD"
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "TeamMembership": {
+        "type": "object",
+        "description": "소속 팀 한 줄",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "팀 id",
+            "example": 3
+          },
+          "name": {
+            "type": "string",
+            "description": "팀 이름",
+            "example": "플랫폼팀"
+          },
+          "kind": {
+            "type": "string",
+            "description": "팀 종류",
+            "enum": [
+              "STANDARD",
+              "EVERYONE"
+            ],
+            "example": "STANDARD"
+          },
+          "role": {
+            "type": "string",
+            "description": "팀 내 역할",
+            "enum": [
+              "LEAD",
+              "MEMBER"
+            ],
+            "example": "MEMBER"
+          }
+        }
+      },
+      "TeamMembershipView": {
+        "type": "object",
+        "description": "소속 팀 한 줄",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "팀 id",
+            "example": 3
+          },
+          "name": {
+            "type": "string",
+            "description": "팀 이름",
+            "example": "플랫폼팀"
+          },
+          "kind": {
+            "type": "string",
+            "description": "팀 종류 — EVERYONE은 활성 사람 멤버 전원이 자동으로 속하는 팀이다",
+            "enum": [
+              "STANDARD",
+              "EVERYONE"
+            ],
+            "example": "STANDARD"
+          },
+          "role": {
+            "type": "string",
+            "description": "팀 내 역할",
+            "enum": [
+              "LEAD",
+              "MEMBER"
+            ],
+            "example": "MEMBER"
+          }
+        }
+      },
+      "TeamPreset": {
+        "type": "object",
+        "description": "팀 프리셋",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "팀 id",
+            "example": 3
+          },
+          "role": {
+            "type": "string",
+            "description": "팀 내 역할. 비우면 MEMBER.",
+            "enum": [
+              "LEAD",
+              "MEMBER"
+            ],
+            "example": "MEMBER"
+          }
+        },
+        "required": [
+          "teamId"
+        ]
+      },
+      "TeamPresetView": {
+        "type": "object",
+        "description": "팀 프리셋",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "팀 id",
+            "example": 3
+          },
+          "name": {
+            "type": "string",
+            "description": "팀 이름",
+            "example": "플랫폼팀"
+          },
+          "role": {
+            "type": "string",
+            "description": "팀 내 역할",
+            "enum": [
+              "LEAD",
+              "MEMBER"
+            ],
+            "example": "MEMBER"
+          }
+        }
+      },
+      "TeamResponse": {
+        "type": "object",
+        "description": "팀 한 줄",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "팀 id",
+            "example": 3
+          },
+          "name": {
+            "type": "string",
+            "description": "팀 이름",
+            "example": "플랫폼팀"
+          },
+          "description": {
+            "type": "string",
+            "description": "팀 설명",
+            "example": "게이트웨이·인증·조직 서비스를 만든다"
+          },
+          "kind": {
+            "type": "string",
+            "description": "팀 종류 — EVERYONE은 활성 사람 멤버 전원이 자동으로 속하며 가입·탈퇴·삭제할 수 없다",
+            "enum": [
+              "STANDARD",
+              "EVERYONE"
+            ],
+            "example": "STANDARD"
+          },
+          "memberCount": {
+            "type": "integer",
+            "format": "int64",
+            "description": "팀원 수",
+            "example": 7
+          },
+          "myRole": {
+            "type": "string",
+            "description": "호출자의 팀 내 역할. 그 팀 소속이 아니면 null.",
+            "enum": [
+              "LEAD",
+              "MEMBER"
+            ],
+            "example": "LEAD"
+          }
+        }
+      },
+      "TeamUpdateRequest": {
+        "type": "object",
+        "description": "팀 수정 요청",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "팀 이름. 100자까지.",
+            "example": "플랫폼팀",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string",
+            "description": "팀 설명",
+            "example": "게이트웨이·인증·조직 서비스를 만든다"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "description": "개인 API 토큰 `chanho_pat_…` 또는 세션 JWT",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
