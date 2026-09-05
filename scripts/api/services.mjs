@@ -20,8 +20,8 @@ export const SERVICES = [
   { id: 'wiki', title: 'WIKI API', host: 'wiki-backend', port: 9110 },
   { id: 'alm', title: 'ALM API', host: 'alm-backend', port: 9120 },
   { id: 'org', title: 'Org API', host: 'org-service', port: 9130 },
-  // 이관 엔진(wiki-backend migration/** 에서 분리, X2~X4). 이미지가 GHCR에 오르기 전까지는 optional.
-  { id: 'migration', title: 'Migration API', host: 'migration-service', port: 9170, optional: true },
+  // 이관 엔진(wiki-backend migration/** 에서 분리). 2026-09-05 배포 확인 후 optional 해제.
+  { id: 'migration', title: 'Migration API', host: 'migration-service', port: 9170 },
 ];
 
 export const serviceById = (id) => SERVICES.find((s) => s.id === id) ?? null;

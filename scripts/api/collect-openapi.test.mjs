@@ -61,9 +61,11 @@ test('collect: 실패한 서비스는 사유를 모으고 성공한 서비스의
     const warnings = [];
     console.error = () => {};
     console.warn = (m) => warnings.push(String(m));
+    // 실제 SERVICES 에는 이제 optional 서비스가 없으므로, optional 동작은 가상의 항목으로 검증한다
+    const servicesWithOptional = [...SERVICES.filter((s) => s.id !== 'migration'), { id: 'migration', title: 'Migration API', host: 'migration-service', port: 9170, optional: true }];
     let result;
     try {
-      result = collect({ services: SERVICES, fromFixture: null, outDir: out, run: fake });
+      result = collect({ services: servicesWithOptional, fromFixture: null, outDir: out, run: fake });
     } finally {
       console.error = origError;
       console.warn = origWarn;

@@ -29,7 +29,7 @@ const SAMPLE = JSON.parse(readFileSync(path.join(HERE, 'fixtures', 'sample.json'
 const EXPECTED_DIR = path.join(HERE, 'fixtures', 'expected', 'wiki');
 const WIKI = SERVICES.find((s) => s.id === 'wiki');
 
-test('서비스 선언: 네 서비스(migration 은 optional)·컴포즈 네트워크·--only 선택', () => {
+test('서비스 선언: 네 서비스·컴포즈 네트워크·--only 선택', () => {
   assert.deepEqual(
     SERVICES.map((s) => [s.id, s.title, s.host, s.port]),
     [
@@ -39,7 +39,7 @@ test('서비스 선언: 네 서비스(migration 은 optional)·컴포즈 네트�
       ['migration', 'Migration API', 'migration-service', 9170],
     ],
   );
-  assert.deepEqual(SERVICES.filter((s) => s.optional).map((s) => s.id), ['migration']);
+  assert.deepEqual(SERVICES.filter((s) => s.optional).map((s) => s.id), []);
   assert.equal(COMPOSE_NETWORK, 'platform_default');
   assert.deepEqual(selectServices('org,wiki').map((s) => s.id), ['org', 'wiki']);
   assert.equal(selectServices(null).length, 4);
