@@ -205,6 +205,11 @@
     "lastmod": "2026-09-05"
   },
   {
+    "url": "/docs/spaces/3/folder/207",
+    "title": "Migration API",
+    "lastmod": "2026-09-05"
+  },
+  {
     "url": "/docs/spaces/3/folder/39",
     "title": "백엔드 요구·설계",
     "lastmod": "2026-09-04"
@@ -411,7 +416,7 @@
   },
   {
     "url": "/docs/spaces/3/pages/136",
-    "title": "API 인증 — 개인 API 토큰",
+    "title": "인증 — 개인 API 토큰",
     "lastmod": "2026-09-05"
   },
   {
@@ -697,6 +702,56 @@
   {
     "url": "/docs/spaces/3/pages/196",
     "title": "Watch",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/197",
+    "title": "페이지 히스토리 화면 — 컨플루언스 충실 복제 (2026-09-06) (2026-09-06)",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/198",
+    "title": "요청·응답 규약",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/199",
+    "title": "오류 처리",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/200",
+    "title": "낙관적 락",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/201",
+    "title": "첨부 파일",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/202",
+    "title": "실전 예제 — WIKI",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/203",
+    "title": "실전 예제 — ALM",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/204",
+    "title": "실전 예제 — Org",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/205",
+    "title": "요청 제한",
+    "lastmod": "2026-09-05"
+  },
+  {
+    "url": "/docs/spaces/3/pages/206",
+    "title": "레퍼런스 읽는 법",
     "lastmod": "2026-09-05"
   },
   {

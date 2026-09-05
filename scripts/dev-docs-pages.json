@@ -41,6 +41,15 @@
   "alm-front/superpowers/specs/2026-09-05-status-icons-avatar-sample-data.md": 134,
   "api-guide/": 135,
   "api-guide/10-authentication.md": 136,
+  "api-guide/20-conventions.md": 198,
+  "api-guide/30-errors.md": 199,
+  "api-guide/40-concurrency.md": 200,
+  "api-guide/50-files.md": 201,
+  "api-guide/60-cookbook-wiki.md": 202,
+  "api-guide/61-cookbook-alm.md": 203,
+  "api-guide/62-cookbook-org.md": 204,
+  "api-guide/70-rate-limits.md": 205,
+  "api-guide/80-reading-the-reference.md": 206,
   "api-reference/": 139,
   "api-reference/alm/": 140,
   "api-reference/alm/README.md": 143,
@@ -68,6 +77,7 @@
   "api-reference/alm/statuses.md": 167,
   "api-reference/alm/versions.md": 168,
   "api-reference/alm/worklogs.md": 169,
+  "api-reference/migration/": 207,
   "api-reference/org/": 141,
   "api-reference/org/README.md": 144,
   "api-reference/org/avatars.md": 170,
@@ -158,5 +168,6 @@
   "wiki-front/superpowers/specs/2026-08-23-w18-page-restriction-design.md": 70,
   "wiki-front/superpowers/specs/2026-09-04-public-docs-instance-design.md": 71,
   "wiki-front/superpowers/specs/2026-09-05-confluence-dc-migration-design.md": 132,
-  "wiki-front/superpowers/specs/2026-09-05-migration-service-split-design.md": 137
+  "wiki-front/superpowers/specs/2026-09-05-migration-service-split-design.md": 137,
+  "wiki-front/superpowers/specs/2026-09-06-page-history-confluence-design.md": 197
 }
