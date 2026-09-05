@@ -22,6 +22,7 @@ import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 import CreateTokenDialog from './CreateTokenDialog';
 import TokenRevealDialog from './TokenRevealDialog';
 import {
+  ApiError,
   formatDate,
   listTokens,
   revokeToken,
@@ -97,6 +98,8 @@ export default function TokensPage() {
     } catch (e: unknown) {
       notify.error(e instanceof Error ? e.message : '토큰을 폐기하지 못했습니다.');
       setRevokeTarget(null);
+      // 404(청소 배치로 이미 사라진 행)면 표에 남은 행이 거짓이다 — 목록을 다시 받는다.
+      if (e instanceof ApiError && e.status === 404) await reload();
     } finally {
       setRevoking(false);
     }
@@ -236,7 +239,7 @@ export default function TokensPage() {
         <DialogTitle>토큰을 폐기할까요?</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            «{revokeTarget?.label}» 토큰이 즉시 무효가 되며 되돌릴 수 없습니다. 이 토큰을 쓰는
+            «{revokeTarget?.label}» 토큰이 최대 1분 안에 차단되며 되돌릴 수 없습니다. 이 토큰을 쓰는
             스크립트는 인증에 실패합니다.
           </DialogContentText>
         </DialogContent>
