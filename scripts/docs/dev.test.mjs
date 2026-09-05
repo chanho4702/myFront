@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DocsApiError, pageHref } from './lib.mjs';
+import { COLLECTIONS as COLLECTIONS_DECL } from './collections.mjs';
 import {
   globToRegExp,
   literalPrefix,
@@ -318,4 +319,20 @@ test('HTTP 오류는 그대로 전파된다', async () => {
     throw new DocsApiError('POST', '/api/wiki/pages', 403, 'forbidden');
   };
   await assert.rejects(syncDevDocs({ collections: COLLECTIONS, mapping: {}, client }), (err) => err.status === 403);
+});
+
+test('컬렉션 선언: id 유일·필수 필드·절대경로, API 가이드는 auth-server/docs/api 만 본다(설계 스펙 제외)', () => {
+  const ids = COLLECTIONS_DECL.map((c) => c.id);
+  assert.equal(new Set(ids).size, ids.length);
+  for (const c of COLLECTIONS_DECL) {
+    assert.ok(c.id && c.title && c.dir && c.include?.length, c.id);
+    assert.ok(/^[A-Za-z]:\/|^\//.test(c.dir), `${c.id}: dir 은 절대경로(슬래시 구분)`);
+    assert.equal(c.dir.includes('\\'), false, c.id);
+  }
+  const api = COLLECTIONS_DECL.find((c) => c.id === 'api-guide');
+  assert.equal(api.title, 'API 가이드');
+  assert.equal(api.dir, 'C:/MSA_TEMPLATE/auth-server/docs/api');
+  assert.ok(matchesAny('authentication.md', api.include));
+  assert.equal(literalPrefix(api.include[0]), ''); // dir 자체가 경계 — superpowers/ 는 dir 밖이라 걸을 수 없다
+  assert.equal(api.folders, undefined);
 });

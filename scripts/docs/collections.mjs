@@ -75,4 +75,12 @@ export const COLLECTIONS = [
     dir: `${PLATFORM_ROOT}/myFront`,
     include: ['README.md'],
   },
+  {
+    // 외부 클라이언트용 공개 API 가이드. dir 을 docs/api 로 좁혀 auth-server/docs/superpowers(설계 스펙)는 안 딸려온다.
+    // README 가 없으므로 루트는 자식 목록으로 생성된다.
+    id: 'api-guide',
+    title: 'API 가이드',
+    dir: `${PLATFORM_ROOT}/auth-server/docs/api`,
+    include: ['**/*.md'],
+  },
 ];
