@@ -10,7 +10,9 @@
     "prerender": "node scripts/prerender.mjs",
     "build:site": "npm run build && npm run prerender",
     "sync:docs": "node scripts/sync-docs.mjs",
-    "test:scripts": "node --test scripts/notes/transform.test.mjs scripts/sync-docs.test.mjs scripts/docs/dev.test.mjs scripts/seo/generate.test.mjs scripts/seo/prerender.test.mjs"
+    "api:collect": "node scripts/api/collect-openapi.mjs",
+    "api:gen": "node scripts/api/gen-reference.mjs",
+    "test:scripts": "node --test scripts/notes/transform.test.mjs scripts/sync-docs.test.mjs scripts/docs/dev.test.mjs scripts/seo/generate.test.mjs scripts/seo/prerender.test.mjs scripts/api/lib.test.mjs scripts/api/collect-openapi.test.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

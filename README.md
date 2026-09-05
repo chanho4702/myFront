@@ -54,8 +54,28 @@ npm run dev        # 개발 서버 → http://localhost:5173 (VSCode Live Server
 | `npm run preview` | `vite preview` | 프로덕션 빌드 미리보기 |
 | `npm run build:site` | `build` → `prerender` | **배포용 빌드.** 빌드 후 공개 라우트를 정적 HTML 로 굽고 sitemap·robots·llms.txt 를 만든다. CI 가 쓰는 명령 |
 | `npm run prerender` | `node scripts/prerender.mjs` | 이미 있는 `dist` 에 프리렌더/SEO 산출물만 다시 만든다 |
-| `npm run test:scripts` | `node --test ...` | 노트 변환기·문서 임포터·SEO 생성기 단위 테스트 |
+| `npm run test:scripts` | `node --test ...` | 노트 변환기·문서 임포터·SEO 생성기·API 레퍼런스 생성기 단위 테스트 |
+| `npm run api:collect` | `node scripts/api/collect-openapi.mjs` | 컨테이너 안 `curl` 로 세 서비스의 `/v3/api-docs` 를 받아 `scripts/api/specs/<id>.json` 에 정렬·pretty 저장(커밋). `-- --only=wiki,alm`, `-- --from-fixture`(도커 대신 샘플 스펙). 아래 "API 레퍼런스 생성" 참고 |
+| `npm run api:gen` | `node scripts/api/gen-reference.mjs` | `scripts/api/specs/*.json` → `docs/api-reference/<id>/README.md` + 태그별 `<slug>.md` 생성(커밋). 서비스 디렉터리를 비우고 다시 쓴다. `-- --only=wiki` |
 | `npm run sync:docs` | `node scripts/sync-docs.mjs` | 공개 문서 위키(`/docs/`, docs 인스턴스)에 멱등 동기화 — **notes**(Obsidian 기술 노트 → 스페이스 `docs`, 매핑 `scripts/docs-pages.json`) 다음 **dev**(플랫폼 리포의 개발 문서 → 스페이스 `dev`, 대상은 `scripts/docs/collections.mjs`, 매핑 `scripts/dev-docs-pages.json`). `-- --only=notes\|dev` 로 하나만. `DOCS_API`(기본 `http://127.0.0.1:19910`)·`DOCS_IMPORT_TOKEN`(없으면 `DOCS_TOKEN_FILE`, 기본 `../infra/keycloak/.env` 에서 읽음)·`OBSIDIAN_VAULT` 환경변수. 매핑 파일은 커밋한다 |
+
+### API 레퍼런스 생성
+
+wiki·alm·org 백엔드의 OpenAPI(springdoc, `/v3/api-docs`)에서 리소스(태그)별 마크다운을 만들어 공개 문서
+위키의 "API 레퍼런스" 스페이스로 올린다. 원본은 각 서비스의 컨트롤러 주석이며 생성물은 손으로 고치지 않는다.
+`/v3/api-docs` 는 게이트웨이가 라우팅하지 않아 클러스터 안에서만 보이므로, 수집기는 컴포즈 네트워크
+(`platform_default`) 안에서 `curlimages/curl` 컨테이너를 띄워 받는다(서비스·네트워크 상수는 `scripts/api/services.mjs`).
+
+```bash
+npm run api:collect   # 1. 스택이 떠 있을 때: /v3/api-docs → scripts/api/specs/<id>.json (정렬·pretty, 커밋)
+npm run api:gen       # 2. 스펙 → docs/api-reference/<id>/README.md + <태그>.md (결정적 출력, 커밋)
+npm run sync:docs     # 3. 문서 위키 dev 스페이스 "API 레퍼런스" 폴더로 동기화 (기존 임포터, --only=dev 가능)
+```
+
+세 단계 모두 멱등이라 코드가 바뀌면 같은 순서로 다시 돌린다. 생성물 diff 는 컨트롤러 주석 변경만 반영한다.
+스택 없이 파이프라인만 점검하려면 `npm run api:collect -- --from-fixture --out-dir=<임시>` 로 샘플 스펙
+(`scripts/api/fixtures/sample.json`)을 쓰고, 그 결과의 골든 파일은 `scripts/api/fixtures/expected/` 에 있다.
+`docs/api-reference/` 에는 실제 서비스 출력만 둔다.
 
 > **원커맨드 기동:** 상위 `../scripts/dev-up.ps1` 이 인프라(docker compose)를 올리고 프론트
 > 3개를 Windows Terminal 탭(:5173 / :5174 / :5175, `--strictPort`)으로 연다. 백엔드는

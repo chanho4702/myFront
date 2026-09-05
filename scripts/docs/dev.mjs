@@ -67,13 +67,28 @@ export function originOf(collection, relpath) {
 
 const DATED = /^(\d{4}-\d{2}-\d{2})-(.+)$/;
 
-/** 본문 맨 앞의 H1. 앞에 다른 내용이 있으면 제목이 아니다. */
+/** H1 앞에 올 수 있는 머리말 — 빈 줄과 인용문(`>`)뿐. 생성 문서의 "자동 생성" 안내가 여기 해당한다. */
+const isPreamble = (s) => s.split(/\r?\n/).every((l) => l.trim() === '' || l.startsWith('>'));
+
+/** 본문 맨 앞의 H1. 앞에 인용문 머리말 말고 다른 내용이 있으면 제목이 아니다. 머리말은 본문에 남긴다. */
 export function firstH1(body) {
   const m = body.match(/^#\s+(.+?)\s*$/m);
-  if (m && body.slice(0, m.index).trim() === '') {
-    return { title: m[1].trim(), body: body.slice(m.index + m[0].length).replace(/^\r?\n/, '') };
+  if (m && isPreamble(body.slice(0, m.index))) {
+    const preamble = body.slice(0, m.index).trim();
+    const rest = body.slice(m.index + m[0].length).replace(/^\r?\n/, '');
+    return { title: m[1].trim(), body: preamble ? `${preamble}\n\n${rest}` : rest };
   }
   return { title: null, body };
+}
+
+/**
+ * optional 컬렉션이 아직 없을 때(디렉터리 없음·대상 파일 0개) 건너뛸 사유. 필수 컬렉션이면 null — 호출 쪽이 오류로 다룬다.
+ */
+export function collectionSkipReason(collection, { dirExists, fileCount }) {
+  if (!collection.optional) return null;
+  if (!dirExists) return `컬렉션 ${collection.id} 건너뜀 — 디렉터리가 아직 없다: ${collection.dir}`;
+  if (fileCount === 0) return `컬렉션 ${collection.id} 건너뜀 — 대상 파일이 없다: ${collection.dir}`;
+  return null;
 }
 
 /**

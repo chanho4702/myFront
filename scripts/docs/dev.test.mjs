@@ -8,6 +8,7 @@ import {
   matchesAny,
   originOf,
   deriveTitle,
+  firstH1,
   buildTree,
   buildPathIndex,
   resolveRelative,
@@ -21,6 +22,7 @@ import {
   staleMappingKeys,
   folderHref,
   syncDevDocs,
+  collectionSkipReason,
 } from './dev.mjs';
 
 test('glob: ** 는 하위 전부, * 는 한 단계, 와일드카드 없는 항목은 파일 하나', () => {
@@ -49,6 +51,19 @@ test('제목: 덮어쓰기 > H1 > 파일명, 날짜 접두 파일은 (YYYY-MM-DD
   assert.equal(deriveTitle('STATUS.md', '# ALM Front 현황', { 'STATUS.md': '진행 현황' }), '진행 현황');
   assert.equal(deriveTitle('BACKLOG.md', '설명\n\n# 나중에 나오는 H1'), 'BACKLOG');
   assert.equal(deriveTitle('a.md', `# ${'x'.repeat(300)}`).length, 255);
+  // 인용문 머리말(생성 문서의 "자동 생성" 안내)만 앞에 있으면 H1 이 제목이고 머리말은 본문에 남는다
+  assert.equal(deriveTitle('spaces.md', '> 자동 생성 — 직접 고치지 말 것\n\n# Spaces\n\n본문'), 'Spaces');
+  assert.equal(firstH1('> 안내\n\n# 제목\n\n본문\n').body, '> 안내\n\n본문\n');
+  assert.equal(firstH1('> 안내\n\n# 제목\n\n본문\n').title, '제목');
+  assert.equal(firstH1('> 안내\n\n글\n\n# 제목').title, null);
+});
+
+test('optional 컬렉션은 디렉터리·파일이 없으면 사유와 함께 건너뛰고, 필수 컬렉션은 null', () => {
+  const opt = { id: 'api-reference', dir: 'C:/x/docs/api-reference', optional: true };
+  assert.match(collectionSkipReason(opt, { dirExists: false, fileCount: 0 }), /api-reference 건너뜀 — 디렉터리가 아직 없다: C:\/x\/docs\/api-reference/);
+  assert.match(collectionSkipReason(opt, { dirExists: true, fileCount: 0 }), /대상 파일이 없다/);
+  assert.equal(collectionSkipReason(opt, { dirExists: true, fileCount: 3 }), null);
+  assert.equal(collectionSkipReason({ id: 'platform', dir: '/r' }, { dirExists: false, fileCount: 0 }), null);
 });
 
 const WIKI = {
@@ -335,4 +350,28 @@ test('컬렉션 선언: id 유일·필수 필드·절대경로, API 가이드는
   assert.ok(matchesAny('authentication.md', api.include));
   assert.equal(literalPrefix(api.include[0]), ''); // dir 자체가 경계 — superpowers/ 는 dir 밖이라 걸을 수 없다
   assert.equal(api.folders, undefined);
+
+  // API 레퍼런스: myFront/docs/api-reference 만(docs/superpowers 제외), 폴더 = 서비스, 생성 전에는 optional
+  const ref = COLLECTIONS_DECL.find((c) => c.id === 'api-reference');
+  assert.equal(ref.title, 'API 레퍼런스');
+  assert.equal(ref.dir, 'C:/MSA_TEMPLATE/myFront/docs/api-reference');
+  assert.deepEqual(ref.folders, { wiki: 'WIKI API', alm: 'ALM API', org: 'Org API' });
+  assert.equal(ref.optional, true);
+  assert.ok(matchesAny('wiki/spaces.md', ref.include));
+  assert.equal(literalPrefix(ref.include[0]), '');
+  const nodes = buildTree(ref, [
+    { relpath: 'wiki/README.md', raw: '> 자동 생성\n\n# WIKI API\n' },
+    { relpath: 'wiki/spaces.md', raw: '> 자동 생성\n\n# Spaces\n' },
+  ]);
+  assert.deepEqual(
+    nodes.map((n) => [n.key, n.kind, n.parentKey, n.title]),
+    [
+      ['api-reference/', 'root', null, 'API 레퍼런스'],
+      ['api-reference/alm/', 'folder', 'api-reference/', 'ALM API'],
+      ['api-reference/org/', 'folder', 'api-reference/', 'Org API'],
+      ['api-reference/wiki/', 'folder', 'api-reference/', 'WIKI API'],
+      ['api-reference/wiki/spaces.md', 'page', 'api-reference/wiki/', 'Spaces'],
+    ],
+  );
+  assert.equal(nodes.find((n) => n.key === 'api-reference/wiki/').relpath, 'wiki/README.md');
 });

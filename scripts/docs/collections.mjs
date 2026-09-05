@@ -9,7 +9,10 @@
 //  folders  { 상대 디렉터리: 폴더 페이지 제목 } — 여기 적힌 디렉터리만 폴더 페이지가 된다.
 //           적히지 않은 중간 디렉터리는 건너뛰고 가장 가까운 상위 폴더(없으면 루트) 아래에 놓인다.
 //  titles   { 상대경로: 제목 } — H1·파일명 대신 쓸 제목
+//  optional true 면 dir 이 없거나 비어 있어도 실패하지 않고 경고만 내고 건너뛴다(생성물이라 아직 없을 수 있는 컬렉션).
 //  루트/폴더 디렉터리의 README.md 는 별도 페이지가 아니라 그 루트/폴더의 본문이 된다(폴더는 자식 목록으로 대체).
+
+import { SERVICES as API_SERVICES } from '../api/services.mjs';
 
 export const PLATFORM_ROOT = 'C:/MSA_TEMPLATE';
 
@@ -82,5 +85,15 @@ export const COLLECTIONS = [
     title: 'API 가이드',
     dir: `${PLATFORM_ROOT}/auth-server/docs/api`,
     include: ['**/*.md'],
+  },
+  {
+    // 서비스 OpenAPI 에서 생성한 레퍼런스(npm run api:collect → api:gen). 폴더 = 서비스, 페이지 = 태그.
+    // dir 을 docs/api-reference 로 좁혀 docs/superpowers(설계 스펙)는 안 딸려온다. 생성 전에는 dir 이 없으므로 optional.
+    id: 'api-reference',
+    title: 'API 레퍼런스',
+    dir: `${PLATFORM_ROOT}/myFront/docs/api-reference`,
+    include: ['**/*.md'],
+    folders: Object.fromEntries(API_SERVICES.map((s) => [s.id, s.title])),
+    optional: true,
   },
 ];

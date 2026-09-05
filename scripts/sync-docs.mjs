@@ -17,7 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isWhitelisted } from './notes/transform.mjs';
 import { createDocsClient, syncDocs } from './docs/lib.mjs';
-import { MAX_FILE_BYTES, SKIP_DIRS, globToRegExp, hasWildcard, literalPrefix, syncDevDocs, toPosix } from './docs/dev.mjs';
+import { MAX_FILE_BYTES, SKIP_DIRS, collectionSkipReason, globToRegExp, hasWildcard, literalPrefix, syncDevDocs, toPosix } from './docs/dev.mjs';
 import { COLLECTIONS, PLATFORM_ROOT } from './docs/collections.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -133,7 +133,13 @@ async function runDev(client) {
   const skipped = [];
   const collections = [];
   for (const collection of COLLECTIONS) {
-    const files = await collectFiles(collection, skipped);
+    const dirExists = existsSync(collection.dir);
+    const files = dirExists ? await collectFiles(collection, skipped) : [];
+    const skip = collectionSkipReason(collection, { dirExists, fileCount: files.length });
+    if (skip) {
+      console.warn(`[sync-docs] 경고 — ${skip}`);
+      continue;
+    }
     if (files.length === 0) throw new Error(`컬렉션 ${collection.id} 에 대상 파일이 없습니다: ${collection.dir}`);
     collections.push({ collection, files });
   }

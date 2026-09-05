@@ -1,0 +1,384 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "WIKI API",
+    "description": "스페이스·페이지·첨부를 다루는 위키 서비스 API",
+    "version": "0.1.0"
+  },
+  "servers": [
+    { "url": "/", "description": "Generated server url" }
+  ],
+  "security": [
+    { "bearerAuth": [] }
+  ],
+  "tags": [
+    { "name": "Spaces", "description": "스페이스(문서 묶음) 관리" },
+    { "name": "Attachments", "description": "페이지 첨부 파일" },
+    { "name": "Pages", "description": "페이지 조회·작성·수정" }
+  ],
+  "paths": {
+    "/api/wiki/spaces/{id}": {
+      "get": {
+        "tags": ["Spaces"],
+        "summary": "스페이스 조회",
+        "operationId": "getSpace",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SpaceResponse" } } } },
+          "401": { "description": "인증 필요", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "403": { "description": "권한 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "404": { "description": "스페이스 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } }
+        }
+      },
+      "put": {
+        "tags": ["Spaces"],
+        "summary": "스페이스 수정",
+        "description": "낙관적 락 — `version` 이 현재 값과 다르면 409.",
+        "operationId": "updateSpace",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateSpaceRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SpaceResponse" } } } },
+          "401": { "description": "인증 필요", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "403": { "description": "권한 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "404": { "description": "스페이스 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "409": { "description": "버전 충돌", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Spaces"],
+        "summary": "스페이스 삭제",
+        "operationId": "deleteSpace",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "204": { "description": "삭제됨" },
+          "401": { "description": "인증 필요", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "403": { "description": "권한 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "404": { "description": "스페이스 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } }
+        }
+      }
+    },
+    "/api/wiki/spaces": {
+      "post": {
+        "tags": ["Spaces"],
+        "summary": "스페이스 생성",
+        "operationId": "createSpace",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateSpaceRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "생성됨", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SpaceResponse" } } } },
+          "400": { "description": "입력 오류", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "401": { "description": "인증 필요", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "403": { "description": "권한 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } }
+        }
+      },
+      "get": {
+        "tags": ["Spaces"],
+        "summary": "스페이스 목록",
+        "operationId": "listSpaces",
+        "parameters": [
+          { "name": "q", "in": "query", "description": "이름·키 부분 일치 검색어", "required": false, "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "required": false, "schema": { "type": "integer", "format": "int32", "default": 0 } },
+          { "name": "size", "in": "query", "required": false, "schema": { "type": "integer", "format": "int32", "default": 20 } }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/SpaceResponse" } } } } },
+          "401": { "description": "인증 필요", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "403": { "description": "권한 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } }
+        }
+      }
+    },
+    "/api/wiki/spaces/{spaceId}/pages": {
+      "get": {
+        "tags": ["Pages"],
+        "summary": "스페이스의 페이지 목록",
+        "operationId": "listPages",
+        "parameters": [
+          { "name": "spaceId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } },
+          { "name": "status", "in": "query", "description": "상태 필터(없으면 전부)", "required": false, "schema": { "type": "string", "enum": ["DRAFT", "PUBLISHED", "ARCHIVED"] } },
+          { "name": "X-Request-Id", "in": "header", "description": "추적용 요청 id", "required": false, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PageSummary" } } } } },
+          "401": { "description": "인증 필요", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "403": { "description": "권한 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "404": { "description": "스페이스 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } }
+        }
+      },
+      "post": {
+        "tags": ["Pages"],
+        "summary": "페이지 생성",
+        "operationId": "createPage",
+        "parameters": [
+          { "name": "spaceId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePageRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "생성됨", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PageResponse" } } } },
+          "400": { "description": "입력 오류", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "401": { "description": "인증 필요", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "403": { "description": "권한 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "404": { "description": "스페이스 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } }
+        }
+      }
+    },
+    "/api/wiki/pages/{id}": {
+      "get": {
+        "tags": ["Pages"],
+        "summary": "페이지 조회",
+        "operationId": "getPage",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PageResponse" } } } },
+          "401": { "description": "인증 필요", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "403": { "description": "권한 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "404": { "description": "페이지 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } }
+        }
+      },
+      "put": {
+        "tags": ["Pages"],
+        "summary": "페이지 수정",
+        "operationId": "updatePage",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdatePageRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PageResponse" } } } },
+          "401": { "description": "인증 필요", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "403": { "description": "권한 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "404": { "description": "페이지 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "409": { "description": "버전 충돌", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } }
+        }
+      },
+      "delete": {
+        "tags": ["Pages"],
+        "summary": "페이지 삭제(휴지통으로)",
+        "operationId": "deletePage",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "204": { "description": "삭제됨" },
+          "401": { "description": "인증 필요", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "403": { "description": "권한 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "404": { "description": "페이지 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } }
+        }
+      }
+    },
+    "/api/wiki/pages/{id}/attachments": {
+      "get": {
+        "tags": ["Attachments"],
+        "summary": "페이지 첨부 목록",
+        "operationId": "listAttachments",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/AttachmentResponse" } } } } },
+          "401": { "description": "인증 필요", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "403": { "description": "권한 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "404": { "description": "페이지 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } }
+        }
+      },
+      "post": {
+        "tags": ["Attachments"],
+        "summary": "첨부 업로드",
+        "operationId": "uploadAttachment",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file"],
+                "properties": {
+                  "file": { "type": "string", "format": "binary", "description": "업로드할 파일(최대 20MB)" },
+                  "comment": { "type": "string", "description": "첨부 설명", "example": "회의록 원본" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "업로드됨", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AttachmentResponse" } } } },
+          "401": { "description": "인증 필요", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "403": { "description": "권한 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "404": { "description": "페이지 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "413": { "description": "파일이 너무 큼", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } }
+        }
+      }
+    },
+    "/api/wiki/attachments/{id}": {
+      "delete": {
+        "tags": ["Attachments"],
+        "summary": "첨부 삭제",
+        "operationId": "deleteAttachment",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "204": { "description": "삭제됨" },
+          "401": { "description": "인증 필요", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "403": { "description": "권한 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } },
+          "404": { "description": "첨부 없음", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlatformError" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateSpaceRequest": {
+        "type": "object",
+        "required": ["name", "version"],
+        "properties": {
+          "name": { "type": "string", "description": "스페이스 이름", "example": "팀 위키" },
+          "description": { "type": ["string", "null"], "description": "한 줄 설명" },
+          "version": { "type": "integer", "format": "int64", "description": "현재 버전(낙관적 락)", "example": 3 }
+        }
+      },
+      "SpaceResponse": {
+        "type": "object",
+        "required": ["id", "key", "name", "version", "createdAt"],
+        "properties": {
+          "id": { "type": "integer", "format": "int64", "example": 42 },
+          "key": { "type": "string", "description": "URL 에 쓰는 짧은 키", "example": "TEAM" },
+          "name": { "type": "string", "example": "팀 위키" },
+          "description": { "type": ["string", "null"] },
+          "owner": { "$ref": "#/components/schemas/UserSummary" },
+          "version": { "type": "integer", "format": "int64", "example": 3 },
+          "createdAt": { "type": "string", "format": "date-time", "example": "2026-09-05T09:00:00Z" }
+        }
+      },
+      "CreateSpaceRequest": {
+        "type": "object",
+        "required": ["key", "name"],
+        "properties": {
+          "key": { "type": "string", "description": "대문자·숫자 2~10자", "example": "TEAM", "pattern": "^[A-Z0-9]{2,10}$" },
+          "name": { "type": "string", "description": "스페이스 이름", "example": "팀 위키" },
+          "description": { "type": "string", "description": "한 줄 설명", "example": "팀 운영 문서" }
+        }
+      },
+      "PageResponse": {
+        "type": "object",
+        "required": ["id", "title", "status", "version", "space"],
+        "properties": {
+          "id": { "type": "integer", "format": "int64", "example": 1001 },
+          "title": { "type": "string", "example": "온보딩 가이드" },
+          "content": { "type": "string", "description": "마크다운 본문" },
+          "status": { "type": "string", "description": "게시 상태", "enum": ["DRAFT", "PUBLISHED", "ARCHIVED"], "example": "PUBLISHED" },
+          "labels": { "type": "array", "description": "라벨 목록", "items": { "type": "string" }, "example": ["guide", "onboarding"] },
+          "author": { "$ref": "#/components/schemas/UserSummary" },
+          "space": { "$ref": "#/components/schemas/SpaceSummary" },
+          "properties": { "type": "object", "description": "확장 속성", "additionalProperties": { "type": "string" } },
+          "version": { "type": "integer", "format": "int64", "example": 7 },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PageSummary": {
+        "type": "object",
+        "required": ["id", "title", "status"],
+        "properties": {
+          "id": { "type": "integer", "format": "int64", "example": 1001 },
+          "title": { "type": "string", "example": "온보딩 가이드" },
+          "status": { "type": "string", "enum": ["DRAFT", "PUBLISHED", "ARCHIVED"] },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CreatePageRequest": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "title": { "type": "string", "description": "제목(1~200자)", "example": "온보딩 가이드" },
+          "content": { "type": "string", "description": "마크다운 본문", "example": "# 환영합니다" },
+          "parentId": { "type": ["integer", "null"], "format": "int64", "description": "상위 페이지 id(없으면 루트)" },
+          "labels": { "type": "array", "items": { "type": "string" }, "example": ["guide"] }
+        }
+      },
+      "UpdatePageRequest": {
+        "type": "object",
+        "required": ["title", "version"],
+        "properties": {
+          "title": { "type": "string", "example": "온보딩 가이드" },
+          "content": { "type": "string", "description": "마크다운 본문" },
+          "status": { "type": "string", "enum": ["DRAFT", "PUBLISHED", "ARCHIVED"], "default": "DRAFT" },
+          "version": { "type": "integer", "format": "int64", "description": "현재 버전(낙관적 락)", "example": 7 }
+        }
+      },
+      "UserSummary": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "description": "Keycloak subject", "example": "2f1c0a2e-7b0e-4a0b-9c1d-0d1e2f3a4b5c" },
+          "name": { "type": "string", "example": "홍길동" },
+          "org": { "$ref": "#/components/schemas/OrgSummary" }
+        }
+      },
+      "SpaceSummary": {
+        "type": "object",
+        "required": ["id", "key"],
+        "properties": {
+          "id": { "type": "integer", "format": "int64", "example": 42 },
+          "key": { "type": "string", "example": "TEAM" },
+          "owner": { "$ref": "#/components/schemas/UserSummary" }
+        }
+      },
+      "OrgSummary": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "integer", "format": "int64", "example": 7 },
+          "name": { "type": "string", "example": "플랫폼팀" }
+        }
+      },
+      "AttachmentResponse": {
+        "type": "object",
+        "required": ["id", "fileName", "size", "downloadUrl"],
+        "properties": {
+          "id": { "type": "integer", "format": "int64", "example": 501 },
+          "fileName": { "type": "string", "example": "minutes.pdf" },
+          "contentType": { "type": "string", "example": "application/pdf" },
+          "size": { "type": "integer", "format": "int64", "description": "바이트", "example": 204800 },
+          "downloadUrl": { "type": "string", "description": "만료되는 서명 URL" },
+          "uploadedBy": { "$ref": "#/components/schemas/UserSummary" }
+        }
+      },
+      "PlatformError": {
+        "type": "object",
+        "required": ["error"],
+        "description": "공통 오류 응답(common-starter 계약)",
+        "properties": {
+          "error": { "type": "string", "description": "사람이 읽는 오류 메시지", "example": "스페이스를 찾을 수 없습니다" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "개인 API 토큰 `chanho_pat_…` 또는 세션 JWT"
+      }
+    }
+  }
+}
