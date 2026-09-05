@@ -378,7 +378,7 @@ test('HTTP 오류는 그대로 전파된다', async () => {
   await assert.rejects(syncDevDocs({ collections: COLLECTIONS, mapping: {}, client }), (err) => err.status === 403);
 });
 
-test('컬렉션 선언: id 유일·필수 필드·절대경로, API 가이드는 auth-server/docs/api 만 본다(설계 스펙 제외)', () => {
+test('컬렉션 선언: id 유일·필수 필드·절대경로, API 가이드는 myFront/docs/api-guide 의 최상위 md 만 본다', () => {
   const ids = COLLECTIONS_DECL.map((c) => c.id);
   assert.equal(new Set(ids).size, ids.length);
   for (const c of COLLECTIONS_DECL) {
@@ -388,9 +388,11 @@ test('컬렉션 선언: id 유일·필수 필드·절대경로, API 가이드는
   }
   const api = COLLECTIONS_DECL.find((c) => c.id === 'api-guide');
   assert.equal(api.title, 'API 가이드');
-  assert.equal(api.dir, 'C:/MSA_TEMPLATE/auth-server/docs/api');
-  assert.ok(matchesAny('authentication.md', api.include));
-  assert.equal(literalPrefix(api.include[0]), ''); // dir 자체가 경계 — superpowers/ 는 dir 밖이라 걸을 수 없다
+  assert.equal(api.dir, 'C:/MSA_TEMPLATE/myFront/docs/api-guide');
+  assert.ok(matchesAny('README.md', api.include)); // 루트 본문
+  assert.ok(matchesAny('10-authentication.md', api.include));
+  assert.equal(matchesAny('sub/x.md', api.include), false); // 하위 폴더는 두지 않는다
+  assert.equal(literalPrefix(api.include[0]), ''); // dir 자체가 경계 — myFront/docs/api-reference 는 dir 밖
   assert.equal(api.folders, undefined);
 
   // API 레퍼런스: myFront/docs/api-reference 만(docs/superpowers 제외), 폴더 = 서비스, 생성 전에는 optional

@@ -80,12 +80,12 @@ export const COLLECTIONS = [
     include: ['README.md'],
   },
   {
-    // 외부 클라이언트용 공개 API 가이드. dir 을 docs/api 로 좁혀 auth-server/docs/superpowers(설계 스펙)는 안 딸려온다.
-    // README 가 없으므로 루트는 자식 목록으로 생성된다.
+    // 외부 클라이언트용 공개 API 가이드(손으로 쓰는 문서). 파일명 접두 번호(10-, 20-, …)가 위키 형제 순서다.
+    // README.md 가 루트 본문이 되고, 하위 폴더는 두지 않는다. 자동 생성 레퍼런스는 아래 api-reference 컬렉션이 맡는다.
     id: 'api-guide',
     title: 'API 가이드',
-    dir: `${PLATFORM_ROOT}/auth-server/docs/api`,
-    include: ['**/*.md'],
+    dir: `${PLATFORM_ROOT}/myFront/docs/api-guide`,
+    include: ['*.md'],
   },
   {
     // 서비스 OpenAPI 에서 생성한 레퍼런스(npm run api:collect → api:gen). 폴더 = 서비스, 페이지 = 태그.

@@ -77,6 +77,11 @@ npm run sync:docs     # 3. 문서 위키 dev 스페이스 "API 레퍼런스" 폴
 (`scripts/api/fixtures/sample.json`)을 쓰고, 그 결과의 골든 파일은 `scripts/api/fixtures/expected/` 에 있다.
 `docs/api-reference/` 에는 실제 서비스 출력만 둔다.
 
+손으로 쓰는 **API 가이드**(인증·규약·오류·낙관적 락·첨부·실전 예제·요청 제한·레퍼런스 읽는 법)는
+`docs/api-guide/` 에 있다. 파일명 접두 번호가 위키 순서이고 `README.md` 가 루트 본문이며, 같은 임포터가
+"API 가이드" 컬렉션으로 올린다(`scripts/docs/collections.mjs`). 가이드의 경로·필드는 `scripts/api/specs/*.json`
+에 있는 것만 적는다 — 레퍼런스와 어긋나면 레퍼런스가 맞다.
+
 > **원커맨드 기동:** 상위 `../scripts/dev-up.ps1` 이 인프라(docker compose)를 올리고 프론트
 > 3개를 Windows Terminal 탭(:5173 / :5174 / :5175, `--strictPort`)으로 연다. 백엔드는
 > 각 repo의 IntelliJ 공유 Run Config로 기동한다. 상세는 상위 README 참고.
