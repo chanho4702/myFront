@@ -109,10 +109,14 @@ const clip = (t) => (t.length > TITLE_MAX ? t.slice(0, TITLE_MAX) : t);
 /**
  * 컬렉션의 파일 목록 → 생성 순서대로 늘어놓은 노드 배열(루트 → 폴더 → 파일).
  * 파일은 상대경로순이라 같은 폴더 안에서는 파일명순이 된다(백엔드는 생성 순서로 형제 위치를 잡는다).
- * 루트/폴더 디렉터리의 README.md 는 그 노드의 `relpath` 가 되고 별도 페이지를 만들지 않는다.
+ * 루트 디렉터리의 README.md 는 루트의 `relpath` 가 되고 별도 페이지를 만들지 않는다.
+ * 폴더 디렉터리의 README.md 는 그 폴더의 **첫 자식 페이지 "개요"** 가 된다 — 폴더 화면(wiki-front FolderPage)은 자식 목록만
+ * 보여주므로 폴더 본문으로 넣으면 내용이 사라지기 때문이다. 폴더 노드 바로 뒤에 두어 형제 중 맨 앞에 생성된다.
  *
  * @param files [{ relpath, raw }] — dir 기준 상대경로(슬래시 구분)
  */
+export const FOLDER_README_TITLE = '개요';
+
 export function buildTree(collection, files) {
   const folders = Object.entries(collection.folders ?? {})
     .map(([dir, title]) => ({ dir: dir.replace(/^\/+|\/+$/g, ''), title }))
@@ -135,7 +139,13 @@ export function buildTree(collection, files) {
     { key: rootKey(collection), kind: 'root', title: clip(collection.title), parentKey: null, relpath: readmeOf('') },
   ];
   for (const f of folders) {
-    nodes.push({ key: folderKey(collection, f.dir), kind: 'folder', title: clip(f.title), parentKey: parentKeyOf(f.dir), dir: f.dir, relpath: readmeOf(f.dir) });
+    nodes.push({ key: folderKey(collection, f.dir), kind: 'folder', title: clip(f.title), parentKey: parentKeyOf(f.dir), dir: f.dir, relpath: null });
+  }
+  // 폴더 README → "개요" 페이지. 폴더들 뒤·일반 페이지들 앞에 두어 각 폴더의 첫 자식이 된다.
+  for (const f of folders) {
+    const readme = readmeOf(f.dir);
+    if (!readme) continue;
+    nodes.push({ key: fileKey(collection, readme), kind: 'page', title: FOLDER_README_TITLE, parentKey: folderKey(collection, f.dir), relpath: readme });
   }
   const consumed = new Set(nodes.map((n) => n.relpath).filter(Boolean));
   const sorted = [...files].sort((a, b) => a.relpath.localeCompare(b.relpath));

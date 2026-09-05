@@ -372,17 +372,27 @@ function renderRequestBody(op, spec) {
   return `${lines.join('\n')}\n`;
 }
 
+/**
+ * 응답 절 — 상태·설명·스키마 표, 그 아래 2xx 응답 본문의 필드 표(요청 본문과 같은 평탄화, 배열 응답은 `[]` 접두).
+ * 401/403/404 같은 오류 응답(PlatformError)은 표 없이 이름만.
+ */
 function renderResponses(op, spec) {
   const responses = op.responses ?? {};
-  const rows = Object.keys(responses)
+  const entries = Object.keys(responses)
     .sort(byCodePoint)
     .map((status) => {
       const r = responses[status]?.$ref ? resolveRef(responses[status].$ref, spec) : responses[status];
-      const content = pickContent(r?.content);
-      return [code(status), cell(r?.description), content?.schema ? code(typeLabel(content.schema, spec)) : ''];
+      return { status, response: r, content: pickContent(r?.content) };
     });
-  if (!rows.length) return '';
-  return `### 응답\n\n${table(['상태', '설명', '스키마'], rows)}\n`;
+  if (!entries.length) return '';
+  const rows = entries.map(({ status, response, content }) => [code(status), cell(response?.description), content?.schema ? code(typeLabel(content.schema, spec)) : '']);
+  const parts = [`### 응답\n\n${table(['상태', '설명', '스키마'], rows)}\n`];
+  for (const { status, content } of entries) {
+    if (!/^2/.test(status) || !content?.schema) continue;
+    const t = schemaTable(content.schema, spec);
+    if (t) parts.push(`**${status} 본문** — ${code(typeLabel(content.schema, spec))}\n\n${t}\n`);
+  }
+  return parts.join('\n');
 }
 
 function renderOperation(o, spec, service) {

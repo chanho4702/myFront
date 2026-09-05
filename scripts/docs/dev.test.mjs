@@ -99,19 +99,61 @@ test('트리: 루트 → 폴더 → 파일 순, README 는 루트 본문, 미등
   assert.equal(nodes[0].relpath, 'README.md');
 });
 
-test('트리: 폴더 안 README 는 그 폴더의 relpath 가 되고, 중첩 폴더는 상위 폴더 아래', () => {
+test('트리: 폴더 안 README 는 그 폴더의 첫 자식 "개요" 페이지, README 없는 폴더는 만들지 않음, 중첩 폴더는 상위 폴더 아래', () => {
   const c = { id: 'alm', title: 'ALM', dir: '/r', folders: { areas: '영역', 'areas/deep': '깊은' } };
   const nodes = buildTree(c, [
-    { relpath: 'areas/README.md', raw: '# 영역 개요' },
     { relpath: 'areas/store.md', raw: '# 스토어' },
+    { relpath: 'areas/README.md', raw: '# 영역 개요' },
     { relpath: 'areas/deep/x.md', raw: '# x' },
   ]);
-  const folder = nodes.find((n) => n.key === 'alm/areas/');
-  assert.equal(folder.relpath, 'areas/README.md');
-  assert.equal(nodes.find((n) => n.key === 'alm/areas/deep/').parentKey, 'alm/areas/');
-  assert.equal(nodes.find((n) => n.key === 'alm/areas/deep/x.md').parentKey, 'alm/areas/deep/');
-  assert.equal(nodes.some((n) => n.key === 'alm/areas/README.md'), false);
+  assert.deepEqual(
+    nodes.map((n) => [n.key, n.kind, n.parentKey, n.title]),
+    [
+      ['alm/', 'root', null, 'ALM'],
+      ['alm/areas/', 'folder', 'alm/', '영역'],
+      ['alm/areas/deep/', 'folder', 'alm/areas/', '깊은'],
+      ['alm/areas/README.md', 'page', 'alm/areas/', '개요'], // 폴더 뒤·일반 페이지 앞 → 형제 중 맨 앞
+      ['alm/areas/deep/x.md', 'page', 'alm/areas/deep/', 'x'],
+      ['alm/areas/store.md', 'page', 'alm/areas/', '스토어'],
+    ],
+  );
+  assert.equal(nodes.find((n) => n.key === 'alm/areas/').relpath, null); // 폴더 본문은 자식 목록
+  assert.equal(nodes.find((n) => n.key === 'alm/areas/README.md').relpath, 'areas/README.md');
+  assert.equal(nodes.some((n) => n.key === 'alm/areas/deep/README.md'), false); // README 없는 폴더
   assert.equal(nodes[0].relpath, null); // 루트 README 없음 → 자식 목록
+});
+
+test('폴더 README 는 "개요" 페이지로 생성·링크되고 두 번째 실행은 멱등이다', async () => {
+  const { client, state } = fakeBackend();
+  const alm = { id: 'alm-front', title: 'ALM', dir: 'C:/MSA_TEMPLATE/alm-front/docs', include: ['**/*.md'], folders: { areas: '영역 가이드' } };
+  const files = [
+    { relpath: 'areas/README.md', raw: '# 영역 개요\n\n[스토어](store.md)\n' },
+    { relpath: 'areas/store.md', raw: '# 스토어\n\n[개요로](README.md) · [폴더로](./)\n' },
+  ];
+  const first = await syncDevDocs({ collections: [{ collection: alm, files }], mapping: {}, client });
+  const m = first.mapping;
+  assert.deepEqual(Object.keys(m).sort(), ['alm-front/', 'alm-front/areas/', 'alm-front/areas/README.md', 'alm-front/areas/store.md']);
+  const sid = first.spaceId;
+  const page = (key) => state.pages.find((p) => p.id === m[key]);
+  const overview = page('alm-front/areas/README.md');
+  assert.equal(overview.title, '개요');
+  assert.equal(overview.type, 'page');
+  assert.equal(overview.parentId, m['alm-front/areas/']);
+  assert.ok(overview.id < page('alm-front/areas/store.md').id); // 형제 중 먼저 생성
+  assert.equal(overview.content, `> 원본: MSA_TEMPLATE/alm-front/docs/areas/README.md\n\n[스토어](${pageHref(sid, m['alm-front/areas/store.md'])})\n`);
+  // README.md 링크는 개요 페이지로, 디렉터리 링크는 폴더 화면으로
+  assert.equal(
+    page('alm-front/areas/store.md').content,
+    `> 원본: MSA_TEMPLATE/alm-front/docs/areas/store.md\n\n[개요로](${pageHref(sid, m['alm-front/areas/README.md'])}) · [폴더로](${folderHref(sid, m['alm-front/areas/'])})\n`,
+  );
+  // 폴더 본문은 자식 목록이고 개요가 맨 앞
+  assert.equal(page('alm-front/areas/').content, `- [개요](${pageHref(sid, m['alm-front/areas/README.md'])})\n- [스토어](${pageHref(sid, m['alm-front/areas/store.md'])})\n`);
+
+  const logLen = state.log.length;
+  const second = await syncDevDocs({ collections: [{ collection: alm, files }], mapping: first.mapping, client });
+  assert.deepEqual(second.mapping, first.mapping);
+  assert.equal(state.log.length, logLen);
+  assert.equal(second.summary['alm-front'].same, 4);
 });
 
 test('상대 링크 해석: .. · 앵커 · 디렉터리 · URL 인코딩', () => {
@@ -370,8 +412,8 @@ test('컬렉션 선언: id 유일·필수 필드·절대경로, API 가이드는
       ['api-reference/alm/', 'folder', 'api-reference/', 'ALM API'],
       ['api-reference/org/', 'folder', 'api-reference/', 'Org API'],
       ['api-reference/wiki/', 'folder', 'api-reference/', 'WIKI API'],
+      ['api-reference/wiki/README.md', 'page', 'api-reference/wiki/', '개요'],
       ['api-reference/wiki/spaces.md', 'page', 'api-reference/wiki/', 'Spaces'],
     ],
   );
-  assert.equal(nodes.find((n) => n.key === 'api-reference/wiki/').relpath, 'wiki/README.md');
 });

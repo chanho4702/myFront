@@ -57,6 +57,22 @@ curl -X DELETE "https://<your-host>/api/wiki/attachments/<id>" \
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 페이지 없음 | `PlatformError` |
 
+**200 본문** — `AttachmentResponse[]`
+
+| 필드 | 타입 | 필수 | 설명 | 예시 |
+| --- | --- | --- | --- | --- |
+| `[].id` | `integer(int64)` | 예 |  | `501` |
+| `[].fileName` | `string` | 예 |  | `minutes.pdf` |
+| `[].contentType` | `string` |  |  | `application/pdf` |
+| `[].size` | `integer(int64)` | 예 | 바이트 | `204800` |
+| `[].downloadUrl` | `string` | 예 | 만료되는 서명 URL |  |
+| `[].uploadedBy` | `UserSummary` |  |  |  |
+| `[].uploadedBy.id` | `string(uuid)` | 예 | Keycloak subject | `2f1c0a2e-7b0e-4a0b-9c1d-0d1e2f3a4b5c` |
+| `[].uploadedBy.name` | `string` | 예 |  | `홍길동` |
+| `[].uploadedBy.org` | `OrgSummary` |  |  |  |
+| `[].uploadedBy.org.id` | `integer(int64)` | 예 |  | `7` |
+| `[].uploadedBy.org.name` | `string` | 예 |  | `플랫폼팀` |
+
 ### curl
 
 ```bash
@@ -92,6 +108,22 @@ curl -X GET "https://<your-host>/api/wiki/pages/<id>/attachments" \
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 페이지 없음 | `PlatformError` |
 | `413` | 파일이 너무 큼 | `PlatformError` |
+
+**201 본문** — `AttachmentResponse`
+
+| 필드 | 타입 | 필수 | 설명 | 예시 |
+| --- | --- | --- | --- | --- |
+| `id` | `integer(int64)` | 예 |  | `501` |
+| `fileName` | `string` | 예 |  | `minutes.pdf` |
+| `contentType` | `string` |  |  | `application/pdf` |
+| `size` | `integer(int64)` | 예 | 바이트 | `204800` |
+| `downloadUrl` | `string` | 예 | 만료되는 서명 URL |  |
+| `uploadedBy` | `UserSummary` |  |  |  |
+| `uploadedBy.id` | `string(uuid)` | 예 | Keycloak subject | `2f1c0a2e-7b0e-4a0b-9c1d-0d1e2f3a4b5c` |
+| `uploadedBy.name` | `string` | 예 |  | `홍길동` |
+| `uploadedBy.org` | `OrgSummary` |  |  |  |
+| `uploadedBy.org.id` | `integer(int64)` | 예 |  | `7` |
+| `uploadedBy.org.name` | `string` | 예 |  | `플랫폼팀` |
 
 ### curl
 

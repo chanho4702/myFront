@@ -258,6 +258,14 @@ test('태그 페이지: 첫 줄 안내, H1, 설명, 엔드포인트 표, 엔드�
   assert.match(md, /### 요청 본문\n\n`application\/json` — `CreateSpaceRequest` \(필수\)/);
   assert.match(md, /### 응답\n\n\| 상태 \| 설명 \| 스키마 \|\n\| --- \| --- \| --- \|\n\| `200` \| OK \| `SpaceResponse\[\]` \|/);
   assert.match(md, /\| `409` \| 버전 충돌 \| `PlatformError` \|/);
+  // 2xx 응답 본문은 필드 표로 펼친다 — 배열 응답은 `[]` 접두, 중첩 $ref 는 2단계
+  assert.match(md, /\*\*200 본문\*\* — `SpaceResponse\[\]`\n\n\| 필드 \| 타입 \| 필수 \| 설명 \| 예시 \|\n\| --- \| --- \| --- \| --- \| --- \|\n\| `\[\]\.id` \| `integer\(int64\)` \| 예 \|  \| `42` \|/);
+  assert.match(md, /\| `\[\]\.owner\.org\.id` \| `integer\(int64\)` \| 예 \|/);
+  assert.match(md, /\*\*201 본문\*\* — `SpaceResponse`\n\n\| 필드 /);
+  // 오류 응답(PlatformError)은 표 없이 이름만, 204 는 본문 없음
+  assert.equal((md.match(/\*\*(401|403|404|409|400) 본문\*\*/g) ?? []).length, 0);
+  assert.equal(md.includes('**204 본문**'), false);
+  assert.equal((md.match(/\*\*2\d\d 본문\*\*/g) ?? []).length, 4); // GET 목록·POST·GET 단건·PUT (DELETE 는 204)
   assert.match(md, /낙관적 락 — `version` 이 현재 값과 다르면 409\./);
   assert.match(md, /### curl\n\n```bash\ncurl -X GET/);
   assert.ok(md.endsWith('```\n'));

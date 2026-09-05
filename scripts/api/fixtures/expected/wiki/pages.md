@@ -33,6 +33,32 @@
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 페이지 없음 | `PlatformError` |
 
+**200 본문** — `PageResponse`
+
+| 필드 | 타입 | 필수 | 설명 | 예시 |
+| --- | --- | --- | --- | --- |
+| `id` | `integer(int64)` | 예 |  | `1001` |
+| `title` | `string` | 예 |  | `온보딩 가이드` |
+| `content` | `string` |  | 마크다운 본문 |  |
+| `status` | `string enum(DRAFT, PUBLISHED, ARCHIVED)` | 예 | 게시 상태 | `PUBLISHED` |
+| `labels` | `string[]` |  | 라벨 목록 | `["guide","onboarding"]` |
+| `author` | `UserSummary` |  |  |  |
+| `author.id` | `string(uuid)` | 예 | Keycloak subject | `2f1c0a2e-7b0e-4a0b-9c1d-0d1e2f3a4b5c` |
+| `author.name` | `string` | 예 |  | `홍길동` |
+| `author.org` | `OrgSummary` |  |  |  |
+| `author.org.id` | `integer(int64)` | 예 |  | `7` |
+| `author.org.name` | `string` | 예 |  | `플랫폼팀` |
+| `space` | `SpaceSummary` | 예 |  |  |
+| `space.id` | `integer(int64)` | 예 |  | `42` |
+| `space.key` | `string` | 예 |  | `TEAM` |
+| `space.owner` | `UserSummary` |  |  |  |
+| `space.owner.id` | `string(uuid)` | 예 | Keycloak subject | `2f1c0a2e-7b0e-4a0b-9c1d-0d1e2f3a4b5c` |
+| `space.owner.name` | `string` | 예 |  | `홍길동` |
+| `space.owner.org` | `OrgSummary` |  |  |  |
+| `properties` | `map<string, string>` |  | 확장 속성 |  |
+| `version` | `integer(int64)` | 예 |  | `7` |
+| `updatedAt` | `string(date-time)` |  |  |  |
+
 ### curl
 
 ```bash
@@ -70,6 +96,32 @@ curl -X GET "https://<your-host>/api/wiki/pages/<id>" \
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 페이지 없음 | `PlatformError` |
 | `409` | 버전 충돌 | `PlatformError` |
+
+**200 본문** — `PageResponse`
+
+| 필드 | 타입 | 필수 | 설명 | 예시 |
+| --- | --- | --- | --- | --- |
+| `id` | `integer(int64)` | 예 |  | `1001` |
+| `title` | `string` | 예 |  | `온보딩 가이드` |
+| `content` | `string` |  | 마크다운 본문 |  |
+| `status` | `string enum(DRAFT, PUBLISHED, ARCHIVED)` | 예 | 게시 상태 | `PUBLISHED` |
+| `labels` | `string[]` |  | 라벨 목록 | `["guide","onboarding"]` |
+| `author` | `UserSummary` |  |  |  |
+| `author.id` | `string(uuid)` | 예 | Keycloak subject | `2f1c0a2e-7b0e-4a0b-9c1d-0d1e2f3a4b5c` |
+| `author.name` | `string` | 예 |  | `홍길동` |
+| `author.org` | `OrgSummary` |  |  |  |
+| `author.org.id` | `integer(int64)` | 예 |  | `7` |
+| `author.org.name` | `string` | 예 |  | `플랫폼팀` |
+| `space` | `SpaceSummary` | 예 |  |  |
+| `space.id` | `integer(int64)` | 예 |  | `42` |
+| `space.key` | `string` | 예 |  | `TEAM` |
+| `space.owner` | `UserSummary` |  |  |  |
+| `space.owner.id` | `string(uuid)` | 예 | Keycloak subject | `2f1c0a2e-7b0e-4a0b-9c1d-0d1e2f3a4b5c` |
+| `space.owner.name` | `string` | 예 |  | `홍길동` |
+| `space.owner.org` | `OrgSummary` |  |  |  |
+| `properties` | `map<string, string>` |  | 확장 속성 |  |
+| `version` | `integer(int64)` | 예 |  | `7` |
+| `updatedAt` | `string(date-time)` |  |  |  |
 
 ### curl
 
@@ -130,6 +182,15 @@ curl -X DELETE "https://<your-host>/api/wiki/pages/<id>" \
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 스페이스 없음 | `PlatformError` |
 
+**200 본문** — `PageSummary[]`
+
+| 필드 | 타입 | 필수 | 설명 | 예시 |
+| --- | --- | --- | --- | --- |
+| `[].id` | `integer(int64)` | 예 |  | `1001` |
+| `[].title` | `string` | 예 |  | `온보딩 가이드` |
+| `[].status` | `string enum(DRAFT, PUBLISHED, ARCHIVED)` | 예 |  |  |
+| `[].updatedAt` | `string(date-time)` |  |  |  |
+
 ### curl
 
 ```bash
@@ -167,6 +228,32 @@ curl -X GET "https://<your-host>/api/wiki/spaces/<spaceId>/pages" \
 | `401` | 인증 필요 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 스페이스 없음 | `PlatformError` |
+
+**201 본문** — `PageResponse`
+
+| 필드 | 타입 | 필수 | 설명 | 예시 |
+| --- | --- | --- | --- | --- |
+| `id` | `integer(int64)` | 예 |  | `1001` |
+| `title` | `string` | 예 |  | `온보딩 가이드` |
+| `content` | `string` |  | 마크다운 본문 |  |
+| `status` | `string enum(DRAFT, PUBLISHED, ARCHIVED)` | 예 | 게시 상태 | `PUBLISHED` |
+| `labels` | `string[]` |  | 라벨 목록 | `["guide","onboarding"]` |
+| `author` | `UserSummary` |  |  |  |
+| `author.id` | `string(uuid)` | 예 | Keycloak subject | `2f1c0a2e-7b0e-4a0b-9c1d-0d1e2f3a4b5c` |
+| `author.name` | `string` | 예 |  | `홍길동` |
+| `author.org` | `OrgSummary` |  |  |  |
+| `author.org.id` | `integer(int64)` | 예 |  | `7` |
+| `author.org.name` | `string` | 예 |  | `플랫폼팀` |
+| `space` | `SpaceSummary` | 예 |  |  |
+| `space.id` | `integer(int64)` | 예 |  | `42` |
+| `space.key` | `string` | 예 |  | `TEAM` |
+| `space.owner` | `UserSummary` |  |  |  |
+| `space.owner.id` | `string(uuid)` | 예 | Keycloak subject | `2f1c0a2e-7b0e-4a0b-9c1d-0d1e2f3a4b5c` |
+| `space.owner.name` | `string` | 예 |  | `홍길동` |
+| `space.owner.org` | `OrgSummary` |  |  |  |
+| `properties` | `map<string, string>` |  | 확장 속성 |  |
+| `version` | `integer(int64)` | 예 |  | `7` |
+| `updatedAt` | `string(date-time)` |  |  |  |
 
 ### curl
 

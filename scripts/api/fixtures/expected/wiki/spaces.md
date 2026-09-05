@@ -34,6 +34,23 @@
 | `401` | 인증 필요 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 
+**200 본문** — `SpaceResponse[]`
+
+| 필드 | 타입 | 필수 | 설명 | 예시 |
+| --- | --- | --- | --- | --- |
+| `[].id` | `integer(int64)` | 예 |  | `42` |
+| `[].key` | `string` | 예 | URL 에 쓰는 짧은 키 | `TEAM` |
+| `[].name` | `string` | 예 |  | `팀 위키` |
+| `[].description` | `string (nullable)` |  |  |  |
+| `[].owner` | `UserSummary` |  |  |  |
+| `[].owner.id` | `string(uuid)` | 예 | Keycloak subject | `2f1c0a2e-7b0e-4a0b-9c1d-0d1e2f3a4b5c` |
+| `[].owner.name` | `string` | 예 |  | `홍길동` |
+| `[].owner.org` | `OrgSummary` |  |  |  |
+| `[].owner.org.id` | `integer(int64)` | 예 |  | `7` |
+| `[].owner.org.name` | `string` | 예 |  | `플랫폼팀` |
+| `[].version` | `integer(int64)` | 예 |  | `3` |
+| `[].createdAt` | `string(date-time)` | 예 |  | `2026-09-05T09:00:00Z` |
+
 ### curl
 
 ```bash
@@ -63,6 +80,23 @@ curl -X GET "https://<your-host>/api/wiki/spaces" \
 | `400` | 입력 오류 | `PlatformError` |
 | `401` | 인증 필요 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
+
+**201 본문** — `SpaceResponse`
+
+| 필드 | 타입 | 필수 | 설명 | 예시 |
+| --- | --- | --- | --- | --- |
+| `id` | `integer(int64)` | 예 |  | `42` |
+| `key` | `string` | 예 | URL 에 쓰는 짧은 키 | `TEAM` |
+| `name` | `string` | 예 |  | `팀 위키` |
+| `description` | `string (nullable)` |  |  |  |
+| `owner` | `UserSummary` |  |  |  |
+| `owner.id` | `string(uuid)` | 예 | Keycloak subject | `2f1c0a2e-7b0e-4a0b-9c1d-0d1e2f3a4b5c` |
+| `owner.name` | `string` | 예 |  | `홍길동` |
+| `owner.org` | `OrgSummary` |  |  |  |
+| `owner.org.id` | `integer(int64)` | 예 |  | `7` |
+| `owner.org.name` | `string` | 예 |  | `플랫폼팀` |
+| `version` | `integer(int64)` | 예 |  | `3` |
+| `createdAt` | `string(date-time)` | 예 |  | `2026-09-05T09:00:00Z` |
 
 ### curl
 
@@ -94,6 +128,23 @@ curl -X POST "https://<your-host>/api/wiki/spaces" \
 | `401` | 인증 필요 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 스페이스 없음 | `PlatformError` |
+
+**200 본문** — `SpaceResponse`
+
+| 필드 | 타입 | 필수 | 설명 | 예시 |
+| --- | --- | --- | --- | --- |
+| `id` | `integer(int64)` | 예 |  | `42` |
+| `key` | `string` | 예 | URL 에 쓰는 짧은 키 | `TEAM` |
+| `name` | `string` | 예 |  | `팀 위키` |
+| `description` | `string (nullable)` |  |  |  |
+| `owner` | `UserSummary` |  |  |  |
+| `owner.id` | `string(uuid)` | 예 | Keycloak subject | `2f1c0a2e-7b0e-4a0b-9c1d-0d1e2f3a4b5c` |
+| `owner.name` | `string` | 예 |  | `홍길동` |
+| `owner.org` | `OrgSummary` |  |  |  |
+| `owner.org.id` | `integer(int64)` | 예 |  | `7` |
+| `owner.org.name` | `string` | 예 |  | `플랫폼팀` |
+| `version` | `integer(int64)` | 예 |  | `3` |
+| `createdAt` | `string(date-time)` | 예 |  | `2026-09-05T09:00:00Z` |
 
 ### curl
 
@@ -133,6 +184,23 @@ curl -X GET "https://<your-host>/api/wiki/spaces/<id>" \
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 스페이스 없음 | `PlatformError` |
 | `409` | 버전 충돌 | `PlatformError` |
+
+**200 본문** — `SpaceResponse`
+
+| 필드 | 타입 | 필수 | 설명 | 예시 |
+| --- | --- | --- | --- | --- |
+| `id` | `integer(int64)` | 예 |  | `42` |
+| `key` | `string` | 예 | URL 에 쓰는 짧은 키 | `TEAM` |
+| `name` | `string` | 예 |  | `팀 위키` |
+| `description` | `string (nullable)` |  |  |  |
+| `owner` | `UserSummary` |  |  |  |
+| `owner.id` | `string(uuid)` | 예 | Keycloak subject | `2f1c0a2e-7b0e-4a0b-9c1d-0d1e2f3a4b5c` |
+| `owner.name` | `string` | 예 |  | `홍길동` |
+| `owner.org` | `OrgSummary` |  |  |  |
+| `owner.org.id` | `integer(int64)` | 예 |  | `7` |
+| `owner.org.name` | `string` | 예 |  | `플랫폼팀` |
+| `version` | `integer(int64)` | 예 |  | `3` |
+| `createdAt` | `string(date-time)` | 예 |  | `2026-09-05T09:00:00Z` |
 
 ### curl
 
