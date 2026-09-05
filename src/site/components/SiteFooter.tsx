@@ -31,6 +31,7 @@ const openSourceLinks: FooterLink[] = openSource.repos.map((r) => ({ label: r.na
 /** 개발용 진입점. GNB 에서 빼고 여기로 격리한다. */
 const devLinks: FooterLink[] = [
   { label: '서비스 데모', to: '/app' },
+  { label: 'API 토큰', to: '/app/tokens' },
   { label: '설계 문서', to: '/designs' },
   { label: 'MUI 템플릿', to: '/templates' },
   { label: '컴포넌트 카탈로그', to: '/components' },

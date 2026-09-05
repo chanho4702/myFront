@@ -9,6 +9,7 @@ import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded';
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
+import KeyRoundedIcon from '@mui/icons-material/KeyRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 
@@ -24,6 +25,7 @@ const mainItems: MenuItem[] = [
   { text: '게시판', icon: <ArticleRoundedIcon />, path: '/app/board' },
   { text: '위키', icon: <MenuBookRoundedIcon />, href: '/wiki/' },
   { text: 'ALM', icon: <AssignmentRoundedIcon />, href: '/alm/' },
+  { text: 'API 토큰', icon: <KeyRoundedIcon />, path: '/app/tokens' },
 ];
 
 const secondaryItems: MenuItem[] = [

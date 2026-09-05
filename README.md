@@ -194,6 +194,7 @@ auth-server의 OIDC 시작점으로 통째로 리다이렉트한다.
 | `/api/auth/refresh` · `/api/auth/logout` | auth-server | 세션 복원 / 백채널 로그아웃 |
 | `/api/me` | auth-server | 로그인 사용자 조회(`fetchMe`) |
 | `/api/board/posts` (GET/POST/PUT/DELETE) | board-service | 게시판 CRUD |
+| `/api/auth/tokens` (GET/POST/DELETE) | auth-server | 개인 API 토큰 목록·발급·폐기 |
 
 게시판(`board/boardStore.ts`)은 auth 인스턴스와 **같은 메모리 AT를 공유**한다(별도 인증
 인스턴스 없음). 읽기(GET)는 public이라 토큰 없이도 되고, 쓰기만 Bearer를 붙이며 401이면
@@ -216,6 +217,7 @@ auth-server의 OIDC 시작점으로 통째로 리다이렉트한다.
 | `/app/board/new` | 글쓰기 | 보호 |
 | `/app/board/:id` | 글 보기 | 보호 |
 | `/app/board/:id/edit` | 글 수정 | 보호 |
+| `/app/tokens` | 개인 API 토큰(PAT) — 목록·발급·폐기 | 보호 |
 | `/designs` | 설계 문서 홈 (Confluence 스타일 중첩 레이아웃 + Outlet) | 조회 공개 |
 | `/designs/:id` | 설계 문서 보기 | 조회 공개 |
 | `/designs/new` · `/designs/:id/edit` | 설계 문서 작성/수정 | 보호 |
@@ -275,6 +277,7 @@ src/
 │  ├─ components/            #   앱 셸: AppLayout/AppSideMenu/AppNavbar/AppMenuContent/AuthLoadingScreen
 │  ├─ pages/                 #   LoginPage, DashboardHome, NotFoundPage, RouteErrorPage
 │  ├─ board/                 #   게시판 CRUD (boardStore → 게이트웨이 REST + List/Detail/Form)
+│  ├─ tokens/                #   개인 API 토큰 (tokensStore → auth-server REST + 목록/발급/1회표시)
 │  ├─ designs/               #   설계 문서 (중첩 레이아웃 + designsStore, localStorage 데모)
 │  └─ profile/               #   자기소개/이력 (profileStore, localStorage 데모)
 │

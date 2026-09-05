@@ -12,6 +12,7 @@ import DashboardHome from './app/pages/DashboardHome';
 import BoardListPage from './app/board/BoardListPage';
 import BoardDetailPage from './app/board/BoardDetailPage';
 import BoardFormPage from './app/board/BoardFormPage';
+import TokensPage from './app/tokens/TokensPage';
 import DesignsLayout from './app/designs/DesignsLayout';
 import DesignsHome from './app/designs/DesignsHome';
 import DesignsDetailPage from './app/designs/DesignsDetailPage';
@@ -77,6 +78,7 @@ const router = createBrowserRouter([
       { path: 'board/new', element: <BoardFormPage /> },
       { path: 'board/:id', element: <BoardDetailPage /> },
       { path: 'board/:id/edit', element: <BoardFormPage /> },
+      { path: 'tokens', element: <TokensPage /> },
     ],
   },
 

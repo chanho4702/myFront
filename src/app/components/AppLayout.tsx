@@ -54,6 +54,9 @@ function useCrumbs(pathname: string): Crumb[] {
       crumbs.push({ label: '글 보기' });
     }
   }
+  if (pathname.startsWith('/app/tokens')) {
+    crumbs.push({ label: 'API 토큰', to: '/app/tokens' });
+  }
   return crumbs;
 }
 
