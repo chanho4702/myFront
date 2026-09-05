@@ -96,7 +96,7 @@ GET /api/wiki/spaces/{spaceId}/pages/children?parentId=12
 | `GET /api/alm/admin/audit` | 50 | 200 |
 | `GET /api/org/members/page` | 20 | — |
 | `GET /api/org/invitations` | 20 | — |
-| `GET /api/wiki/migrations/{jobId}/items` | 서버 고정(`page`만 받는다) | — |
+| `GET /api/migration/{jobId}/items` | 서버 고정(`page`만 받는다) | — |
 
 상한을 넘긴 `size`는 서버가 상한으로 줄여 처리한다.
 
