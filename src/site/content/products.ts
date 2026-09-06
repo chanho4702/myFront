@@ -9,14 +9,22 @@ export interface Product {
   summary: string;
   spec: SpecRow[];
   highlights: string[];
-  repoUrl: string;
+  /**
+   * 공개 저장소. **비공개 리포인 제품은 이 값을 비운다** — 없는 링크를 걸거나
+   * "오픈소스"라고 표기하지 않기 위해서다(카드 kicker·상세 CTA·JSON-LD 가 전부 이 값으로 갈린다).
+   */
+  repoUrl?: string;
   /** nginx 단일 오리진(/wiki/, /alm/)에서만 유효한 구동 링크 */
   liveUrl?: string;
+  /** 인덱스 카드 하단 라벨. 기본은 'OPEN SOURCE' — 저장소가 비공개인 제품이 다른 말을 할 자리. */
+  kicker?: string;
+  /** 라이브 앱도 공개 저장소도 없는 제품의 진입점(문서·설정 화면). 전부 실재하는 경로만 적는다. */
+  entryPoints?: { label: string; href: string }[];
 }
 
 /**
- * 제품은 셋이다 — 문서(WIKI)·이슈(ALM)·그 둘이 올라가는 플랫폼.
- * 디자인 시스템은 제품이 아니라 공유 레이어라 /tech 에서만 다룬다.
+ * 제품은 넷이다 — 문서(WIKI)·이슈(ALM)·그 둘을 다루는 AI 에이전트(AI Agent)·
+ * 셋이 올라가는 플랫폼. 디자인 시스템은 제품이 아니라 공유 레이어라 /tech 에서만 다룬다.
  */
 export const products: Product[] = [
   {
@@ -66,6 +74,34 @@ export const products: Product[] = [
     liveUrl: '/alm/',
   },
   {
+    slug: 'ai-agent',
+    name: 'AI Agent',
+    tagline: 'MCP 로 위키·ALM 을 직접 다루는 AI 팀원',
+    summary:
+      'Claude Code 나 Codex 같은 AI 코딩 에이전트를 플랫폼에 붙이는 통로입니다. 에이전트는 채팅 밖에서 실제로 이슈를 만들고 상태를 옮기고 위키에 작업 보고서를 씁니다. 모든 기록은 사람 계정이 아니라 그 에이전트의 페르소나 명의로 남습니다.',
+    spec: [
+      { label: '접속', value: 'MCP streamable-HTTP — 게이트웨이 /api/agent/mcp 단일 진입점' },
+      { label: '도구', value: '18종 — 이슈 조회·생성·전이·코멘트·워크로그·PR 링크, 위키 페이지 조회·작성·이어쓰기' },
+      { label: '신원', value: '페르소나 = 조직 멤버(kind=AGENT) — 사람 멤버(kind=USER)와 같은 자리에 다른 종류로 선다' },
+      { label: '인증', value: '에이전트 전용 토큰(agp_ 접두사 · SHA-256 저장 · 페르소나에 바인딩)' },
+      { label: '감사', value: '도구 호출마다 호출 도구 · 결과 · 페르소나가 감사 테이블에 적재' },
+      { label: '사람의 자리', value: '승인 게이트에서 판단 · 작업 보고서 의무 — 보고서 없는 완료 금지' },
+      { label: 'Backend', value: 'agent-service (Spring Boot · PostgreSQL)' },
+      { label: '클라이언트', value: 'MCP 를 말하는 코딩 에이전트면 무엇이든 — Claude Code · Codex' },
+    ],
+    highlights: [
+      '에이전트를 봇 계정이 아니라 조직 멤버로 세웠다. 신원은 auth-server 계정 → org-service 멤버(kind=AGENT) → 페르소나 세 계층으로 이어지고, 이슈의 담당자·코멘트 작성자·위키 수정자가 전부 그 페르소나로 찍힌다. "누가 이걸 했나"에 사람 이름이 잘못 붙지 않게 한 선택.',
+      '보고서 없는 완료를 금지했다. 에이전트는 완료 전에 위키에 작업 보고서를 남기고 그 링크를 이슈에 달아야 한다 — 사람이 결과를 되짚을 수 있어야 자동화를 늘릴 수 있다는 판단.',
+      '토큰을 사람 것과 분리했다. 에이전트 토큰은 별도 접두사로 발급돼 페르소나에 묶이고, 사람이 쓰는 개인 API 토큰은 제품별 읽기·쓰기 스코프로 권한을 좁힌다. 자동화가 넓은 권한을 물려받지 않게 하는 층.',
+      '사람이 판단하는 지점을 남겨 뒀다 — 승인 게이트가 앞에 있고, 예산 상한과 킬 스위치는 설계에 포함돼 있다. 무인 워커 루프와 감독 UI 는 준비 중이라 아직 이 목록의 사실이 아니다.',
+    ],
+    kicker: 'MCP · 셀프호스팅',
+    entryPoints: [
+      { label: 'API 가이드', href: '/docs/spaces/3/pages/135' },
+      { label: '개인 API 토큰', href: '/app/tokens' },
+    ],
+  },
+  {
     slug: 'msa-platform-template',
     name: 'MSA Platform Template',
     tagline: 'Keycloak SSO · 게이트웨이 · 이벤트 기반 MSA 골격',
@@ -80,7 +116,7 @@ export const products: Product[] = [
       { label: '데이터', value: 'PostgreSQL · MinIO(S3 호환 첨부) · OpenSearch(검색)' },
       { label: '관측', value: 'stdout JSON → Alloy → Loki → Grafana' },
       { label: 'CI/CD', value: 'GitHub Actions → GHCR → 셀프호스티드 러너 배포' },
-      { label: '서비스', value: '백엔드 6 · 프론트 3 + 공유 디자인 시스템' },
+      { label: '서비스', value: '백엔드 7(에이전트 기록 계층 포함) · 프론트 3 + 공유 디자인 시스템' },
     ],
     highlights: [
       '로그 수집을 앱에서 디커플했다 — 앱은 stdout 에 JSON 만 쓰고 수집기가 가져간다. 로그 백엔드를 바꿔도 앱을 안 고친다.',

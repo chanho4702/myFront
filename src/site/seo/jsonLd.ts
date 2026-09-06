@@ -45,11 +45,27 @@ export function faqPageJsonLd(items: typeof faq = faq) {
 }
 
 /**
- * 제품 상세. 소스가 공개된 제품이라 SoftwareSourceCode 로 저장소를 밝히고,
+ * 제품 상세. 소스가 공개된 제품이면 SoftwareSourceCode 로 저장소를 밝히고,
  * 동시에 "설치해서 쓰는 애플리케이션"이기도 하므로 SoftwareApplication 을 함께 낸다.
+ *
+ * **저장소가 비공개인 제품은 SoftwareSourceCode 를 아예 내지 않는다** —
+ * codeRepository 없는 소스코드 스키마도, 열 수 없는 URL 을 가리키는 sameAs 도 거짓말이 된다.
  */
 export function productJsonLd(product: Product) {
   const url = abs(`/products/${product.slug}`);
+  const app = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: product.name,
+    description: product.tagline,
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Self-hosted (Docker)',
+    url,
+    ...(product.repoUrl ? { sameAs: [product.repoUrl] } : {}),
+    isPartOf: { '@type': 'SoftwareApplication', name: BRAND, url: abs('/') },
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  };
+  if (!product.repoUrl) return [app];
   return [
     {
       '@context': 'https://schema.org',
@@ -61,16 +77,6 @@ export function productJsonLd(product: Product) {
       programmingLanguage: ['TypeScript', 'Java'],
       isPartOf: { '@type': 'SoftwareApplication', name: BRAND, url: abs('/') },
     },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'SoftwareApplication',
-      name: product.name,
-      description: product.tagline,
-      applicationCategory: 'BusinessApplication',
-      operatingSystem: 'Self-hosted (Docker)',
-      url,
-      sameAs: [product.repoUrl],
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    },
+    app,
   ];
 }

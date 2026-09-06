@@ -25,8 +25,9 @@ function ProductCard({ product }: { product: Product }) {
           {product.tagline}
         </Typography>
         <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', mt: 2, color: 'text.secondary' }}>
+          {/* 저장소가 비공개인 제품에 'OPEN SOURCE' 를 찍지 않는다 — kicker 가 그 자리를 대신한다. */}
           <Typography variant="caption" sx={{ fontFamily: MONO, letterSpacing: '0.08em' }}>
-            OPEN SOURCE
+            {product.kicker ?? 'OPEN SOURCE'}
           </Typography>
           <ArrowForwardRoundedIcon sx={{ fontSize: 14 }} />
         </Stack>
@@ -37,9 +38,9 @@ function ProductCard({ product }: { product: Product }) {
 
 export default function ProductsPage() {
   useSeo({
-    title: '제품 — WIKI · ALM · MSA 플랫폼 | chanho',
+    title: '제품 — WIKI · ALM · AI Agent · MSA 플랫폼 | chanho',
     description:
-      '문서 위키(WIKI), 이슈·스프린트 트래커(ALM), 그리고 둘이 올라가는 MSA 플랫폼 템플릿. 셋 다 오픈소스이고 도커로 셀프호스팅합니다.',
+      '문서 위키(WIKI), 이슈·스프린트 트래커(ALM), MCP 로 둘을 다루는 AI 에이전트, 그리고 셋이 올라가는 MSA 플랫폼 템플릿. 도커로 셀프호스팅합니다.',
     canonicalPath: '/products',
   });
   return (
@@ -49,14 +50,14 @@ export default function ProductsPage() {
           제품
         </Typography>
         <Typography sx={{ mt: 2.5, color: 'text.secondary', maxWidth: 620, fontSize: '1.1rem', lineHeight: 1.7 }}>
-          문서, 이슈, 그리고 둘이 올라가는 플랫폼. 셋이 한 계정으로 이어집니다.
+          문서, 이슈, 그 둘을 다루는 AI 에이전트, 그리고 셋이 올라가는 플랫폼. 한 계정으로 이어집니다.
         </Typography>
       </Container>
 
-      <GridSection index="01" label="PRODUCTS" title="세 가지 제품">
+      <GridSection index="01" label="PRODUCTS" title="네 가지 제품">
         <Grid container spacing={{ xs: 2, md: 2.5 }}>
           {products.map((p) => (
-            <Grid key={p.slug} size={{ xs: 12, sm: 6, md: 4 }}>
+            <Grid key={p.slug} size={{ xs: 12, sm: 6, md: 3 }}>
               <ProductCard product={p} />
             </Grid>
           ))}

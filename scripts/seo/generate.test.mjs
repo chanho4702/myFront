@@ -13,7 +13,7 @@ import {
   buildUrlset,
   xmlEscape,
 } from './generate.mjs';
-import { AI_AGENTS, DEFINITION, DISALLOWED, PRODUCTS, PUBLIC_ROUTES } from './site.mjs';
+import { AI_AGENT, AI_AGENTS, DEFINITION, DISALLOWED, PRODUCTS, PUBLIC_ROUTES, REPOS } from './site.mjs';
 
 const SRC = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'src');
 const read = (rel) => readFileSync(path.join(SRC, rel), 'utf8');
@@ -68,12 +68,15 @@ test('robots 는 이름을 밝힌 봇 그룹에도 Disallow 를 복사한다 —
   assert.ok(txt.includes('Sitemap: https://chanho.dev/sitemap.xml'));
 });
 
-test('llms.txt 는 H1 · 정의 인용문 · 제품/문서/소스 절을 갖는다', () => {
+test('llms.txt 는 H1 · 정의 인용문 · 제품/AI/문서/소스 절을 갖는다', () => {
   const txt = buildLlmsTxt('https://chanho.dev');
   const lines = txt.split('\n');
   assert.equal(lines[0], '# chanho');
   assert.equal(lines[2], `> ${DEFINITION}`);
-  for (const section of ['## 제품', '## 문서', '## 소스']) assert.ok(txt.includes(section), `${section} 없음`);
+  for (const section of ['## 제품', '## AI 에이전트 (MCP)', '## 문서', '## 소스']) assert.ok(txt.includes(section), `${section} 없음`);
+  assert.ok(txt.includes(AI_AGENT.summary), 'AI 에이전트 요약이 없다');
+  assert.ok(txt.includes('`/api/agent/mcp`'), 'MCP 엔드포인트가 없다');
+  assert.ok(txt.includes(`(https://chanho.dev${AI_AGENT.guide.path})`), 'API 가이드 링크가 없다');
   for (const p of PRODUCTS) assert.ok(txt.includes(`(https://chanho.dev/products/${p.slug})`), `${p.slug} 링크 없음`);
   assert.ok(txt.includes('(https://chanho.dev/docs/)'));
   assert.ok(txt.includes('(https://chanho.dev/docs/spaces/2)') && txt.includes('(https://chanho.dev/docs/spaces/3)'));
@@ -95,8 +98,19 @@ test('제품 slug·name·tagline·repoUrl 은 products.ts 와 같다', () => {
     assert.ok(products.includes(`slug: '${p.slug}'`), `products.ts 에 slug ${p.slug} 없음`);
     assert.ok(products.includes(`name: '${p.name}'`), `products.ts 에 name ${p.name} 없음`);
     assert.ok(products.includes(`tagline: '${p.tagline}'`), `products.ts 에 tagline 불일치: ${p.slug}`);
-    assert.ok(products.includes(`repoUrl: '${p.repoUrl}'`), `products.ts 에 repoUrl 불일치: ${p.slug}`);
+    // repoUrl 은 공개 저장소가 있는 제품만 갖는다(비공개 리포 제품은 양쪽 모두 비어 있어야 한다).
+    if (p.repoUrl) assert.ok(products.includes(`repoUrl: '${p.repoUrl}'`), `products.ts 에 repoUrl 불일치: ${p.slug}`);
   }
+  // 공개 저장소 목록에는 비공개 리포가 섞이지 않는다.
+  for (const r of REPOS) assert.ok(r.url.startsWith('https://github.com/'), `공개 저장소가 아니다: ${r.name}`);
+  assert.ok(!REPOS.some((r) => r.name === 'agent-service'), 'agent-service 는 비공개 리포다 — 공개 저장소 목록에 넣지 않는다');
+});
+
+test('AI 에이전트 사실은 products.ts 의 ai-agent 스펙과 같다', () => {
+  const products = read('site/content/products.ts');
+  assert.ok(products.includes(`slug: '${AI_AGENT.slug}'`), `products.ts 에 ${AI_AGENT.slug} 제품이 없다`);
+  assert.ok(products.includes(AI_AGENT.endpoint), `products.ts 에 MCP 엔드포인트(${AI_AGENT.endpoint})가 없다`);
+  assert.ok(products.includes('18종'), 'products.ts 에 도구 수(18종)가 없다 — llms.txt 와 화면이 다른 수를 말하면 안 된다');
 });
 
 test('프리렌더 라우트는 main.tsx 의 공개 라우트와 같다', () => {

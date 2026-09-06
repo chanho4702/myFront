@@ -35,6 +35,15 @@ export const comparison = {
       values: ['내 PostgreSQL · MinIO(첨부)', 'Atlassian 클라우드 또는 자체 DB(Data Center)', 'Notion 클라우드'],
     },
     {
+      // 세 제품 모두 MCP 서버를 제공한다 — 차이는 "어디서 도느냐"와 "에이전트가 누구 명의로 기록하느냐"다.
+      label: 'AI 에이전트 연동 (MCP)',
+      values: [
+        '셀프호스팅 MCP 서버 내장 — 에이전트가 조직 멤버 페르소나 명의로 이슈·문서 작성',
+        '공식 MCP 서버 제공 (클라우드)',
+        '공식 MCP 서버 제공 (클라우드)',
+      ],
+    },
+    {
       label: '소스 공개',
       values: ['GitHub 공개 (오픈소스)', '비공개', '비공개'],
     },

@@ -206,6 +206,86 @@ export function AlmMock() {
   );
 }
 
+/** 에이전트 활동 한 줄 — 왼쪽에 MCP 도구 이름(모노), 오른쪽에 남은 기록. */
+function ToolRow({ tool, result, state }: { tool: string; result: string; state: 'done' | 'active' | 'wait' }) {
+  const dot = state === 'done' ? 'success.main' : state === 'active' ? 'primary.main' : ink(0.28);
+  return (
+    <Stack direction="row" spacing={1.25} sx={{ alignItems: 'flex-start' }}>
+      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: dot, mt: '5px', flexShrink: 0 }} />
+      <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+        <Typography sx={{ fontFamily: MONO, fontSize: 10, color: state === 'wait' ? 'text.secondary' : 'primary.main', lineHeight: 1.5 }}>
+          {tool}
+        </Typography>
+        <Typography sx={{ fontSize: 11, color: 'text.secondary', lineHeight: 1.55, wordBreak: 'keep-all' }}>{result}</Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+/**
+ * AI Agent — 왼쪽에 페르소나 카드와 도구 호출 타임라인, 오른쪽에 그 결과로 남은 기록
+ * (ALM 이슈 · 위키 보고서)과 승인 게이트. 도구 이름은 실제 MCP 도구 이름만 쓴다.
+ */
+export function AgentMock() {
+  return (
+    <Window title="MCP · /api/agent/mcp" minHeight={300}>
+      <Box sx={{ flexGrow: 1, display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, minWidth: 0 }}>
+        <Box sx={{ p: { xs: 1.75, md: 2.25 }, borderRight: { sm: '1px solid' }, borderColor: { sm: 'divider' }, minWidth: 0 }}>
+          {/* 페르소나 카드 — 사람 아바타가 아니라 kind=AGENT 멤버라는 표시 */}
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1.75 }}>
+            <Box
+              sx={{
+                width: 24,
+                height: 24,
+                borderRadius: '6px',
+                bgcolor: brand(0.16),
+                border: '1px solid',
+                borderColor: 'primary.main',
+                flexShrink: 0,
+              }}
+            />
+            <Box sx={{ minWidth: 0 }}>
+              {line(56, true)}
+              <Typography sx={{ fontFamily: MONO, fontSize: 9, color: 'text.secondary', mt: 0.5, lineHeight: 1 }}>kind=AGENT</Typography>
+            </Box>
+          </Stack>
+          <Stack spacing={1.4}>
+            <ToolRow tool="get_project_context" result="스킴과 멤버 명단 확인" state="done" />
+            <ToolRow tool="create_issue" result="PLT-47 등록 · 담당자 = 페르소나" state="done" />
+            <ToolRow tool="claim_issue → log_work" result="진행 중으로 전이, 작업 시간 기록" state="done" />
+            <ToolRow tool="create_page" result="위키에 작업 보고서 작성" state="active" />
+            <ToolRow tool="update_issue_status" result="승인 후 완료 — 보고서 없이는 막힌다" state="wait" />
+          </Stack>
+        </Box>
+        <Box sx={{ p: { xs: 1.75, md: 2.25 }, display: 'flex', flexDirection: 'column', gap: 1.25, minWidth: 0 }}>
+          <Typography sx={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.1em', color: 'text.secondary' }}>남은 기록</Typography>
+          <IssueCard keyText="PLT-47" w="78%" priority="warning" />
+          {/* 위키 보고서 카드 */}
+          <Box sx={{ p: 1.25, borderRadius: '6px', border: '1px solid', borderColor: 'divider', bgcolor: 'background.default' }}>
+            {line('72%', true)}
+            <Stack spacing={0.6} sx={{ mt: 1 }}>
+              {line('100%')}
+              {line('84%')}
+            </Stack>
+            <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', mt: 1 }}>
+              <Box sx={{ width: 10, height: 10, borderRadius: '3px', bgcolor: 'primary.main' }} />
+              <Typography sx={{ fontFamily: MONO, fontSize: 9, color: 'text.secondary', lineHeight: 1 }}>작업 보고서</Typography>
+            </Stack>
+          </Box>
+          {/* 승인 게이트 — 사람이 판단하는 자리 */}
+          <Box sx={{ mt: 'auto', p: 1.25, borderRadius: '6px', border: '1px dashed', borderColor: 'primary.main', bgcolor: brand(0.06) }}>
+            <Typography sx={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.08em', color: 'primary.main', mb: 1 }}>승인 게이트</Typography>
+            <Stack direction="row" spacing={0.75}>
+              <Box sx={{ height: 18, flexGrow: 1, borderRadius: 999, bgcolor: 'primary.main' }} />
+              <Box sx={{ height: 18, width: 42, borderRadius: 999, border: '1px solid', borderColor: 'divider' }} />
+            </Stack>
+          </Box>
+        </Box>
+      </Box>
+    </Window>
+  );
+}
+
 function Node({ label, accent, mono }: { label: string; accent?: boolean; mono?: boolean }) {
   return (
     <Box
@@ -252,6 +332,7 @@ export function PlatformMock() {
           <Node label="alm" mono />
           <Node label="org" mono />
           <Node label="board" mono />
+          <Node label="agent" mono />
           <Node label="search" mono />
         </Stack>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 1 }}>

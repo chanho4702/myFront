@@ -16,7 +16,8 @@ import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
 import SitePage from '../site/components/SitePage';
-import { WorkspaceMock, WikiMock, AlmMock, PlatformMock } from '../site/components/ProductMocks';
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
+import { WorkspaceMock, WikiMock, AlmMock, AgentMock, PlatformMock } from '../site/components/ProductMocks';
 import { HairlineCard, MONO } from '../site/ui';
 import { hero, pain, features, composition, openSource, faq, finalCta, definition, GITHUB_URL, START_URL, getProduct, type Feature } from '../site/content';
 import { useSeo, softwareApplicationJsonLd, faqPageJsonLd } from '../site/seo';
@@ -50,6 +51,7 @@ function SectionHead({ eyebrow, title, sub, align = 'center' }: { eyebrow?: stri
 const mocks: Record<Feature['slug'], () => React.JSX.Element> = {
   wiki: WikiMock,
   alm: AlmMock,
+  'ai-agent': AgentMock,
   'msa-platform-template': PlatformMock,
 };
 
@@ -113,6 +115,27 @@ export default function Home() {
         }}
       >
         <Container maxWidth="lg" sx={{ pt: { xs: 9, md: 14 }, pb: { xs: 6, md: 8 }, textAlign: 'center' }}>
+          {/* AI 배지 — 헤드라인 위 한 줄. 칩 자체가 제품 상세로 가는 링크다(장식이 아니라 진입점). */}
+          <Chip
+            component={RouterLink}
+            to={hero.badge.to}
+            clickable
+            icon={<AutoAwesomeRoundedIcon sx={{ fontSize: 16 }} />}
+            label={hero.badge.label}
+            sx={{
+              mb: { xs: 3, md: 4 },
+              borderRadius: 999,
+              height: 32,
+              fontWeight: 600,
+              fontSize: '0.8rem',
+              color: 'primary.main',
+              bgcolor: brand(0.1),
+              border: '1px solid',
+              borderColor: brand(0.3),
+              '& .MuiChip-icon': { color: 'primary.main' },
+              '&:hover': { bgcolor: brand(0.16) },
+            }}
+          />
           <Typography
             component="h1"
             sx={{ fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 1.06, fontSize: 'clamp(2.2rem, 7.6vw, 5.4rem)', mx: 'auto', maxWidth: 980, wordBreak: 'keep-all' }}
@@ -125,6 +148,9 @@ export default function Home() {
             sx={{ mt: 3.5, mx: 'auto', maxWidth: 640, color: 'text.secondary', fontSize: 'clamp(1.05rem, 2vw, 1.25rem)', lineHeight: 1.65, whiteSpace: 'pre-line' }}
           >
             {hero.sub}
+          </Typography>
+          <Typography sx={{ mt: 2, mx: 'auto', maxWidth: 620, color: 'text.secondary', fontSize: '0.98rem', lineHeight: 1.7, wordBreak: 'keep-all' }}>
+            {hero.aiNote}
           </Typography>
           <Stack direction="row" spacing={1.5} sx={{ justifyContent: 'center', flexWrap: 'wrap', gap: 1.5, mt: 5 }}>
             <Button href={START_URL} variant="contained" size="large" endIcon={<ArrowForwardRoundedIcon />} sx={{ ...PILL, px: 4 }}>
@@ -175,8 +201,8 @@ export default function Home() {
         <Container maxWidth="lg" sx={{ pt: { xs: 8, md: 14 }, pb: { xs: 4, md: 6 } }}>
           <SectionHead
             eyebrow="ONE PLATFORM"
-            title="쓰고, 추적하고, 실행하기 — 하나의 플랫폼에서"
-            sub="문서 위키와 이슈 트래커가 같은 로그인, 같은 게이트웨이 위에서 돌아갑니다. 셋 중 무엇부터 시작해도 나머지가 이미 연결돼 있습니다."
+            title="쓰고, 추적하고, 맡기고, 실행하기 — 하나의 플랫폼에서"
+            sub="문서 위키와 이슈 트래커가 같은 로그인, 같은 게이트웨이 위에서 돌아갑니다. AI 에이전트도 같은 자리에 멤버로 앉습니다. 어디서 시작하든 나머지가 이미 연결돼 있습니다."
           />
           {features.map((f, i) => (
             <FeatureBlock key={f.slug} feature={f} flip={i % 2 === 1} />

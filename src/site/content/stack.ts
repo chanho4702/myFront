@@ -20,7 +20,10 @@ export const techGroups: TechGroup[] = [
     items: ['Docker Compose', 'nginx', 'Keycloak', 'GitHub Actions', 'GHCR', 'Alloy · Loki · Grafana'],
   },
   { category: 'Frontend', items: ['React 19', 'TypeScript', 'Vite', 'TipTap', 'MUI', '@chanho 디자인 시스템'] },
-  { category: 'AI', items: ['Claude Code 워크플로', 'Codex 교차 리뷰'] },
+  {
+    category: 'AI',
+    items: ['MCP (streamable-HTTP)', 'agent-service (에이전트 기록 계층)', 'Claude Code 워크플로', 'Codex 교차 리뷰'],
+  },
 ];
 
 /** /tech 상단 — 이 플랫폼이 실제로 어떻게 구성돼 있는지. products.ts 의 MSA 템플릿 스펙과 같은 사실. */
@@ -31,6 +34,7 @@ export const platformSpec: SpecRow[] = [
   { label: '이벤트', value: 'Redis Streams' },
   { label: '데이터', value: 'PostgreSQL · MinIO · OpenSearch' },
   { label: '관측', value: 'stdout JSON → Alloy → Loki → Grafana' },
+  { label: 'AI 연동', value: 'MCP 서버(agent-service) — 게이트웨이 /api/agent/mcp · 페르소나 명의 기록' },
   { label: 'CI/CD', value: 'GitHub Actions → GHCR → 셀프호스티드 러너 배포' },
   { label: '프론트', value: 'React 19 · 공유 디자인 시스템(@chanho) · nginx 단일 오리진' },
 ];

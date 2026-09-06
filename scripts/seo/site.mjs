@@ -17,15 +17,21 @@ export const PUBLIC_ROUTES = [
   '/products',
   '/products/wiki',
   '/products/alm',
+  '/products/ai-agent',
   '/products/msa-platform-template',
   '/tech',
   '/contact',
 ];
 
-/** src/site/content/products.ts 의 slug·name·tagline·repoUrl. */
+/**
+ * src/site/content/products.ts 의 slug·name·tagline·repoUrl. **순서까지 같아야 한다**
+ * (드리프트 테스트가 slug 목록을 순서 그대로 대조한다).
+ * `repoUrl` 은 공개 저장소가 있는 제품에만 적는다 — agent-service 는 비공개라 비운다.
+ */
 export const PRODUCTS = [
   { slug: 'wiki', name: 'WIKI', tagline: 'Confluence 스타일 문서·위키', repoUrl: 'https://github.com/chanho4702/WIKI' },
   { slug: 'alm', name: 'ALM', tagline: 'Jira 스타일 이슈·스프린트 관리', repoUrl: 'https://github.com/chanho4702/ALM' },
+  { slug: 'ai-agent', name: 'AI Agent', tagline: 'MCP 로 위키·ALM 을 직접 다루는 AI 팀원' },
   {
     slug: 'msa-platform-template',
     name: 'MSA Platform Template',
@@ -33,6 +39,19 @@ export const PRODUCTS = [
     repoUrl: 'https://github.com/chanho4702/infra-settings',
   },
 ];
+
+/**
+ * AI 에이전트 연동. 답변 엔진이 "이 플랫폼에 AI 를 어떻게 붙이나"를 물었을 때 인용할 사실 —
+ * 엔드포인트와 도구 수는 agent-service 의 실제 계약이고, src/site/content/products.ts 의
+ * `ai-agent` 스펙과 같은 사실이어야 한다. 아직 안 된 것(무인 워커 루프·감독 UI)은 적지 않는다.
+ */
+export const AI_AGENT = {
+  slug: 'ai-agent',
+  endpoint: '/api/agent/mcp',
+  summary:
+    'MCP(streamable-HTTP) 서버로 AI 코딩 에이전트를 붙인다. 도구 18종으로 ALM 이슈를 만들고 전이하고 위키에 작업 보고서를 쓰며, 모든 기록은 조직 멤버(kind=AGENT) 페르소나 명의로 남는다.',
+  guide: { title: 'API 가이드', path: '/docs/spaces/3/pages/135' },
+};
 
 /** 같은 호스트의 `/docs/` 에 있는 공개 문서 위키(별도 SPA). 스페이스 id 는 임포터가 쓰는 것과 같다. */
 export const DOCS = {

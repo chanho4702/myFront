@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
+import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import SitePage from '../components/SitePage';
 import { GridSection, SpecTable } from '../ui';
 import { getProduct, type Product } from '../content';
@@ -45,22 +46,39 @@ function ProductDetail({ product }: { product: Product }) {
         <Typography sx={{ color: 'text.secondary', maxWidth: 680, fontSize: '1.1rem', lineHeight: 1.7 }}>
           {product.summary}
         </Typography>
+        {/*
+          CTA 순서는 "지금 열 수 있는 것" → "읽을 것" → "소스". 저장소가 비공개인 제품은
+          소스 버튼을 아예 그리지 않는다 — 없는 링크를 만들지 않기 위해서다.
+        */}
         <Stack direction="row" spacing={1.5} sx={{ flexWrap: 'wrap', gap: 1.5, mt: 4 }}>
           {product.liveUrl && (
             <Button variant="contained" href={product.liveUrl} startIcon={<LaunchRoundedIcon />} sx={{ borderRadius: 999 }}>
               라이브로 열기
             </Button>
           )}
-          <Button
-            variant={product.liveUrl ? 'outlined' : 'contained'}
-            href={product.repoUrl}
-            target="_blank"
-            rel="noopener"
-            startIcon={<GitHubIcon />}
-            sx={{ borderRadius: 999 }}
-          >
-            소스 보기
-          </Button>
+          {product.entryPoints?.map((e, i) => (
+            <Button
+              key={e.href}
+              variant={!product.liveUrl && i === 0 ? 'contained' : 'outlined'}
+              href={e.href}
+              endIcon={<ArrowForwardRoundedIcon />}
+              sx={{ borderRadius: 999 }}
+            >
+              {e.label}
+            </Button>
+          ))}
+          {product.repoUrl && (
+            <Button
+              variant={product.liveUrl || product.entryPoints?.length ? 'outlined' : 'contained'}
+              href={product.repoUrl}
+              target="_blank"
+              rel="noopener"
+              startIcon={<GitHubIcon />}
+              sx={{ borderRadius: 999 }}
+            >
+              소스 보기
+            </Button>
+          )}
         </Stack>
       </Container>
 

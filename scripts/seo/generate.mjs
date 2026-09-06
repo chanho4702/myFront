@@ -1,7 +1,7 @@
 // sitemap / robots / llms.txt 본문 생성기 — 순수 함수만. 파일 I/O·프로세스는 prerender.mjs 가 맡는다
 // (백엔드도 크롬도 없이 단위 테스트하기 위해서다. docs/lib.mjs 와 같은 구조).
 
-import { AI_AGENTS, BRAND, DEFINITION, DISALLOWED, DOCS, PRODUCTS, PUBLIC_ROUTES, REPOS } from './site.mjs';
+import { AI_AGENT, AI_AGENTS, BRAND, DEFINITION, DISALLOWED, DOCS, PRODUCTS, PUBLIC_ROUTES, REPOS } from './site.mjs';
 
 /** XML 텍스트 노드 이스케이프. URL 의 `&` 하나로 사이트맵 전체가 파싱 실패한다. */
 export const xmlEscape = (s) =>
@@ -79,6 +79,13 @@ export function buildLlmsTxt(origin) {
     '## 제품',
     '',
     ...PRODUCTS.map((p) => link(p.name, `/products/${p.slug}`, p.tagline)),
+    '',
+    '## AI 에이전트 (MCP)',
+    '',
+    `> ${AI_AGENT.summary} 접속 지점: \`${AI_AGENT.endpoint}\` (게이트웨이 경유).`,
+    '',
+    link('AI Agent 제품 소개', `/products/${AI_AGENT.slug}`),
+    link(AI_AGENT.guide.title, AI_AGENT.guide.path, '토큰 발급과 API 호출 방법'),
     '',
     '## 문서',
     '',

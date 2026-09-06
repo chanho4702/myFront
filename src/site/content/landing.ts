@@ -15,9 +15,16 @@ export const definition =
   'chanho 는 문서 위키(WIKI)와 이슈 트래커(ALM)를 하나의 로그인·게이트웨이 위에 올린 오픈소스 협업 플랫폼입니다. Confluence 와 Jira 가 나눠 하던 일을 한 플랫폼에서 합니다.';
 
 export const hero = {
+  /**
+   * 히어로 상단 배지. 헤드라인 위 한 줄로 새 축(AI)을 알리고 제품 상세로 보낸다 —
+   * 정의문(`definition`)은 답변 엔진이 인용하는 문장이라 손대지 않고, 강조는 배지로 얹는다.
+   */
+  badge: { label: 'NEW — AI 에이전트가 팀원으로 들어옵니다', to: '/products/ai-agent' },
   /** 줄바꿈 위치를 카피가 정한다 — 화면 폭에 따라 임의로 끊기면 리듬이 깨진다. */
   headline: ['쓰고, 추적하고,', '협업하기를 한 곳에서.'],
   sub: definition,
+  /** 정의문 아래 한 줄. AI 가 이 플랫폼에서 무엇을 하는지만 짧게 — 과장은 여기서 가장 위험하다. */
+  aiNote: 'AI 에이전트도 같은 플랫폼 위에서 일합니다. MCP 로 붙어 이슈를 만들고 위키에 보고서를 남기며, 그 기록은 전부 에이전트 페르소나 명의로 찍힙니다.',
   cta: '시작하기',
   secondary: 'GitHub 에서 보기',
 };
@@ -25,11 +32,11 @@ export const hero = {
 export const pain = {
   title: '도구를 오가는 번거로움과 작별하세요',
   sub: '문서는 여기, 이슈는 저기, 로그인은 또 따로. 흩어져 있던 것들을 한 플랫폼 위에 올렸습니다.',
-  chips: ['문서 & 위키', '이슈 & 스프린트', '칸반 보드', '첨부 & 검색', '단일 로그인'],
+  chips: ['문서 & 위키', '이슈 & 스프린트', '칸반 보드', '첨부 & 검색', '단일 로그인', 'AI 에이전트 (MCP)'],
 };
 
 export interface Feature {
-  slug: 'wiki' | 'alm' | 'msa-platform-template';
+  slug: 'wiki' | 'alm' | 'ai-agent' | 'msa-platform-template';
   eyebrow: string;
   title: string;
   body: string;
@@ -56,6 +63,18 @@ export const features: Feature[] = [
     liveUrl: '/alm/',
   },
   {
+    slug: 'ai-agent',
+    eyebrow: 'AUTOMATE',
+    title: 'AI 에이전트가 이슈를 집고, 옮기고, 보고서를 씁니다',
+    body: 'Claude Code 같은 코딩 에이전트를 MCP 로 붙이면 채팅 밖에서 실제로 일합니다. 도구 18종으로 이슈를 만들고 상태를 옮기고 위키에 작업 보고서를 남기며, 모든 기록이 에이전트 페르소나 명의로 찍힙니다.',
+    bullets: [
+      'MCP streamable-HTTP · 게이트웨이 /api/agent/mcp 단일 진입점',
+      '도구 18종 — 이슈 생성·전이·코멘트·워크로그, 위키 작성·이어쓰기',
+      '페르소나 = 조직 멤버(kind=AGENT) · 도구 호출마다 감사 기록',
+      '사람은 게이트에서 판단 — 승인 게이트 · 보고서 없는 완료 금지',
+    ],
+  },
+  {
     slug: 'msa-platform-template',
     eyebrow: 'RUN',
     title: '한 번의 로그인, 하나의 게이트웨이 위에서 전부 돌아갑니다',
@@ -67,9 +86,10 @@ export const features: Feature[] = [
 /** 플랫폼 구성 요약. 히어로 아래 "어떻게 구성돼 있나" 한 줄 스트립. */
 export const composition = [
   { value: '3', label: '프론트 앱' },
-  { value: '6', label: '백엔드 서비스' },
+  { value: '7', label: '백엔드 서비스' },
   { value: '1', label: '로그인 (Keycloak SSO)' },
   { value: '1', label: '데이터베이스 (PostgreSQL)' },
+  { value: '18', label: 'AI 에이전트 도구 (MCP)' },
 ];
 
 export const openSource = {
@@ -91,6 +111,10 @@ export const faq = [
   {
     q: 'WIKI 와 ALM 은 따로 써도 되나요?',
     a: '두 앱은 각각 독립된 프론트와 백엔드로 나뉘어 있고, 같은 Keycloak 계정과 게이트웨이를 공유합니다. 한 계정으로 둘 다 쓰는 것이 기본이지만, 서비스 단위로 떼어 배포할 수 있게 경계를 잡아 두었습니다.',
+  },
+  {
+    q: 'AI 에이전트는 무엇을 할 수 있나요?',
+    a: 'Claude Code 나 Codex 같은 MCP 클라이언트를 게이트웨이의 /api/agent/mcp 에 붙이면, 에이전트가 도구 18종으로 ALM 이슈를 만들고 상태를 옮기고 위키에 작업 보고서를 씁니다. 에이전트는 조직 멤버(kind=AGENT) 페르소나로 등록되고 전용 토큰으로 인증하므로, 남는 기록의 작성자가 사람 계정과 섞이지 않습니다. 무인으로 계속 도는 워커 루프와 감독 화면은 준비 중입니다.',
   },
   {
     q: '데이터는 어디에 저장되나요?',
