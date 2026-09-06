@@ -18,6 +18,10 @@
   ],
   "tags": [
     {
+      "description": "플랫폼 관리자 전용 위키 현황. 전역 관리자만 읽을 수 있다.",
+      "name": "Admin"
+    },
+    {
       "description": "페이지 보관과 보관 해제.",
       "name": "Archive"
     },
@@ -99,6 +103,57 @@
     }
   ],
   "paths": {
+    "/api/wiki/admin/stats": {
+      "get": {
+        "operationId": "stats",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/WikiAdminStats"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "인증 실패 — 토큰 없음·만료·무효"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "권한 없음"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "권한 서비스(org) 불능"
+          }
+        },
+        "summary": "위키 전체 현황 통계를 조회한다 — 전역 관리자만",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
     "/api/wiki/attachments/{id}": {
       "get": {
         "operationId": "download",
@@ -8947,6 +9002,66 @@
               "folder",
               "blog"
             ]
+          }
+        }
+      },
+      "WikiAdminStats": {
+        "type": "object",
+        "description": "위키 전체 현황 통계. 관리자 대시보드용 집계 한 장이다.",
+        "properties": {
+          "attachmentBytes": {
+            "type": "integer",
+            "format": "int64",
+            "description": "확정된 첨부의 총 바이트",
+            "example": 123456789
+          },
+          "attachments": {
+            "type": "integer",
+            "format": "int64",
+            "description": "확정된 첨부 수. 저장만 되고 본문에 붙지 않은 임시 업로드는 세지 않는다",
+            "example": 310
+          },
+          "comments": {
+            "type": "integer",
+            "format": "int64",
+            "description": "댓글 수. 인라인 댓글과 답글을 모두 포함한다",
+            "example": 420
+          },
+          "draftPages": {
+            "type": "integer",
+            "format": "int64",
+            "description": "초안 상태 문서 수. 휴지통 제외",
+            "example": 40
+          },
+          "editsLast7Days": {
+            "type": "integer",
+            "format": "int64",
+            "description": "최근 7일 편집 수. 리비전 한 건이 편집 한 번이다",
+            "example": 96
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int64",
+            "description": "문서 수. 휴지통은 빼고, 폴더·블로그 글은 포함한다",
+            "example": 1834
+          },
+          "revisions": {
+            "type": "integer",
+            "format": "int64",
+            "description": "누적 리비전 수",
+            "example": 15220
+          },
+          "spaces": {
+            "type": "integer",
+            "format": "int64",
+            "description": "스페이스 수",
+            "example": 12
+          },
+          "trashedPages": {
+            "type": "integer",
+            "format": "int64",
+            "description": "휴지통에 있는 문서 수",
+            "example": 7
           }
         }
       }

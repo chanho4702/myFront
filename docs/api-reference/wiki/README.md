@@ -10,7 +10,7 @@
 | --- | --- |
 | 버전 | `0.0.1-SNAPSHOT` |
 | 기본 URL | `https://<your-host>` |
-| 엔드포인트 | 95 |
+| 엔드포인트 | 96 |
 
 ## 인증
 
@@ -24,6 +24,7 @@ Authorization: Bearer chanho_pat_…
 
 | 리소스 | 설명 | 엔드포인트 |
 | --- | --- | --- |
+| [Admin](admin.md) | 플랫폼 관리자 전용 위키 현황. 전역 관리자만 읽을 수 있다. | 1 |
 | [Archive](archive.md) | 페이지 보관과 보관 해제. | 3 |
 | [Attachments](attachments.md) | 페이지 첨부 파일의 업로드·목록·내려받기와 버전 관리. | 9 |
 | [Audit](audit.md) | 스페이스 감사 로그 조회. | 2 |

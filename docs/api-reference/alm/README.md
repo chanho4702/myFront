@@ -8,7 +8,7 @@
 | --- | --- |
 | 버전 | `0.1.0` |
 | 기본 URL | `https://<your-host>` |
-| 엔드포인트 | 122 |
+| 엔드포인트 | 125 |
 
 ## 인증
 
@@ -28,6 +28,7 @@ Authorization: Bearer chanho_pat_…
 | [Comments](comments.md) | 이슈 댓글과 멘션 | 4 |
 | [Components](components.md) | 프로젝트 컴포넌트와 기본 담당자 | 4 |
 | [Dashboards](dashboards.md) | 대시보드와 가젯 배치 | 5 |
+| [Issue AQL](issue-aql.md) | AQL로 이슈를 검색한다 | 3 |
 | [Issue Archive](issue-archive.md) | 이슈 보관과 보관함 복원 | 3 |
 | [Issue History](issue-history.md) | 이슈 변경 이력과 활동 피드 | 2 |
 | [Issue Links](issue-links.md) | 이슈 사이의 연결(차단·복제 등) | 3 |

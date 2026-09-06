@@ -17,6 +17,10 @@
   ],
   "tags": [
     {
+      "name": "Admin",
+      "description": "관리자 대시보드가 읽는 조직 현황 — 전역 관리자 전용"
+    },
+    {
       "name": "Avatars",
       "description": "아바타 이미지 — 올리고 지우는 것은 본인만, 보는 것은 로그인한 누구나."
     },
@@ -42,6 +46,47 @@
     }
   ],
   "paths": {
+    "/api/org/admin/stats": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "조직 현황 통계 조회 — 사람 멤버의 상태별 수·에이전트·팀·대기 중 초대. 서버에서 60초 캐시한다",
+        "operationId": "stats",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgStatsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/org/grants": {
       "get": {
         "tags": [
@@ -2989,6 +3034,44 @@
             "type": "string",
             "format": "date-time",
             "description": "아바타를 마지막으로 바꾼 시각. 없으면 null."
+          }
+        }
+      },
+      "OrgStatsResponse": {
+        "type": "object",
+        "description": "조직 현황 통계 — 멤버 상태별 수, 에이전트, 팀, 대기 중 초대",
+        "properties": {
+          "members": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "사람 멤버의 상태별 수. 키는 ACTIVE·PENDING·SUSPENDED·DEACTIVATED 넷이며 0도 포함한다",
+            "example": {
+              "ACTIVE": 31,
+              "PENDING": 2,
+              "SUSPENDED": 1,
+              "DEACTIVATED": 4
+            }
+          },
+          "agents": {
+            "type": "integer",
+            "format": "int64",
+            "description": "에이전트 페르소나 멤버 수(로그인 없는 AI 계정)",
+            "example": 3
+          },
+          "teams": {
+            "type": "integer",
+            "format": "int64",
+            "description": "팀 수 — \"전체 구성원\" 팀을 포함한다",
+            "example": 6
+          },
+          "pendingInvitations": {
+            "type": "integer",
+            "format": "int64",
+            "description": "아직 수락되지 않은 초대 수(PENDING)",
+            "example": 2
           }
         }
       },

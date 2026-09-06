@@ -9,7 +9,7 @@
 | 메서드 | 경로 | 요약 |
 | --- | --- | --- |
 | `GET` | `/api/alm/admin/audit` | [감사 로그를 조건별로 조회한다](#get-apialmadminaudit) |
-| `GET` | `/api/alm/admin/stats` | [프로젝트·이슈·첨부 총량 등 시스템 현황을 조회한다](#get-apialmadminstats) |
+| `GET` | `/api/alm/admin/stats` | [프로젝트·이슈·첨부 총량 등 시스템 현황을 조회한다. 서버에서 60초 캐시한다](#get-apialmadminstats) |
 
 ## GET /api/alm/admin/audit
 
@@ -60,7 +60,7 @@ curl -X GET "https://<your-host>/api/alm/admin/audit" \
 
 ## GET /api/alm/admin/stats
 
-프로젝트·이슈·첨부 총량 등 시스템 현황을 조회한다
+프로젝트·이슈·첨부 총량 등 시스템 현황을 조회한다. 서버에서 60초 캐시한다
 
 ### 응답
 
