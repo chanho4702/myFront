@@ -32,7 +32,7 @@ export const hero = {
 export const pain = {
   title: '도구를 오가는 번거로움과 작별하세요',
   sub: '문서는 여기, 이슈는 저기, 로그인은 또 따로. 흩어져 있던 것들을 한 플랫폼 위에 올렸습니다.',
-  chips: ['문서 & 위키', '이슈 & 스프린트', '칸반 보드', '첨부 & 검색', '단일 로그인', 'AI 에이전트 (MCP)'],
+  chips: ['AI 에이전트 (MCP)', '문서 & 위키', '이슈 & 스프린트', '칸반 보드', '첨부 & 검색', '단일 로그인'],
 };
 
 export interface Feature {
@@ -52,22 +52,6 @@ export interface Feature {
 
 export const features: Feature[] = [
   {
-    slug: 'wiki',
-    eyebrow: 'WRITE',
-    title: '문서를 쓰고, 트리로 정리하고, 함께 다듬으세요',
-    body: '스페이스 안에서 페이지를 트리로 쌓습니다. 리치 에디터로 쓰되 마크다운으로 저장하니, 문서가 도구에 갇히지 않습니다.',
-    bullets: ['TipTap 리치 에디터 · 마크다운 저장', '스페이스 · 페이지 트리 · 라벨 · 백링크', '인라인 댓글 · 구독 · 리비전 이력', '첨부 · 내보내기 · 휴지통'],
-    liveUrl: '/wiki/',
-  },
-  {
-    slug: 'alm',
-    eyebrow: 'TRACK',
-    title: '이슈를 추적하고, 스프린트를 계획하고, 보드로 흐름을 보세요',
-    body: '백로그에서 스프린트로, 칸반에서 간트로. 지라가 잘한 구조는 가져오고, 한국어 검색과 URL 로 공유되는 필터는 다르게 만들었습니다.',
-    bullets: ['백로그 · 스프린트 · 칸반 보드', '워크플로 캔버스 · 상태 · 우선순위 스킴', '간트 · 대시보드 · 워크로그', '한국어 스마트 검색 · 필터 URL 공유'],
-    liveUrl: '/alm/',
-  },
-  {
     slug: 'ai-agent',
     eyebrow: 'AUTOMATE',
     title: 'AI 에이전트가 이슈를 집고, 옮기고, 보고서를 씁니다',
@@ -83,6 +67,22 @@ export const features: Feature[] = [
       { label: '회의가 끝나면 회의록과 액션 아이템 이슈를 대신 남긴다', to: '/products/ai-agent#meeting-notes' },
       { label: '방치된 백로그를 훑어 중복·우선순위를 코멘트로 제안한다', to: '/products/ai-agent#backlog-triage' },
     ],
+  },
+  {
+    slug: 'wiki',
+    eyebrow: 'WRITE',
+    title: '문서를 쓰고, 트리로 정리하고, 함께 다듬으세요',
+    body: '스페이스 안에서 페이지를 트리로 쌓습니다. 리치 에디터로 쓰되 마크다운으로 저장하니, 문서가 도구에 갇히지 않습니다.',
+    bullets: ['TipTap 리치 에디터 · 마크다운 저장', '스페이스 · 페이지 트리 · 라벨 · 백링크', '인라인 댓글 · 구독 · 리비전 이력', '첨부 · 내보내기 · 휴지통'],
+    liveUrl: '/wiki/',
+  },
+  {
+    slug: 'alm',
+    eyebrow: 'TRACK',
+    title: '이슈를 추적하고, 스프린트를 계획하고, 보드로 흐름을 보세요',
+    body: '백로그에서 스프린트로, 칸반에서 간트로. 지라가 잘한 구조는 가져오고, 한국어 검색과 URL 로 공유되는 필터는 다르게 만들었습니다.',
+    bullets: ['백로그 · 스프린트 · 칸반 보드', '워크플로 캔버스 · 상태 · 우선순위 스킴', '간트 · 대시보드 · 워크로그', '한국어 스마트 검색 · 필터 URL 공유'],
+    liveUrl: '/alm/',
   },
   {
     slug: 'msa-platform-template',

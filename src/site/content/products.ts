@@ -61,52 +61,6 @@ export interface Product {
  */
 export const products: Product[] = [
   {
-    slug: 'wiki',
-    name: 'WIKI',
-    tagline: 'Confluence 스타일 문서·위키',
-    summary:
-      '스페이스 단위로 문서를 쓰고 관리하는 위키. 편집은 TipTap 리치 에디터지만 저장 포맷은 마크다운 문자열이라, 문서가 특정 에디터에 갇히지 않는다.',
-    spec: [
-      { label: 'Frontend', value: 'React · TipTap · react-router' },
-      { label: 'UI', value: '@chanho/react + @chanho/tokens (자체 디자인 시스템)' },
-      { label: 'Backend', value: 'wiki-backend (Spring Boot · PostgreSQL)' },
-      { label: '저장 포맷', value: '마크다운 문자열 (serializeMarkdown 직렬화)' },
-      { label: '협업', value: '인라인 댓글 · 구독 · 리비전 · 라벨 · 백링크' },
-      { label: '서빙', value: 'nginx 단일 오리진 /wiki/ (Vite base + router basename 쌍)' },
-      { label: '데이터 경로', value: 'wikiStore async 함수 단일 경유 — 백엔드 교체 시 화면 무수정' },
-    ],
-    highlights: [
-      '에디터 스키마의 단일 원천을 확장 목록 파일 하나로 고정해, 화면 에디터와 헤드리스 마크다운 변환기가 같은 스키마를 공유한다. 마크다운 왕복이 깨지지 않는 근거.',
-      '보기 렌더와 에디터 양쪽 모두 raw HTML 을 렌더하지 않는다 — XSS 방어를 한쪽만 걸지 않았다.',
-      '권한은 조상 폐포(ancestor closure)로 미리 풀어 두고, 페이지 트리는 지연 로딩한다 — 문서가 수만 장으로 늘어도 트리와 권한 검사가 느려지지 않게 한 선택.',
-    ],
-    repoUrl: 'https://github.com/chanho4702/WIKI',
-    liveUrl: '/wiki/',
-  },
-  {
-    slug: 'alm',
-    name: 'ALM',
-    tagline: 'Jira 스타일 이슈·스프린트 관리',
-    summary:
-      '지라의 검증된 구조 위에 한국어 스마트 검색과 필터 URL 공유를 얹은 이슈 트래커. 지라 클론이 아니라, 지라가 잘한 것을 가져오고 다른 지점을 의도적으로 다르게 만들었다.',
-    spec: [
-      { label: 'Frontend', value: 'React · react-router · TipTap(설명·댓글, @멘션)' },
-      { label: 'UI', value: '@chanho/react + @chanho/tokens (자체 디자인 시스템)' },
-      { label: 'Backend', value: 'alm-backend (Spring Boot · PostgreSQL · MinIO 첨부)' },
-      { label: '보드', value: '백로그 · 스프린트 · 칸반 · 간트 · 대시보드 · 워크로그' },
-      { label: '설정', value: '워크플로 캔버스 · 상태/타입 레지스트리 · 우선순위 스킴 · 링크 타입 · 컴포넌트' },
-      { label: '서빙', value: 'nginx 단일 오리진 /alm/' },
-      { label: '특색', value: '한국어 스마트 검색 · 필터 URL 공유 · 저장 필터 사이드바 · 시간추적' },
-    ],
-    highlights: [
-      '필터 상태를 URL 에 실어 공유 가능하게 만들었다 — 협업 도구에서 "내가 보는 화면"을 그대로 넘길 수 있어야 한다는 판단.',
-      '이슈 계층에 깊이 제한을 두지 않는다. 에픽→스토리→서브태스크로 고정하는 대신 타입 레지스트리가 허용하는 관계면 어디까지든 내려간다.',
-      '백엔드 없이 못 만드는 기능은 구현하지 않고 백로그에 남긴다. 목업으로 흉내 낸 기능이 나중에 계약과 어긋나는 것을 막는다.',
-    ],
-    repoUrl: 'https://github.com/chanho4702/ALM',
-    liveUrl: '/alm/',
-  },
-  {
     slug: 'ai-agent',
     name: 'AI Agent',
     tagline: 'MCP 로 위키·ALM 을 직접 다루는 AI 팀원',
@@ -223,6 +177,52 @@ curl -X POST https://<호스트>/api/agent/tokens \\
         body: 'ping 으로 연결을, whoami 로 어떤 페르소나로 붙었는지 확인한 다음 이슈를 넘긴다. 그 뒤로는 서버가 내려주는 규약대로 움직인다 — 작업 전 get_project_context 로 스킴과 멤버를 확인하고, 이슈를 집을 때 claim_issue, 진행은 add_comment 와 log_work, 완료 전에는 위키 작업 보고서. 남는 기록의 작성자는 전부 페르소나이고, 도구 호출은 하나도 빠짐없이 감사 테이블에 적재된다.',
       },
     ],
+  },
+  {
+    slug: 'wiki',
+    name: 'WIKI',
+    tagline: 'Confluence 스타일 문서·위키',
+    summary:
+      '스페이스 단위로 문서를 쓰고 관리하는 위키. 편집은 TipTap 리치 에디터지만 저장 포맷은 마크다운 문자열이라, 문서가 특정 에디터에 갇히지 않는다.',
+    spec: [
+      { label: 'Frontend', value: 'React · TipTap · react-router' },
+      { label: 'UI', value: '@chanho/react + @chanho/tokens (자체 디자인 시스템)' },
+      { label: 'Backend', value: 'wiki-backend (Spring Boot · PostgreSQL)' },
+      { label: '저장 포맷', value: '마크다운 문자열 (serializeMarkdown 직렬화)' },
+      { label: '협업', value: '인라인 댓글 · 구독 · 리비전 · 라벨 · 백링크' },
+      { label: '서빙', value: 'nginx 단일 오리진 /wiki/ (Vite base + router basename 쌍)' },
+      { label: '데이터 경로', value: 'wikiStore async 함수 단일 경유 — 백엔드 교체 시 화면 무수정' },
+    ],
+    highlights: [
+      '에디터 스키마의 단일 원천을 확장 목록 파일 하나로 고정해, 화면 에디터와 헤드리스 마크다운 변환기가 같은 스키마를 공유한다. 마크다운 왕복이 깨지지 않는 근거.',
+      '보기 렌더와 에디터 양쪽 모두 raw HTML 을 렌더하지 않는다 — XSS 방어를 한쪽만 걸지 않았다.',
+      '권한은 조상 폐포(ancestor closure)로 미리 풀어 두고, 페이지 트리는 지연 로딩한다 — 문서가 수만 장으로 늘어도 트리와 권한 검사가 느려지지 않게 한 선택.',
+    ],
+    repoUrl: 'https://github.com/chanho4702/WIKI',
+    liveUrl: '/wiki/',
+  },
+  {
+    slug: 'alm',
+    name: 'ALM',
+    tagline: 'Jira 스타일 이슈·스프린트 관리',
+    summary:
+      '지라의 검증된 구조 위에 한국어 스마트 검색과 필터 URL 공유를 얹은 이슈 트래커. 지라 클론이 아니라, 지라가 잘한 것을 가져오고 다른 지점을 의도적으로 다르게 만들었다.',
+    spec: [
+      { label: 'Frontend', value: 'React · react-router · TipTap(설명·댓글, @멘션)' },
+      { label: 'UI', value: '@chanho/react + @chanho/tokens (자체 디자인 시스템)' },
+      { label: 'Backend', value: 'alm-backend (Spring Boot · PostgreSQL · MinIO 첨부)' },
+      { label: '보드', value: '백로그 · 스프린트 · 칸반 · 간트 · 대시보드 · 워크로그' },
+      { label: '설정', value: '워크플로 캔버스 · 상태/타입 레지스트리 · 우선순위 스킴 · 링크 타입 · 컴포넌트' },
+      { label: '서빙', value: 'nginx 단일 오리진 /alm/' },
+      { label: '특색', value: '한국어 스마트 검색 · 필터 URL 공유 · 저장 필터 사이드바 · 시간추적' },
+    ],
+    highlights: [
+      '필터 상태를 URL 에 실어 공유 가능하게 만들었다 — 협업 도구에서 "내가 보는 화면"을 그대로 넘길 수 있어야 한다는 판단.',
+      '이슈 계층에 깊이 제한을 두지 않는다. 에픽→스토리→서브태스크로 고정하는 대신 타입 레지스트리가 허용하는 관계면 어디까지든 내려간다.',
+      '백엔드 없이 못 만드는 기능은 구현하지 않고 백로그에 남긴다. 목업으로 흉내 낸 기능이 나중에 계약과 어긋나는 것을 막는다.',
+    ],
+    repoUrl: 'https://github.com/chanho4702/ALM',
+    liveUrl: '/alm/',
   },
   {
     slug: 'msa-platform-template',

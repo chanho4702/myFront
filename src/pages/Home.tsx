@@ -222,7 +222,7 @@ export default function Home() {
         <Container maxWidth="lg" sx={{ pt: { xs: 8, md: 14 }, pb: { xs: 4, md: 6 } }}>
           <SectionHead
             eyebrow="ONE PLATFORM"
-            title="쓰고, 추적하고, 맡기고, 실행하기 — 하나의 플랫폼에서"
+            title="맡기고, 쓰고, 추적하고, 실행하기 — 하나의 플랫폼에서"
             sub="문서 위키와 이슈 트래커가 같은 로그인, 같은 게이트웨이 위에서 돌아갑니다. AI 에이전트도 같은 자리에 멤버로 앉습니다. 어디서 시작하든 나머지가 이미 연결돼 있습니다."
           />
           {features.map((f, i) => (

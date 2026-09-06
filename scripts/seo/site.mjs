@@ -15,9 +15,9 @@ export const DEFINITION =
 export const PUBLIC_ROUTES = [
   '/',
   '/products',
+  '/products/ai-agent',
   '/products/wiki',
   '/products/alm',
-  '/products/ai-agent',
   '/products/msa-platform-template',
   '/tech',
   '/contact',
@@ -29,9 +29,9 @@ export const PUBLIC_ROUTES = [
  * `repoUrl` 은 공개 저장소가 있는 제품에만 적는다 — agent-service 는 비공개라 비운다.
  */
 export const PRODUCTS = [
+  { slug: 'ai-agent', name: 'AI Agent', tagline: 'MCP 로 위키·ALM 을 직접 다루는 AI 팀원' },
   { slug: 'wiki', name: 'WIKI', tagline: 'Confluence 스타일 문서·위키', repoUrl: 'https://github.com/chanho4702/WIKI' },
   { slug: 'alm', name: 'ALM', tagline: 'Jira 스타일 이슈·스프린트 관리', repoUrl: 'https://github.com/chanho4702/ALM' },
-  { slug: 'ai-agent', name: 'AI Agent', tagline: 'MCP 로 위키·ALM 을 직접 다루는 AI 팀원' },
   {
     slug: 'msa-platform-template',
     name: 'MSA Platform Template',
