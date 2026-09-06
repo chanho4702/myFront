@@ -16,6 +16,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
@@ -32,9 +33,10 @@ import {
   type CreatedToken,
   type TokenStatus,
 } from './tokensStore';
+import { displayScopes, SCOPE_DESCRIPTION, type ScopeId } from './scopes';
 import { useNotify } from '../../notifications';
 
-const COLUMN_COUNT = 7;
+const COLUMN_COUNT = 8;
 
 const STATUS_CHIP: Record<TokenStatus, { label: string; color: 'success' | 'warning' | 'error' | 'default' }> = {
   active: { label: '활성', color: 'success' },
@@ -167,6 +169,7 @@ export default function TokensPage() {
                 <TableCell width={130}>만든 날</TableCell>
                 <TableCell width={130}>만료</TableCell>
                 <TableCell width={130}>마지막 사용</TableCell>
+                <TableCell width={220}>권한</TableCell>
                 <TableCell width={110}>상태</TableCell>
                 <TableCell width={100} align="right">
                   관리
@@ -189,6 +192,9 @@ export default function TokensPage() {
                       <TableCell sx={{ color: 'text.secondary' }}>{formatDate(token.createdAt)}</TableCell>
                       <TableCell sx={{ color: 'text.secondary' }}>{formatDate(token.expiresAt)}</TableCell>
                       <TableCell sx={{ color: 'text.secondary' }}>{formatDate(token.lastUsedAt)}</TableCell>
+                      <TableCell>
+                        <ScopeChips scopes={token.scopes} />
+                      </TableCell>
                       <TableCell>
                         <Chip size="small" variant="outlined" label={chip.label} color={chip.color} />
                       </TableCell>
@@ -253,5 +259,29 @@ export default function TokensPage() {
         </DialogActions>
       </Dialog>
     </Box>
+  );
+}
+
+/**
+ * 목록 행의 스코프 칩. 서버가 아직 `scopes` 를 주지 않는 구버전 토큰은 "전체"로 표시한다 —
+ * 스코프 도입 전에 만든 토큰은 게이트웨이가 제한 없이 통과시키기 때문이다(§1.3).
+ */
+function ScopeChips({ scopes }: { scopes?: string[] }) {
+  const list = displayScopes(scopes);
+  if (list.length === 0) {
+    return (
+      <Tooltip title="스코프 도입 전에 만든 토큰이라 제한이 없습니다. 새로 발급해 범위를 좁히세요.">
+        <Chip size="small" variant="outlined" color="warning" label="전체" />
+      </Tooltip>
+    );
+  }
+  return (
+    <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
+      {list.map((scope) => (
+        <Tooltip key={scope} title={SCOPE_DESCRIPTION[scope as ScopeId] ?? scope}>
+          <Chip size="small" variant="outlined" label={scope} sx={{ fontFamily: 'monospace' }} />
+        </Tooltip>
+      ))}
+    </Stack>
   );
 }

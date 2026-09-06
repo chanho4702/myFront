@@ -20,6 +20,11 @@ export interface ApiToken {
   expiresAt: string; // ISO
   lastUsedAt: string | null; // ISO, 한 번도 안 썼으면 null
   revokedAt: string | null; // ISO, 폐기 시각
+  /**
+   * 이 토큰이 쓸 수 있는 스코프(예: `["wiki:read","admin"]`). 스코프 도입 이전에 만든 토큰이나
+   * 구버전 서버는 이 필드를 주지 않을 수 있으므로 화면은 항상 빈 배열로 방어한다.
+   */
+  scopes?: string[];
 }
 
 /** 발급(POST) 응답. `token` 은 이 응답에만 실리고 다시는 볼 수 없다. */
@@ -30,11 +35,14 @@ export interface CreatedToken {
   createdAt: string; // ISO
   expiresAt: string; // ISO
   token: string; // 원문 chanho_pat_…
+  scopes?: string[];
 }
 
 export interface CreateTokenInput {
   label: string;
   expiresInDays: number;
+  /** 필수. 빈 배열이면 서버가 400 `scopes_required` 로 막는다(§1.2). */
+  scopes: string[];
 }
 
 /** 토큰 원문의 고정 접두사. 목록에서 `chanho_pat_…hint` 로 식별한다. */
@@ -63,6 +71,9 @@ const ERROR_MESSAGES: Record<string, string> = {
   label_required: '라벨을 입력해 주세요.',
   invalid_expiry: '만료 기간이 올바르지 않습니다.',
   token_limit: '토큰은 최대 25개까지 만들 수 있습니다.',
+  scopes_required: '권한(스코프)을 하나 이상 선택해 주세요.',
+  scopes_invalid: '알 수 없는 권한(스코프)이 포함돼 있습니다. 화면을 새로고침한 뒤 다시 시도해 주세요.',
+  insufficient_scope: '이 토큰에는 필요한 스코프가 없습니다.',
   not_found: '이미 삭제되었거나 존재하지 않는 토큰입니다.',
   pat_cannot_manage_tokens: 'API 토큰으로는 토큰을 관리할 수 없습니다. 브라우저로 로그인해 주세요.',
 };

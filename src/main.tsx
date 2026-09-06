@@ -8,7 +8,7 @@ import NotFoundPage from './app/pages/NotFoundPage';
 import RouteErrorPage from './app/pages/RouteErrorPage';
 import AppLayout from './app/components/AppLayout';
 import AuthLoadingScreen from './app/components/AuthLoadingScreen';
-import DashboardHome from './app/pages/DashboardHome';
+import AppHomePage from './app/admin/AppHomePage';
 import BoardListPage from './app/board/BoardListPage';
 import BoardDetailPage from './app/board/BoardDetailPage';
 import BoardFormPage from './app/board/BoardFormPage';
@@ -73,7 +73,7 @@ const router = createBrowserRouter([
     ),
     errorElement: <RouteErrorPage />,
     children: [
-      { index: true, element: <DashboardHome /> },
+      { index: true, element: <AppHomePage /> },
       { path: 'board', element: <BoardListPage /> },
       { path: 'board/new', element: <BoardFormPage /> },
       { path: 'board/:id', element: <BoardDetailPage /> },

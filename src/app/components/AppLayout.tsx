@@ -28,6 +28,7 @@ import {
   treeViewCustomizations,
 } from '../../context/templates/dashboard/theme/customizations';
 import { useAuth } from '../../auth';
+import { resetAdminIdentity, useAdminIdentity } from '../admin/adminStore';
 
 const xThemeComponents = {
   ...chartsCustomizations,
@@ -41,9 +42,10 @@ interface Crumb {
   to?: string;
 }
 
-// 현재 경로 기준 브레드크럼 트레일 계산
-function useCrumbs(pathname: string): Crumb[] {
-  const crumbs: Crumb[] = [{ label: '대시보드', to: '/app' }];
+// 현재 경로 기준 브레드크럼 트레일 계산. 루트 라벨은 사이드 메뉴와 같은 규칙을 따른다
+// (관리자면 "관리자 대시보드", 아니면 "홈").
+function useCrumbs(pathname: string, isGlobalAdmin: boolean): Crumb[] {
+  const crumbs: Crumb[] = [{ label: isGlobalAdmin ? '관리자 대시보드' : '홈', to: '/app' }];
   if (pathname.startsWith('/app/board')) {
     crumbs.push({ label: '게시판', to: '/app/board' });
     if (pathname === '/app/board/new') {
@@ -64,10 +66,13 @@ export default function AppLayout(props: { disableCustomTheme?: boolean }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuth();
-  const crumbs = useCrumbs(location.pathname);
+  const { isGlobalAdmin } = useAdminIdentity();
+  const crumbs = useCrumbs(location.pathname, isGlobalAdmin);
 
   const handleLogout = async () => {
     await logout();
+    // 다음 로그인이 다른 계정일 수 있으므로 관리자 판정 캐시를 버린다.
+    resetAdminIdentity();
     navigate('/login', { replace: true });
   };
 

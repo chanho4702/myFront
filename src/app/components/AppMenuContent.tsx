@@ -12,6 +12,7 @@ import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import KeyRoundedIcon from '@mui/icons-material/KeyRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
+import { useAdminIdentity } from '../admin/adminStore';
 
 interface MenuItem {
   text: string;
@@ -20,8 +21,9 @@ interface MenuItem {
   href?: string; // 별도 SPA(위키/ALM) — 라우터 밖이라 전체 페이지 이동. nginx 단일 오리진에서만 유효
 }
 
+// `/app` 인덱스는 관리자면 플랫폼 점검 대시보드, 아니면 바로가기 홈이다 — 라벨도 그에 맞춘다.
 const mainItems: MenuItem[] = [
-  { text: '대시보드', icon: <HomeRoundedIcon />, path: '/app' },
+  { text: '홈', icon: <HomeRoundedIcon />, path: '/app' },
   { text: '게시판', icon: <ArticleRoundedIcon />, path: '/app/board' },
   { text: '위키', icon: <MenuBookRoundedIcon />, href: '/wiki/' },
   { text: 'ALM', icon: <AssignmentRoundedIcon />, href: '/alm/' },
@@ -43,6 +45,11 @@ function isSelected(pathname: string, path: string) {
 export default function AppMenuContent({ onNavigate }: { onNavigate?: () => void }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isGlobalAdmin } = useAdminIdentity();
+
+  const items = mainItems.map((item) =>
+    item.path === '/app' && isGlobalAdmin ? { ...item, text: '관리자 대시보드' } : item,
+  );
 
   const go = (item: MenuItem) => {
     if (item.href) {
@@ -59,7 +66,7 @@ export default function AppMenuContent({ onNavigate }: { onNavigate?: () => void
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: 'space-between' }}>
       <List dense>
-        {mainItems.map((item) => (
+        {items.map((item) => (
           <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
             <ListItemButton
               selected={!!item.path && isSelected(location.pathname, item.path)}
