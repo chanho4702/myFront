@@ -77,6 +77,7 @@ test('llms.txt 는 H1 · 정의 인용문 · 제품/AI/문서/소스 절을 갖�
   assert.ok(txt.includes(AI_AGENT.summary), 'AI 에이전트 요약이 없다');
   assert.ok(txt.includes('`/api/agent/mcp`'), 'MCP 엔드포인트가 없다');
   assert.ok(txt.includes(`(https://chanho.dev${AI_AGENT.guide.path})`), 'API 가이드 링크가 없다');
+  for (const s of AI_AGENT.scenarios) assert.ok(txt.includes(`- ${s}`), `활용 시나리오가 빠졌다: ${s.slice(0, 20)}…`);
   for (const p of PRODUCTS) assert.ok(txt.includes(`(https://chanho.dev/products/${p.slug})`), `${p.slug} 링크 없음`);
   assert.ok(txt.includes('(https://chanho.dev/docs/)'));
   assert.ok(txt.includes('(https://chanho.dev/docs/spaces/2)') && txt.includes('(https://chanho.dev/docs/spaces/3)'));
@@ -111,6 +112,34 @@ test('AI 에이전트 사실은 products.ts 의 ai-agent 스펙과 같다', () =
   assert.ok(products.includes(`slug: '${AI_AGENT.slug}'`), `products.ts 에 ${AI_AGENT.slug} 제품이 없다`);
   assert.ok(products.includes(AI_AGENT.endpoint), `products.ts 에 MCP 엔드포인트(${AI_AGENT.endpoint})가 없다`);
   assert.ok(products.includes('18종'), 'products.ts 에 도구 수(18종)가 없다 — llms.txt 와 화면이 다른 수를 말하면 안 된다');
+});
+
+test('도구 수 표기(18종)는 실제 도구 목록과 같다', () => {
+  assert.equal(AI_AGENT.tools.length, 18, 'agent-service 의 도구가 늘거나 줄면 화면의 "18종" 표기도 함께 고쳐야 한다');
+  assert.equal(new Set(AI_AGENT.tools).size, 18, '도구 이름이 중복된다');
+});
+
+test('시나리오의 도구 흐름은 실재하는 MCP 도구 이름만 쓴다', () => {
+  const products = read('site/content/products.ts');
+  const blocks = [...products.matchAll(/flow:\s*\[([\s\S]*?)\]/g)].map((m) => m[1]);
+  assert.ok(blocks.length > 0, 'products.ts 에 시나리오 flow 가 하나도 없다');
+  const named = blocks
+    .flatMap((b) => [...b.matchAll(/'([^']+)'/g)].map((m) => m[1]))
+    // `~…~` 로 감싼 항목은 도구가 아니라 사람의 작업·다른 경로라고 표시한 것이다.
+    .filter((s) => !(s.startsWith('~') && s.endsWith('~')))
+    // 'create_page (작업 보고서)' · 'create_issue × N' 처럼 뒤에 설명이 붙는다 — 첫 토큰만 본다.
+    .map((s) => s.split(' ')[0]);
+  assert.ok(named.length > 0, '도구 이름이 하나도 안 잡혔다 — 파싱이 깨졌는지 확인하라');
+  for (const n of named) assert.ok(AI_AGENT.tools.includes(n), `실재하지 않는 도구 이름을 시나리오에 적었다: ${n}`);
+});
+
+test('연결 안내는 실재하는 관리자 엔드포인트만 적는다', () => {
+  const products = read('site/content/products.ts');
+  for (const path of ['/api/agent/personas', '/api/agent/tokens', '/api/agent/mcp']) {
+    assert.ok(products.includes(path), `products.ts 에 ${path} 안내가 없다`);
+  }
+  // 토큰 실값이 새어 나가지 않게 — 스니펫의 토큰은 늘 플레이스홀더다.
+  assert.doesNotMatch(products, /agp_[A-Za-z0-9]{8,}/, '스니펫에 실제처럼 보이는 토큰이 들어 있다');
 });
 
 test('프리렌더 라우트는 main.tsx 의 공개 라우트와 같다', () => {

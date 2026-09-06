@@ -51,6 +51,40 @@ export const AI_AGENT = {
   summary:
     'MCP(streamable-HTTP) 서버로 AI 코딩 에이전트를 붙인다. 도구 18종으로 ALM 이슈를 만들고 전이하고 위키에 작업 보고서를 쓰며, 모든 기록은 조직 멤버(kind=AGENT) 페르소나 명의로 남는다.',
   guide: { title: 'API 가이드', path: '/docs/spaces/3/pages/135' },
+  /**
+   * agent-service `src/main/java/com/platform/agentservice/tools/` 에 실제로 등록된 도구 18종.
+   * 화면의 "18종" 표기와 시나리오 카드의 도구 이름이 이 목록을 벗어나지 않는지 테스트가 대조한다 —
+   * 있지도 않은 도구 이름을 활용 예에 적는 것이 가장 하기 쉬운 거짓말이다.
+   */
+  tools: [
+    'whoami',
+    'ping',
+    'list_projects',
+    'get_project_context',
+    'search_issues',
+    'get_issue',
+    'create_issue',
+    'claim_issue',
+    'update_issue_status',
+    'add_comment',
+    'log_work',
+    'link_pr',
+    'list_spaces',
+    'find_pages',
+    'get_page',
+    'create_page',
+    'update_page',
+    'append_to_page',
+  ],
+  /**
+   * 활용 시나리오 요약. src/site/content/products.ts 의 `scenarios` 카드와 같은 사실이어야 한다 —
+   * 답변 엔진이 "이걸로 뭘 할 수 있나"에 인용할 문장이라 능력이 아니라 쓰임으로 적는다.
+   */
+  scenarios: [
+    '설계가 끝난 이슈를 통째로 맡긴다 — 에이전트가 claim_issue 로 집고, 구현 뒤 link_pr, 위키에 작업 보고서(create_page)를 남기고 나서야 완료로 전이한다. 사람은 PR 과 보고서를 보고 승인만 한다.',
+    '회의가 끝나면 회의록(create_page)과 액션 아이템 이슈(create_issue)를 대신 남기고, 각 이슈에 회의록 링크를 코멘트로 단다. 담당자와 우선순위는 사람이 정한다.',
+    '방치된 백로그를 search_issues 로 훑어 중복·우선순위를 코멘트로 제안한다. 닫을지 올릴지는 사람이 결정한다.',
+  ],
 };
 
 /** 같은 호스트의 `/docs/` 에 있는 공개 문서 위키(별도 SPA). 스페이스 id 는 임포터가 쓰는 것과 같다. */

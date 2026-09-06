@@ -43,6 +43,11 @@ export interface Feature {
   bullets: string[];
   /** 라이브 앱 링크. 플랫폼은 화면이 없으니 상세로 보낸다. */
   liveUrl?: string;
+  /**
+   * 활용 예 한 줄씩. `to` 는 제품 상세의 시나리오 카드 앵커라서,
+   * 홈에서 궁금해진 사람이 그 카드로 바로 내려간다(목록만 보고 끝나지 않게).
+   */
+  scenarios?: { label: string; to: string }[];
 }
 
 export const features: Feature[] = [
@@ -72,6 +77,11 @@ export const features: Feature[] = [
       '도구 18종 — 이슈 생성·전이·코멘트·워크로그, 위키 작성·이어쓰기',
       '페르소나 = 조직 멤버(kind=AGENT) · 도구 호출마다 감사 기록',
       '사람은 게이트에서 판단 — 승인 게이트 · 보고서 없는 완료 금지',
+    ],
+    scenarios: [
+      { label: '설계가 끝난 이슈를 통째로 맡기고, 사람은 PR 과 작업 보고서만 승인한다', to: '/products/ai-agent#issue-handoff' },
+      { label: '회의가 끝나면 회의록과 액션 아이템 이슈를 대신 남긴다', to: '/products/ai-agent#meeting-notes' },
+      { label: '방치된 백로그를 훑어 중복·우선순위를 코멘트로 제안한다', to: '/products/ai-agent#backlog-triage' },
     ],
   },
   {

@@ -7,6 +7,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
+import Link from '@mui/material/Link';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -79,6 +80,26 @@ function FeatureBlock({ feature, flip }: { feature: Feature; flip: boolean }) {
             </Stack>
           ))}
         </Stack>
+        {/*
+          활용 예 — 기능 나열만으로는 "그래서 뭘 맡기나"가 안 그려지는 블록에만 붙인다.
+          각 줄은 제품 상세의 시나리오 카드 앵커로 바로 내려간다.
+        */}
+        {feature.scenarios && (
+          <Box sx={{ mt: 3.5, pl: 2, borderLeft: '2px solid', borderColor: brand(0.35) }}>
+            <Typography sx={{ fontFamily: MONO, fontSize: '0.7rem', letterSpacing: '0.14em', color: 'text.secondary', mb: 1.25 }}>
+              이렇게 씁니다
+            </Typography>
+            <Stack component="ul" spacing={1} sx={{ pl: 0, listStyle: 'none', m: 0 }}>
+              {feature.scenarios.map((s) => (
+                <Box component="li" key={s.to}>
+                  <Link component={RouterLink} to={s.to} variant="body2" sx={{ lineHeight: 1.7, fontWeight: 500, wordBreak: 'keep-all' }}>
+                    {s.label}
+                  </Link>
+                </Box>
+              ))}
+            </Stack>
+          </Box>
+        )}
         <Stack direction="row" spacing={1.5} sx={{ flexWrap: 'wrap', gap: 1.5, mt: 4 }}>
           {feature.liveUrl && (
             <Button href={feature.liveUrl} variant="contained" endIcon={<LaunchRoundedIcon />} sx={PILL}>

@@ -1,5 +1,32 @@
 import type { SpecRow } from '../types';
 
+/**
+ * "이렇게 씁니다" 한 장. 상황 → 도구 흐름 → 사람이 개입하는 지점의 세 칸으로 고정한다 —
+ * 자동화 소개가 능력 자랑으로 흐르지 않게 하려면 마지막 칸이 항상 있어야 한다.
+ *
+ * `flow` 에는 **실재하는 MCP 도구 이름만** 적는다(agent-service `tools/` 의 18종).
+ * 도구가 아닌 단계(사람의 구현 작업 등)는 `~` 로 감싸 도구와 구분한다.
+ */
+export interface Scenario {
+  /** 해시 앵커. 홈 기능 블록이 `/products/<slug>#<id>` 로 이 카드를 직접 가리킨다. */
+  id: string;
+  title: string;
+  /** 상황 한 줄 */
+  situation: string;
+  flow: string[];
+  /** 사람이 판단하는 지점 */
+  human: string;
+  /** 더 읽을 문서(선택). 실재하는 경로만. */
+  doc?: { label: string; href: string };
+}
+
+/** "연결하는 법" 한 단계. `code` 는 그대로 복사해 쓰는 스니펫이고 토큰은 늘 플레이스홀더다. */
+export interface SetupStep {
+  title: string;
+  body: string;
+  code?: string;
+}
+
 export interface Product {
   slug: string;
   name: string;
@@ -20,6 +47,12 @@ export interface Product {
   kicker?: string;
   /** 라이브 앱도 공개 저장소도 없는 제품의 진입점(문서·설정 화면). 전부 실재하는 경로만 적는다. */
   entryPoints?: { label: string; href: string }[];
+  /** 상세 페이지 메타 설명. 비우면 `summary` 를 쓴다 — 활용법이 검색 스니펫에 와야 할 때만 채운다. */
+  metaDescription?: string;
+  /** "이렇게 씁니다" 활용 시나리오. */
+  scenarios?: Scenario[];
+  /** "연결하는 법" 단계. */
+  setup?: SetupStep[];
 }
 
 /**
@@ -99,6 +132,96 @@ export const products: Product[] = [
     entryPoints: [
       { label: 'API 가이드', href: '/docs/spaces/3/pages/135' },
       { label: '개인 API 토큰', href: '/app/tokens' },
+    ],
+    metaDescription:
+      'AI 코딩 에이전트를 MCP 로 위키·ALM 에 붙여 이슈를 맡기고, 회의록과 액션 아이템을 남기고, 백로그를 정리하고, 문서를 최신화합니다. 도구 18종 · 페르소나 명의 기록 · 승인 게이트. 연결은 세 단계면 됩니다.',
+    scenarios: [
+      {
+        id: 'issue-handoff',
+        title: '이슈 하나를 통째로 맡긴다',
+        situation: '설계까지 끝난 이슈가 있고, 구현부터 기록까지 한 번에 넘기고 싶다.',
+        flow: [
+          'claim_issue',
+          'get_page (설계 문서)',
+          '~구현~',
+          'link_pr',
+          'create_page (작업 보고서)',
+          'add_comment (보고서 링크)',
+          'update_issue_status',
+        ],
+        human: 'PR 과 작업 보고서를 보고 완료를 승인한다. 보고서를 남기지 않으면 완료로 넘어가지 못한다.',
+      },
+      {
+        id: 'meeting-notes',
+        title: '회의가 끝나면 기록은 에이전트가',
+        situation: '논의는 끝났는데 회의록도 액션 아이템도 아무 데도 안 남는다.',
+        flow: ['create_page (회의록)', 'create_issue × N (액션 아이템)', 'add_comment (각 이슈에 회의록 링크)'],
+        human: '담당자와 우선순위는 사람이 정한다. 에이전트는 빠진 항목이 없게 받아 적는 쪽이다.',
+      },
+      {
+        id: 'backlog-triage',
+        title: '백로그 트리아지',
+        situation: '오래 방치된 이슈와 담당자 없는 이슈가 쌓여 어디부터 볼지 모르겠다.',
+        flow: ['search_issues (오래된 · 미배정)', 'get_issue', 'add_comment (중복 · 우선순위 제안)'],
+        human: '에이전트는 코멘트로 제안만 한다. 닫을지 올릴지 합칠지는 사람이 결정한다.',
+      },
+      {
+        id: 'doc-refresh',
+        title: '문서 최신화 초안',
+        situation: '코드는 바뀌었는데 설계 문서는 몇 달 전 그대로다.',
+        flow: ['find_pages', 'get_page', 'append_to_page (변경 요약 초안)'],
+        human: '원문은 건드리지 않고 뒤에 덧붙인다. 본문을 교체하는 update_page 는 사람이 확인한 뒤에.',
+      },
+      {
+        id: 'work-log',
+        title: '진행 기록이 저절로 쌓인다',
+        situation: '회고 때 "이번 스프린트에 무슨 일이 있었나"를 되짚을 근거가 없다.',
+        flow: ['claim_issue', 'add_comment (진행 메모)', 'log_work (시간)', '~대시보드 · 워크로그에서 집계~'],
+        human: '따로 적을 것이 없다. 사람은 쌓인 기록을 읽고 판단만 한다.',
+      },
+      {
+        id: 'status-qa',
+        title: '"이 기능 지금 어디까지 됐어?"',
+        situation: '상태를 묻는 질문마다 사람이 보드와 위키를 번갈아 뒤진다.',
+        flow: ['list_projects', 'search_issues', 'get_issue', 'find_pages', 'get_page'],
+        human: '읽기만 하는 페르소나를 따로 둘 수 있다 — 권한은 페르소나 단위로 스페이스·프로젝트에 준다.',
+      },
+      {
+        id: 'ci-automation',
+        title: 'CI 에서 거는 개인 자동화',
+        situation: '배포가 끝나면 이슈를 옮기고 릴리스 노트를 남기는 일을 사람이 매번 한다.',
+        flow: ['~MCP 가 아니라 개인 API 토큰(chanho_pat_)으로 REST 호출~', '~ALM 이슈 상태 전이~', '~위키 릴리스 노트 생성~'],
+        human: '토큰에 alm:write · wiki:write 처럼 필요한 스코프만 담아, 자동화가 건드릴 수 있는 범위를 미리 좁힌다.',
+        doc: { label: '실전 예제 — ALM', href: '/docs/spaces/3/pages/203' },
+      },
+    ],
+    setup: [
+      {
+        title: '페르소나와 전용 토큰을 발급한다',
+        body: '관리자가 페르소나를 하나 만든다. 이 호출 한 번이 auth-server 계정과 조직 멤버(kind=AGENT), 그리고 스페이스·프로젝트 권한까지 함께 세운다. 이어서 전용 토큰을 발급한다 — 토큰 값은 이때 한 번만 보인다. 전용 관리 화면은 아직 없고 관리자 API 로 발급한다.',
+        code: `# 관리자 액세스 토큰으로 한 번만
+curl -X POST https://<호스트>/api/agent/personas \\
+  -H "Authorization: Bearer <관리자-액세스-토큰>" \\
+  -H "Content-Type: application/json" \\
+  -d '{"slug":"jiho","role":"BACKEND","name":"지호",
+       "grants":[{"resourceType":"PROJECT","resourceId":"<프로젝트-id>","role":"EDITOR"}]}'
+
+curl -X POST https://<호스트>/api/agent/tokens \\
+  -H "Authorization: Bearer <관리자-액세스-토큰>" \\
+  -H "Content-Type: application/json" \\
+  -d '{"label":"my-claude-code","personaSlug":"jiho"}'`,
+      },
+      {
+        title: 'MCP 클라이언트에 등록한다',
+        body: 'Claude Code·Codex 같은 MCP 클라이언트에 게이트웨이 주소를 streamable-HTTP 로 등록하고, 발급받은 토큰을 헤더에 태운다. 진입점은 게이트웨이 하나뿐이라 서비스 주소를 따로 알 필요가 없다.',
+        code: `claude mcp add --transport http agent-platform \\
+  https://<호스트>/api/agent/mcp \\
+  --header "Authorization: Bearer agp_<발급받은-토큰>"`,
+      },
+      {
+        title: '이슈를 페르소나에게 맡긴다',
+        body: 'ping 으로 연결을, whoami 로 어떤 페르소나로 붙었는지 확인한 다음 이슈를 넘긴다. 그 뒤로는 서버가 내려주는 규약대로 움직인다 — 작업 전 get_project_context 로 스킴과 멤버를 확인하고, 이슈를 집을 때 claim_issue, 진행은 add_comment 와 log_work, 완료 전에는 위키 작업 보고서. 남는 기록의 작성자는 전부 페르소나이고, 도구 호출은 하나도 빠짐없이 감사 테이블에 적재된다.',
+      },
     ],
   },
   {
