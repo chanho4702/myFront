@@ -349,12 +349,15 @@ export async function fetchAlmActivity(size = 20): Promise<ActivityItem[]> {
  * 스페이스 **id** 다 — 키가 아니다(wiki-front `src/app/App.tsx`, `GlobalSidebar` 의 링크 생성과 동일).
  * 위키 SPA 는 base `/wiki/` 아래 뜨므로 그 접두사를 붙인다.
  *
- * `pageId` 는 대상이 페이지일 때만 오고(`targetType=PAGE`) 스페이스·템플릿·첨부 이벤트에는 없다.
- * `spaceKey` 는 이미 지워진 스페이스면 null 이다. 그래서 둘 중 하나라도 없으면 링크를 만들지 않고
- * 화면은 텍스트만 낸다 — 열리지 않는 주소를 걸지 않는다.
+ * 링크를 만들려면 세 가지가 다 있어야 한다 — 하나라도 없으면 화면은 텍스트만 낸다.
+ * - `pageId`: 대상이 페이지인 기록에만 있다(`PAGE_*` 등). 스페이스·템플릿 이벤트에는 없다.
+ * - `spaceId`: 서버 컬럼이 NOT NULL 이라 항상 온다. 라우트가 쓰는 값이 이것이다(키가 아니다).
+ * - `spaceKey`: **스페이스가 아직 살아 있다는 신호**로만 본다. 감사 기록은 스페이스보다 오래
+ *   살아서(V30) 지워진 스페이스의 기록은 spaceId 는 남고 spaceKey 만 null 이 된다 — 그때
+ *   spaceId 로 주소를 만들면 위키에서 404 가 난다.
  */
-function wikiPageHref(spaceId: string | null, pageId: string | null): string | null {
-  if (spaceId === null || pageId === null) return null;
+function wikiPageHref(spaceId: string | null, pageId: string | null, spaceKey: string | null): string | null {
+  if (spaceId === null || pageId === null || spaceKey === null) return null;
   return `/wiki/spaces/${spaceId}/pages/${pageId}`;
 }
 
@@ -410,7 +413,7 @@ export async function fetchWikiActivity(size = 20): Promise<ActivityItem[]> {
       detail: it.summary ?? '',
       occurredAt: it.occurredAt ?? '',
       actorId: idToString(it.actorId),
-      href: wikiPageHref(spaceId, idToString(it.pageId)),
+      href: wikiPageHref(spaceId, idToString(it.pageId), it.spaceKey ?? null),
     };
   });
 }
