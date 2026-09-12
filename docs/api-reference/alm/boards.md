@@ -228,6 +228,7 @@ curl -X DELETE "https://<your-host>/api/alm/boards/<boardId>" \
 | `[].createdAt` | `string(date-time)` |  | 생성 시각 | `2026-09-01T09:00:00Z` |
 | `[].updatedAt` | `string(date-time)` |  | 마지막 수정 시각 | `2026-09-04T15:20:00Z` |
 | `[].archivedAt` | `string(date-time)` |  | 보관 시각. 보관 상태가 아니면 null |  |
+| `[].resolvedAt` | `string(date-time)` |  | 해결일 — 완료 사유가 처음 붙은 시각. 미해결이면 null | `2026-09-10T04:12:00Z` |
 
 ### curl
 

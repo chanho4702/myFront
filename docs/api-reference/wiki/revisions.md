@@ -98,11 +98,20 @@ curl -X GET "https://<your-host>/api/wiki/pages/<pageId>/revisions/<version>" \
 | `pageId` | path | `integer(int64)` | 예 | 페이지 ID |
 | `version` | path | `integer(int32)` | 예 | 되돌릴 버전 번호 |
 
+### 요청 본문
+
+`application/json` — `RevisionRestoreRequest`
+
+| 필드 | 타입 | 필수 | 설명 | 예시 |
+| --- | --- | --- | --- | --- |
+| `changeNote` | `string` |  | 복원으로 생기는 새 리비전에 남길 변경 요약. 비우면 "v{n} 버전으로 복원" | `장애 전 상태로 되돌림` |
+
 ### 응답
 
 | 상태 | 설명 | 스키마 |
 | --- | --- | --- |
 | `200` | OK | `PageResponse` |
+| `400` | 요청 검증 실패 | `PlatformError` |
 | `401` | 인증 실패 — 토큰 없음·만료·무효 | `PlatformError` |
 | `403` | 권한 없음 | `PlatformError` |
 | `404` | 대상 없음 | `PlatformError` |
@@ -135,5 +144,9 @@ curl -X GET "https://<your-host>/api/wiki/pages/<pageId>/revisions/<version>" \
 
 ```bash
 curl -X POST "https://<your-host>/api/wiki/pages/<pageId>/revisions/<version>/restore" \
-  -H "Authorization: Bearer chanho_pat_…"
+  -H "Authorization: Bearer chanho_pat_…" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "changeNote": "장애 전 상태로 되돌림"
+  }'
 ```

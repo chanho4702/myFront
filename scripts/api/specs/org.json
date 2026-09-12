@@ -33,6 +33,10 @@
       "description": "초대 — 이메일로 사람을 조직에 들인다. 팀·권한 프리셋을 함께 담아 두면 수락 시점에 적용된다."
     },
     {
+      "name": "Mail",
+      "description": "플랫폼 메일 — 설정 한 벌과 발송 큐. 위키·ALM·초대가 모두 이 설정으로 나간다."
+    },
+    {
       "name": "Me",
       "description": "내 정보 — 프로필·소속 팀·권한. 승인 대기 계정도 이 경로만은 읽을 수 있다."
     },
@@ -1633,6 +1637,306 @@
         }
       }
     },
+    "/api/org/settings/mail": {
+      "get": {
+        "tags": [
+          "Mail"
+        ],
+        "summary": "메일 설정 조회 — 비밀번호는 담기지 않고 저장 여부만 나온다",
+        "operationId": "get",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MailSettingResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Mail"
+        ],
+        "summary": "메일 설정 저장 — password는 생략=유지, \"\"=삭제, 값=교체",
+        "operationId": "put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MailSettingUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MailSettingResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/settings/mail/log": {
+      "get": {
+        "tags": [
+          "Mail"
+        ],
+        "summary": "발송 로그 조회 — 큐이자 로그다(30일 보관)",
+        "operationId": "log",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "상태 필터 — PENDING | SENT | FAILED. 미지정이면 전부.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "0부터 세는 페이지 번호",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "페이지 크기(최대 100)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageResponseMailLogItem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/settings/mail/log/{id}/retry": {
+      "post": {
+        "tags": [
+          "Mail"
+        ],
+        "summary": "실패한 발송 다시 보내기 — FAILED를 PENDING으로 되돌린다",
+        "operationId": "retry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "발송 로그 id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "대상 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "실패한 발송만 다시 보낼 수 있습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/org/settings/mail/test": {
+      "post": {
+        "tags": [
+          "Mail"
+        ],
+        "summary": "테스트 발송 — 동기. 실패해도 200이고 error에 SMTP 문구가 그대로 담긴다",
+        "operationId": "test",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MailTestRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MailTestResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 검증 실패",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패 — 토큰 없음·만료·무효",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/org/teams": {
       "get": {
         "tags": [
@@ -2722,6 +3026,230 @@
           }
         }
       },
+      "MailLogItem": {
+        "type": "object",
+        "description": "발송 로그 한 줄. 본문은 담지 않는다.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "로그 id",
+            "example": 42
+          },
+          "to": {
+            "type": "string",
+            "description": "받는 주소",
+            "example": "chanho@example.com"
+          },
+          "subject": {
+            "type": "string",
+            "description": "제목",
+            "example": "[플랫폼] 김찬호님이 초대했습니다"
+          },
+          "source": {
+            "type": "string",
+            "description": "출처 — wiki | alm | org | test",
+            "example": "org"
+          },
+          "status": {
+            "type": "string",
+            "description": "상태",
+            "enum": [
+              "PENDING",
+              "SENT",
+              "FAILED"
+            ],
+            "example": "SENT"
+          },
+          "attempts": {
+            "type": "integer",
+            "format": "int32",
+            "description": "시도 횟수. 5회를 다 쓰면 FAILED다.",
+            "example": 1
+          },
+          "lastError": {
+            "type": "string",
+            "description": "마지막 실패 사유(SMTP 원문). 성공이면 null."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "큐에 들어온 시각"
+          },
+          "sentAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "보낸 시각. 아직이면 null."
+          }
+        }
+      },
+      "MailSettingResponse": {
+        "type": "object",
+        "description": "플랫폼 메일 설정. 비밀번호는 응답에 담기지 않고 저장 여부만 알려 준다.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "메일 발송 사용 여부. false면 큐에 넣지 않고 곧바로 disabled로 답한다.",
+            "example": true
+          },
+          "mode": {
+            "type": "string",
+            "description": "설치 시 고른 인프라 모드(MAIL_MODE) — none | external | relay | full | dev. 읽기 전용 안내값이다.",
+            "enum": [
+              "none",
+              "external",
+              "relay",
+              "full",
+              "dev"
+            ],
+            "example": "relay"
+          },
+          "host": {
+            "type": "string",
+            "description": "SMTP 호스트",
+            "example": "mail-relay"
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "description": "SMTP 포트",
+            "example": 25
+          },
+          "username": {
+            "type": "string",
+            "description": "SMTP 사용자. 비면 인증 없이 보낸다(사내 릴레이).",
+            "example": "platform@example.com"
+          },
+          "passwordSet": {
+            "type": "boolean",
+            "description": "비밀번호가 저장돼 있는가. 값 자체는 절대 내려가지 않는다.",
+            "example": true
+          },
+          "tls": {
+            "type": "string",
+            "description": "전송 보안",
+            "enum": [
+              "NONE",
+              "STARTTLS",
+              "SSL"
+            ],
+            "example": "STARTTLS"
+          },
+          "fromAddress": {
+            "type": "string",
+            "description": "보내는 주소",
+            "example": "no-reply@example.com"
+          },
+          "fromName": {
+            "type": "string",
+            "description": "보내는 이름",
+            "example": "플랫폼"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "마지막 저장 시각"
+          },
+          "updatedBy": {
+            "type": "integer",
+            "format": "int64",
+            "description": "마지막으로 저장한 멤버 id. 최초 시드(env)면 null.",
+            "example": 1
+          }
+        }
+      },
+      "MailSettingUpdateRequest": {
+        "type": "object",
+        "description": "메일 설정 저장. password는 생략하면 유지, 빈 문자열이면 삭제, 값이 있으면 교체다.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "메일 발송 사용 여부. true면 host·port·fromAddress가 필수다.",
+            "example": true
+          },
+          "host": {
+            "type": "string",
+            "description": "SMTP 호스트",
+            "example": "mail-relay",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "description": "SMTP 포트",
+            "example": 25,
+            "maximum": 65535,
+            "minimum": 1
+          },
+          "username": {
+            "type": "string",
+            "description": "SMTP 사용자. 비우면 인증 없이 보낸다.",
+            "example": "platform@example.com",
+            "maxLength": 320,
+            "minLength": 0
+          },
+          "password": {
+            "type": "string",
+            "description": "SMTP 비밀번호. 생략=유지, \"\"=삭제, 값=교체. 저장하려면 ORG_SETTINGS_ENC_KEY가 있어야 한다.",
+            "maxLength": 500,
+            "minLength": 0
+          },
+          "tls": {
+            "type": "string",
+            "description": "전송 보안",
+            "enum": [
+              "NONE",
+              "STARTTLS",
+              "SSL"
+            ],
+            "example": "STARTTLS"
+          },
+          "fromAddress": {
+            "type": "string",
+            "description": "보내는 주소",
+            "example": "no-reply@example.com",
+            "maxLength": 320,
+            "minLength": 0
+          },
+          "fromName": {
+            "type": "string",
+            "description": "보내는 이름",
+            "example": "플랫폼",
+            "maxLength": 120,
+            "minLength": 0
+          }
+        }
+      },
+      "MailTestRequest": {
+        "type": "object",
+        "description": "테스트 발송 대상. 비우면 요청한 관리자 본인에게 보낸다.",
+        "properties": {
+          "to": {
+            "type": "string",
+            "description": "받는 주소. 생략하면 요청자의 이메일.",
+            "example": "chanho@example.com",
+            "maxLength": 320,
+            "minLength": 0
+          }
+        }
+      },
+      "MailTestResponse": {
+        "type": "object",
+        "description": "테스트 발송 결과. 실패해도 200이고 error에 SMTP 문구가 그대로 담긴다.",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "description": "보냈는가",
+            "example": false
+          },
+          "error": {
+            "type": "string",
+            "description": "실패 사유(SMTP 원문). 성공이면 null.",
+            "example": "Couldn't connect to host, port: mail-relay, 25"
+          }
+        }
+      },
       "MeResponse": {
         "type": "object",
         "description": "내 프로필. 프론트의 전역 관리자 판정은 globalRoles에 ADMIN이 있는지로 통일한다.",
@@ -3084,6 +3612,37 @@
             "description": "이 페이지의 항목",
             "items": {
               "$ref": "#/components/schemas/InvitationResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "description": "0부터 세는 페이지 번호",
+            "example": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "description": "페이지 크기",
+            "example": 20
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "전체 항목 수",
+            "example": 137
+          }
+        }
+      },
+      "PageResponseMailLogItem": {
+        "type": "object",
+        "description": "목록 응답 봉투. Spring Data Page의 구현 세부는 담지 않는다 — 프론트가 읽는 것은 네 개뿐이다.",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "이 페이지의 항목",
+            "items": {
+              "$ref": "#/components/schemas/MailLogItem"
             }
           },
           "page": {

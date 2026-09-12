@@ -3,7 +3,7 @@
   "info": {
     "description": "스페이스와 계층형 페이지, 버전 이력, 첨부, 댓글을 다루는 위키 정본 서비스.\n모든 경로는 `/api/wiki` 아래에 있고, 인가는 org-service의 스페이스 권한으로 판정한다.\n오류 응답은 플랫폼 공통 계약인 `{\"error\": \"메시지\"}` 한 가지다.",
     "title": "WIKI API",
-    "version": "0.0.1-SNAPSHOT"
+    "version": "15ee137-20260912"
   },
   "servers": [
     {
@@ -30,7 +30,7 @@
       "name": "Attachments"
     },
     {
-      "description": "스페이스 감사 로그 조회.",
+      "description": "감사 로그 조회 — 스페이스 스코프와 전역 피드.",
       "name": "Audit"
     },
     {
@@ -616,6 +616,100 @@
         "summary": "지난 버전을 현재 첨부로 되돌린다 — 되돌린 것도 새 버전으로 쌓인다",
         "tags": [
           "Attachments"
+        ]
+      }
+    },
+    "/api/wiki/audit": {
+      "get": {
+        "operationId": "feed",
+        "parameters": [
+          {
+            "description": "0부터 세는 페이지 번호. 음수면 0으로 본다",
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "description": "페이지 크기. 기본 20, 상한 100 — 넘겨도 거절하지 않고 100으로 자른다",
+            "in": "query",
+            "name": "size",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "description": "eventType 필터(선택). 모르는 값이면 400",
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "이 시각 이후만(선택, ISO-8601 — 예: 2026-09-01T00:00:00Z)",
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditFeedPage"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "인증 실패 — 토큰 없음·만료·무효"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "권한 없음"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "권한 서비스(org) 불능"
+          }
+        },
+        "summary": "전역 감사 피드를 조회한다 — 전역 관리자만",
+        "tags": [
+          "Audit"
         ]
       }
     },
@@ -4578,6 +4672,15 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevisionRestoreRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "content": {
@@ -4588,6 +4691,16 @@
               }
             },
             "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformError"
+                }
+              }
+            },
+            "description": "요청 검증 실패"
           },
           "401": {
             "content": {
@@ -7723,6 +7836,92 @@
           }
         }
       },
+      "AuditFeedItem": {
+        "type": "object",
+        "description": "전역 감사 피드 항목.",
+        "properties": {
+          "actorId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "조작한 사용자 ID",
+            "example": 7
+          },
+          "eventType": {
+            "type": "string",
+            "description": "조작 종류. PAGE_TRASHED(페이지 휴지통 이동), PAGE_RESTORED(페이지 복원), PAGE_PURGED(페이지 완전 삭제), PAGE_ARCHIVED(페이지 보관), PAGE_UNARCHIVED(페이지 보관 해제), PAGE_RESTRICTIONS_CHANGED(페이지 제한 변경), PAGE_OWNER_CHANGED(페이지 소유자 변경), PAGE_VERIFIED(페이지 검증), PAGE_UNVERIFIED(페이지 검증 해제), ATTACHMENT_DELETED(첨부 삭제), SPACE_UPDATED(스페이스 정보 변경), SPACE_DELETED(스페이스 삭제), TEMPLATE_CREATED(템플릿 생성), TEMPLATE_UPDATED(템플릿 수정), TEMPLATE_DELETED(템플릿 삭제), IMPORTED(외부 위키에서 이관) 중 하나. 본문 수정은 리비전이 남기므로 감사 로그에 없다.",
+            "example": "PAGE_TRASHED"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "감사 기록 ID",
+            "example": 123
+          },
+          "occurredAt": {
+            "type": "string",
+            "description": "발생 시각(ISO-8601 UTC)",
+            "example": "2026-09-12T01:02:03Z"
+          },
+          "pageId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "대상 페이지 ID. 페이지 대상 기록이 아니면 null",
+            "example": 55
+          },
+          "spaceId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "대상 스페이스 ID",
+            "example": 3
+          },
+          "spaceKey": {
+            "type": "string",
+            "description": "대상 스페이스 key. 이미 지워진 스페이스면 null",
+            "example": "DOCS"
+          },
+          "summary": {
+            "type": "string",
+            "description": "한 줄 요약 — 조작 라벨에 상세가 있으면 덧붙인다",
+            "example": "페이지 휴지통 이동"
+          },
+          "targetTitle": {
+            "type": "string",
+            "description": "대상의 그때 이름(페이지 제목·첨부 파일명·스페이스 이름 등)",
+            "example": "설계 문서"
+          }
+        }
+      },
+      "AuditFeedPage": {
+        "type": "object",
+        "description": "전역 감사 피드 한 페이지.",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "이 페이지의 기록. 최신이 먼저",
+            "items": {
+              "$ref": "#/components/schemas/AuditFeedItem"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "description": "0부터 세는 페이지 번호",
+            "example": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "description": "실제 적용된 페이지 크기(상한 100)",
+            "example": 20
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "필터를 적용한 전체 건수",
+            "example": 1234
+          }
+        }
+      },
       "BlogPostView": {
         "type": "object",
         "properties": {
@@ -8737,6 +8936,19 @@
           "version": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "RevisionRestoreRequest": {
+        "type": "object",
+        "description": "리비전 복원 요청. 본문 전체가 선택이며, 비우면 기본 요약이 남는다.",
+        "properties": {
+          "changeNote": {
+            "type": "string",
+            "description": "복원으로 생기는 새 리비전에 남길 변경 요약. 비우면 \"v{n} 버전으로 복원\"",
+            "example": "장애 전 상태로 되돌림",
+            "maxLength": 500,
+            "minLength": 0
           }
         }
       },

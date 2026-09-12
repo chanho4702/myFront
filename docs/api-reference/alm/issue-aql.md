@@ -66,6 +66,7 @@ AQL로 이슈를 검색한다
 | `items[].createdAt` | `string(date-time)` |  | 생성 시각 | `2026-09-01T09:00:00Z` |
 | `items[].updatedAt` | `string(date-time)` |  | 마지막 수정 시각 | `2026-09-04T15:20:00Z` |
 | `items[].archivedAt` | `string(date-time)` |  | 보관 시각. 보관 상태가 아니면 null |  |
+| `items[].resolvedAt` | `string(date-time)` |  | 해결일 — 완료 사유가 처음 붙은 시각. 미해결이면 null | `2026-09-10T04:12:00Z` |
 | `page` | `integer(int32)` |  | 0부터 세는 페이지 번호 |  |
 | `size` | `integer(int32)` |  | 한 페이지 항목 수 |  |
 | `total` | `integer(int64)` |  | 조건을 적용한 전체 건수 |  |

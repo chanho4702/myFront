@@ -8,7 +8,7 @@
 | --- | --- |
 | 버전 | `0.1.0` |
 | 기본 URL | `https://<your-host>` |
-| 엔드포인트 | 125 |
+| 엔드포인트 | 132 |
 
 ## 인증
 
@@ -41,11 +41,13 @@ Authorization: Bearer chanho_pat_…
 | [Priorities](priorities.md) | 우선순위 레지스트리와 사용량 | 6 |
 | [Project Settings](project-settings.md) | 프로젝트에 적용되는 설정 스킴과 개별 재정의 | 4 |
 | [Projects](projects.md) | 프로젝트 생성·수정·보관·휴지통 | 10 |
+| [Saved Filters](saved-filters.md) | 내 저장 필터(스마트 검색·AQL) | 4 |
 | [Settings Schemes](settings-schemes.md) | 설정 스킴 정의와 기본 스킴 지정 | 6 |
 | [Sprints](sprints.md) | 스프린트 계획·시작·완료 | 6 |
 | [Status Categories](status-categories.md) | 상태 카테고리 레지스트리 | 5 |
 | [Statuses](statuses.md) | 상태 레지스트리와 사용량 | 5 |
 | [Versions](versions.md) | 릴리스 버전 관리와 배포 표시 | 6 |
+| [Web Links](web-links.md) | 이슈에 붙는 외부 링크(PR·커밋·웹) — 에이전트 git 연결 | 3 |
 | [Worklogs](worklogs.md) | 작업 시간 기록과 프로젝트 집계 | 4 |
 
 ## 공통 오류

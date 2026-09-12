@@ -8,9 +8,9 @@
 
 | 항목 | 값 |
 | --- | --- |
-| 버전 | `0.0.1-SNAPSHOT` |
+| 버전 | `15ee137-20260912` |
 | 기본 URL | `https://<your-host>` |
-| 엔드포인트 | 96 |
+| 엔드포인트 | 97 |
 
 ## 인증
 
@@ -27,7 +27,7 @@ Authorization: Bearer chanho_pat_…
 | [Admin](admin.md) | 플랫폼 관리자 전용 위키 현황. 전역 관리자만 읽을 수 있다. | 1 |
 | [Archive](archive.md) | 페이지 보관과 보관 해제. | 3 |
 | [Attachments](attachments.md) | 페이지 첨부 파일의 업로드·목록·내려받기와 버전 관리. | 9 |
-| [Audit](audit.md) | 스페이스 감사 로그 조회. | 2 |
+| [Audit](audit.md) | 감사 로그 조회 — 스페이스 스코프와 전역 피드. | 3 |
 | [Blog](blog.md) | 스페이스 블로그 글 목록. 글 자체는 페이지 API로 다룬다. | 1 |
 | [Collaboration](collaboration.md) | 공동 편집 세션 접속용 1회용 티켓. | 1 |
 | [Comments](comments.md) | 페이지 댓글과 본문 구간에 붙는 인라인 스레드. | 5 |
