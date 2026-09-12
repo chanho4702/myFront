@@ -12,7 +12,7 @@
 //   GET /api/alm/admin/stats        → AlmStats
 //   GET /api/org/admin/stats        → OrgStats
 //   GET /api/alm/admin/audit        → AuditPageResponse
-//   GET /api/wiki/audit/space-deletions → AuditEntry[]  (위키의 유일한 전역 감사 경로)
+//   GET /api/wiki/audit             → WikiAuditPage    (위키 전역 감사 피드)
 //
 // 부하 원칙(§0): 헬스만 60초 폴링하고 통계는 진입 1회 + 수동 새로고침이다. 폴링은 화면이
 // 담당하며(document.hidden 이면 중단) 이 모듈은 단순 호출자로 남는다.
@@ -277,16 +277,24 @@ interface AlmAuditPage {
   total: number;
 }
 
-/** 위키 감사 1건(`AuditEntry`) — createdAt 은 레퍼런스상 date-time 이 아닌 문자열이다. */
-interface WikiAuditEntry {
+/** 위키 전역 감사 1건(`GET /api/wiki/audit` 의 items). */
+interface WikiAuditLog {
   id: number;
-  action: string;
+  eventType: string;
   actorId: number | null;
-  createdAt: string;
-  detail: string | null;
-  targetId: number | null;
-  targetLabel: string | null;
-  targetType: string | null;
+  spaceId: number | null;
+  spaceKey: string | null;
+  pageId: number | null;
+  targetTitle: string | null;
+  summary: string | null;
+  occurredAt: string; // ISO
+}
+
+interface WikiAuditPage {
+  items: WikiAuditLog[];
+  page: number;
+  size: number;
+  total: number;
 }
 
 /** 두 제품의 감사를 하나로 합친 표시용 항목. */
@@ -298,6 +306,8 @@ export interface ActivityItem {
   detail: string;
   occurredAt: string; // ISO 또는 빈 문자열
   actorId: number | null;
+  /** 대상 화면으로 가는 절대 경로. 만들 수 없으면 null 이고 화면은 텍스트만 낸다. */
+  href: string | null;
 }
 
 /**
@@ -317,27 +327,48 @@ export async function fetchAlmActivity(size = 20): Promise<ActivityItem[]> {
     detail: it.summary ?? '',
     occurredAt: it.occurredAt ?? '',
     actorId: it.actorId ?? null,
+    // ALM 은 이슈 키만 주고 프로젝트 경로를 주지 않아 링크를 만들지 않는다.
+    href: null,
   }));
 }
 
 /**
- * 위키의 전역 감사. 현재 전역 관리자가 볼 수 있는 위키 감사 경로는 스페이스 삭제 기록뿐이라
- * (`/api/wiki/audit/space-deletions`, 페이지네이션 없음) 그것만 모은다. 스페이스별 감사
- * (`/api/wiki/spaces/{id}/audit`)는 스페이스 ADMIN 전용이라 대시보드에서 전역으로 쓸 수 없다.
+ * 위키 페이지 링크. wiki-front 의 라우트는 `/spaces/:spaceId/pages/:pageId` 이고 `:spaceId` 는
+ * 스페이스 **id** 다 — 키가 아니다(wiki-front `src/app/App.tsx`, `GlobalSidebar` 의 링크 생성과 동일).
+ * 위키 SPA 는 base `/wiki/` 아래 뜨므로 그 접두사를 붙인다. 둘 중 하나라도 없으면 링크를 만들지 않는다.
  */
-export async function fetchWikiActivity(): Promise<ActivityItem[]> {
-  const body = await getJson<WikiAuditEntry[]>(
-    '/api/wiki/audit/space-deletions',
-    '위키 활동 기록을 불러오지 못했습니다.',
-  );
-  const items = Array.isArray(body) ? body : [];
+function wikiPageHref(spaceId: number | null, pageId: number | null): string | null {
+  if (spaceId == null || pageId == null) return null;
+  return `/wiki/spaces/${spaceId}/pages/${pageId}`;
+}
+
+/**
+ * 위키의 전역 감사 최근 n건(`GET /api/wiki/audit`). 아직 배포되지 않은 서버는 404 를 주므로
+ * 그때는 "ALM 만 보인다"는 뜻이 드러나는 문구로 바꿔 던진다 — 화면이 경고 배너로 받는다.
+ */
+export async function fetchWikiActivity(size = 20): Promise<ActivityItem[]> {
+  let body: WikiAuditPage;
+  try {
+    body = await getJson<WikiAuditPage>(
+      `/api/wiki/audit?page=0&size=${size}`,
+      '위키 활동 기록을 불러오지 못했습니다.',
+    );
+  } catch (e: unknown) {
+    if (e instanceof AdminApiError && e.status === 404) {
+      throw new AdminApiError(404, '위키 감사 피드가 아직 배포되지 않았습니다. ALM 활동만 표시합니다.');
+    }
+    throw e;
+  }
+  const items = Array.isArray(body?.items) ? body.items : [];
   return items.map((it) => ({
     key: `wiki-${it.id}`,
     source: 'WIKI' as const,
-    action: it.action ?? '',
-    target: it.targetLabel ?? (it.targetId != null ? `#${it.targetId}` : ''),
-    detail: it.detail ?? '',
-    occurredAt: it.createdAt ?? '',
+    action: it.eventType ?? '',
+    target:
+      it.targetTitle ?? it.spaceKey ?? (it.spaceId != null ? `스페이스 #${it.spaceId}` : ''),
+    detail: it.summary ?? '',
+    occurredAt: it.occurredAt ?? '',
     actorId: it.actorId ?? null,
+    href: wikiPageHref(it.spaceId ?? null, it.pageId ?? null),
   }));
 }

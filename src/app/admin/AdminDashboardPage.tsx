@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -21,6 +22,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type { SxProps, Theme } from '@mui/material/styles';
+import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import ErrorRoundedIcon from '@mui/icons-material/ErrorRounded';
 import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
@@ -187,6 +190,8 @@ function StatCard({
 interface ToolLink {
   label: string;
   href: string;
+  /** 이 앱 안의 라우트 — 전체 페이지 이동 없이 react-router 로 간다. */
+  router?: boolean;
   /** 내부망에서만 열리는 링크(nginx 뒤로 공개하지 않는다). */
   internal?: boolean;
   hint?: string;
@@ -203,6 +208,7 @@ function buildToolLinks(): { product: ToolLink[]; internal: ToolLink[] } {
   const host = typeof window !== 'undefined' && window.location.hostname ? window.location.hostname : 'localhost';
   return {
     product: [
+      { label: '플랫폼 · AI 에이전트', href: '/app/agents', router: true },
       { label: '위키 · 조직 관리', href: '/wiki/admin/org' },
       { label: '위키 · 검색 색인', href: '/wiki/admin/search' },
       { label: '위키 · 이관', href: '/wiki/admin/migrations' },
@@ -231,32 +237,54 @@ function buildToolLinks(): { product: ToolLink[]; internal: ToolLink[] } {
   };
 }
 
+const toolLinkSx: SxProps<Theme> = (theme) => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 0.75,
+  px: 1.5,
+  py: 1,
+  borderRadius: 1,
+  border: '1px solid',
+  borderColor: 'divider',
+  color: 'text.primary',
+  fontSize: theme.typography.body2.fontSize,
+  '&:hover': { borderColor: 'primary.main', color: 'primary.main' },
+});
+
+function ToolLinkContent({ link }: { link: ToolLink }) {
+  return (
+    <>
+      {link.internal ? (
+        <LockOutlinedIcon fontSize="small" aria-hidden />
+      ) : link.router ? (
+        <ArrowForwardRoundedIcon fontSize="small" aria-hidden />
+      ) : (
+        <OpenInNewRoundedIcon fontSize="small" aria-hidden />
+      )}
+      {link.label}
+      {link.internal && (
+        <Chip size="small" label="내부망" variant="outlined" color="warning" sx={{ ml: 0.5 }} />
+      )}
+    </>
+  );
+}
+
 function ToolLinkButton({ link }: { link: ToolLink }) {
-  const body = (
+  // 이 앱 안의 라우트는 전체 페이지를 다시 받지 않도록 router Link 로, 그 밖(위키·ALM·운영 콘솔)은
+  // 라우터 밖이라 실제 이동이다.
+  const body = link.router ? (
+    <Link component={RouterLink} to={link.href} underline="none" sx={toolLinkSx}>
+      <ToolLinkContent link={link} />
+    </Link>
+  ) : (
     <Link
       href={link.href}
       target={link.internal ? '_blank' : undefined}
       rel={link.internal ? 'noreferrer' : undefined}
       underline="none"
-      sx={(theme) => ({
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 0.75,
-        px: 1.5,
-        py: 1,
-        borderRadius: 1,
-        border: '1px solid',
-        borderColor: 'divider',
-        color: 'text.primary',
-        fontSize: theme.typography.body2.fontSize,
-        '&:hover': { borderColor: 'primary.main', color: 'primary.main' },
-      })}
+      sx={toolLinkSx}
     >
-      {link.internal ? <LockOutlinedIcon fontSize="small" aria-hidden /> : <OpenInNewRoundedIcon fontSize="small" aria-hidden />}
-      {link.label}
-      {link.internal && (
-        <Chip size="small" label="내부망" variant="outlined" color="warning" sx={{ ml: 0.5 }} />
-      )}
+      <ToolLinkContent link={link} />
     </Link>
   );
   return link.hint ? <Tooltip title={link.hint}>{body}</Tooltip> : body;
@@ -583,7 +611,7 @@ interface ActivityResult {
 async function loadActivity(): Promise<ActivityResult> {
   const [almResult, wikiResult] = await Promise.allSettled([
     fetchAlmActivity(ACTIVITY_LIMIT),
-    fetchWikiActivity(),
+    fetchWikiActivity(ACTIVITY_LIMIT),
   ]);
 
   const failures: string[] = [];
@@ -651,7 +679,9 @@ function ActivityList({ result }: { result: ActivityResult }) {
                 />
               </TableCell>
               <TableCell sx={{ fontFamily: 'monospace', fontSize: 12 }}>{item.action || '—'}</TableCell>
-              <TableCell sx={{ color: 'text.secondary' }}>{item.target || '—'}</TableCell>
+              <TableCell sx={{ color: 'text.secondary' }}>
+                <ActivityTarget item={item} />
+              </TableCell>
               <TableCell sx={{ color: 'text.secondary' }}>{item.detail || '—'}</TableCell>
               <TableCell sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>
                 {formatDateTime(item.occurredAt)}
@@ -661,6 +691,20 @@ function ActivityList({ result }: { result: ActivityResult }) {
         </TableBody>
       </Table>
     </>
+  );
+}
+
+/**
+ * 활동 1건의 대상. 위키 페이지처럼 열어 볼 곳이 있으면 링크로, 없으면 텍스트로 낸다.
+ * 위키·ALM 은 라우터 밖의 별도 SPA 라 router Link 가 아니라 실제 이동이다.
+ */
+function ActivityTarget({ item }: { item: ActivityItem }) {
+  const text = item.target || '—';
+  if (!item.href || !item.target) return <>{text}</>;
+  return (
+    <Link href={item.href} underline="hover" color="inherit">
+      {text}
+    </Link>
   );
 }
 

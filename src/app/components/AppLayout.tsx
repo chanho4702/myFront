@@ -59,6 +59,9 @@ function useCrumbs(pathname: string, isGlobalAdmin: boolean): Crumb[] {
   if (pathname.startsWith('/app/tokens')) {
     crumbs.push({ label: 'API 토큰', to: '/app/tokens' });
   }
+  if (pathname.startsWith('/app/agents')) {
+    crumbs.push({ label: 'AI 에이전트', to: '/app/agents' });
+  }
   return crumbs;
 }
 

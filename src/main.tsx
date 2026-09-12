@@ -13,6 +13,7 @@ import BoardListPage from './app/board/BoardListPage';
 import BoardDetailPage from './app/board/BoardDetailPage';
 import BoardFormPage from './app/board/BoardFormPage';
 import TokensPage from './app/tokens/TokensPage';
+import AgentsPage from './app/agents/AgentsPage';
 import DesignsLayout from './app/designs/DesignsLayout';
 import DesignsHome from './app/designs/DesignsHome';
 import DesignsDetailPage from './app/designs/DesignsDetailPage';
@@ -79,6 +80,8 @@ const router = createBrowserRouter([
       { path: 'board/:id', element: <BoardDetailPage /> },
       { path: 'board/:id/edit', element: <BoardFormPage /> },
       { path: 'tokens', element: <TokensPage /> },
+      // AI 에이전트(페르소나·토큰) — 화면 스스로 전역 관리자 여부를 판정해 비관리자에게는 안내만 낸다.
+      { path: 'agents', element: <AgentsPage /> },
     ],
   },
 

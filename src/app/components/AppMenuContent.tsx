@@ -10,6 +10,7 @@ import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded';
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import KeyRoundedIcon from '@mui/icons-material/KeyRounded';
+import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import { useAdminIdentity } from '../admin/adminStore';
@@ -19,6 +20,7 @@ interface MenuItem {
   icon: React.ReactNode;
   path?: string; // 없으면 비활성 placeholder
   href?: string; // 별도 SPA(위키/ALM) — 라우터 밖이라 전체 페이지 이동. nginx 단일 오리진에서만 유효
+  adminOnly?: boolean; // 전역 관리자에게만 보인다(화면 자체도 서버 판정으로 다시 막는다)
 }
 
 // `/app` 인덱스는 관리자면 플랫폼 점검 대시보드, 아니면 바로가기 홈이다 — 라벨도 그에 맞춘다.
@@ -28,6 +30,7 @@ const mainItems: MenuItem[] = [
   { text: '위키', icon: <MenuBookRoundedIcon />, href: '/wiki/' },
   { text: 'ALM', icon: <AssignmentRoundedIcon />, href: '/alm/' },
   { text: 'API 토큰', icon: <KeyRoundedIcon />, path: '/app/tokens' },
+  { text: 'AI 에이전트', icon: <SmartToyRoundedIcon />, path: '/app/agents', adminOnly: true },
 ];
 
 const secondaryItems: MenuItem[] = [
@@ -47,9 +50,9 @@ export default function AppMenuContent({ onNavigate }: { onNavigate?: () => void
   const location = useLocation();
   const { isGlobalAdmin } = useAdminIdentity();
 
-  const items = mainItems.map((item) =>
-    item.path === '/app' && isGlobalAdmin ? { ...item, text: '관리자 대시보드' } : item,
-  );
+  const items = mainItems
+    .filter((item) => !item.adminOnly || isGlobalAdmin)
+    .map((item) => (item.path === '/app' && isGlobalAdmin ? { ...item, text: '관리자 대시보드' } : item));
 
   const go = (item: MenuItem) => {
     if (item.href) {
