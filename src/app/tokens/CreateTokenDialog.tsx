@@ -24,8 +24,10 @@ import {
   isReadLocked,
   PRODUCT_LABEL,
   PRODUCTS,
+  READ_ONLY_PRODUCTS,
   SCOPE_DESCRIPTION,
   toggleAdmin,
+  toggleReadOnlyScope,
   toggleScope,
   toScopes,
   type ScopeId,
@@ -124,7 +126,8 @@ export default function CreateTokenDialog({ open, onClose, onCreated }: Props) {
               </Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                 토큰이 부를 수 있는 API를 제품별로 고릅니다. 쓰기를 켜면 같은 제품의 읽기가 함께
-                켜집니다. 스코프는 내 권한을 넘지 못합니다 — 내가 못 하는 일은 토큰도 못 합니다.
+                켜집니다. 검색은 읽기만 있습니다. 스코프는 내 권한을 넘지 못합니다 — 내가 못 하는
+                일은 토큰도 못 합니다.
               </Typography>
 
               <Stack spacing={0.5} sx={{ mt: 1.5 }}>
@@ -176,6 +179,38 @@ export default function CreateTokenDialog({ open, onClose, onCreated }: Props) {
                     </Stack>
                   );
                 })}
+
+                {READ_ONLY_PRODUCTS.map((product) => (
+                  <Stack
+                    key={product}
+                    direction="row"
+                    spacing={2}
+                    sx={{ alignItems: 'center', flexWrap: 'wrap' }}
+                  >
+                    <Typography variant="body2" sx={{ fontWeight: 600, minWidth: 64 }}>
+                      {PRODUCT_LABEL[product]}
+                    </Typography>
+                    <Tooltip title={SCOPE_DESCRIPTION[`${product}:read` as ScopeId]}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            size="small"
+                            checked={selection[product]}
+                            disabled={submitting}
+                            onChange={(e) =>
+                              setSelection((prev) => toggleReadOnlyScope(prev, product, e.target.checked))
+                            }
+                            slotProps={{ input: { 'aria-label': `${PRODUCT_LABEL[product]} 읽기` } }}
+                          />
+                        }
+                        label={<Typography variant="body2">읽기</Typography>}
+                      />
+                    </Tooltip>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      쓰기 없음
+                    </Typography>
+                  </Stack>
+                ))}
 
                 <Tooltip title={SCOPE_DESCRIPTION.admin}>
                   <FormControlLabel
