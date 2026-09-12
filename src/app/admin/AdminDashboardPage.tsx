@@ -29,6 +29,7 @@ import ErrorRoundedIcon from '@mui/icons-material/ErrorRounded';
 import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import {
@@ -36,6 +37,7 @@ import {
   fetchAlmActivity,
   fetchAlmStats,
   fetchOrgStats,
+  fetchPlatformFeatures,
   fetchPlatformHealth,
   fetchTokenStats,
   fetchWikiActivity,
@@ -44,6 +46,8 @@ import {
   type ComponentStatus,
   type HealthComponent,
   type PlatformHealth,
+  type SearchFeatures,
+  type SearchMode,
 } from './adminStore';
 import {
   formatBytes,
@@ -137,6 +141,27 @@ function StatusCell({ status }: { status: ComponentStatus }) {
   );
 }
 
+/** 설치 옵션 칩의 설명 — 관리자가 이 설치에서 무엇이 되고 안 되는지 바로 알게 한다. */
+const SEARCH_MODE_HINT: Record<SearchMode, string> = {
+  lite: '위키·ALM 각각의 기본 검색만 씁니다. 통합 검색과 색인 관리 화면이 없습니다.',
+  opensearch: 'OpenSearch 로 통합 검색과 색인 관리를 씁니다.',
+  external: '외부 검색 엔진에 연결된 설치입니다. 통합 검색과 색인 관리를 씁니다.',
+};
+
+/** 검색 설치 모드 칩. 상태(정상/저하)가 아니라 설치 옵션이라 색을 쓰지 않는다. */
+function SearchModeChip({ search }: { search: SearchFeatures }) {
+  return (
+    <Tooltip title={SEARCH_MODE_HINT[search.mode]}>
+      <Chip
+        size="small"
+        variant="outlined"
+        icon={<SearchRoundedIcon />}
+        label={`검색 모드: ${search.mode}`}
+      />
+    </Tooltip>
+  );
+}
+
 /** 현황 카드 한 줄(라벨 + 값). */
 function StatRow({ label, value }: { label: string; value: string }) {
   return (
@@ -191,6 +216,8 @@ function StatCard({
 interface ToolLink {
   label: string;
   href: string;
+  /** 색인 관리를 켠 설치에서만 보인다 — lite 모드에는 그 화면 자체가 없다. */
+  requiresReindex?: boolean;
   /** 이 앱 안의 라우트 — 전체 페이지 이동 없이 react-router 로 간다. */
   router?: boolean;
   /** 내부망에서만 열리는 링크(nginx 뒤로 공개하지 않는다). */
@@ -211,7 +238,7 @@ function buildToolLinks(): { product: ToolLink[]; internal: ToolLink[] } {
     product: [
       { label: '플랫폼 · AI 에이전트', href: '/app/agents', router: true },
       { label: '위키 · 조직 관리', href: '/wiki/admin/org' },
-      { label: '위키 · 검색 색인', href: '/wiki/admin/search' },
+      { label: '위키 · 검색 색인', href: '/wiki/admin/search', requiresReindex: true },
       { label: '위키 · 이관', href: '/wiki/admin/migrations' },
       { label: 'ALM · 조직 설정', href: '/alm/settings/org' },
     ],
@@ -348,6 +375,9 @@ export default function AdminDashboardPage() {
   const alm = useAsyncData(fetchAlmStats, reloadKey);
   const org = useAsyncData(fetchOrgStats, reloadKey);
   const tokens = useAsyncData(fetchTokenStats, reloadKey);
+  // 설치 옵션. 이 호출은 던지지 않고 실패를 lite 로 돌려주므로 에러 상태가 없다.
+  const features = useAsyncData(fetchPlatformFeatures, reloadKey);
+  const search = features.data?.search ?? null;
 
   // 최근 활동: 위키·ALM 중 하나가 죽어도 나머지는 보여 준다.
   const activity = useAsyncData(loadActivity, reloadKey);
@@ -432,6 +462,7 @@ export default function AdminDashboardPage() {
           />
         )}
         <Chip size="small" variant="outlined" label={`전체 ${summary.total}`} />
+        {search && <SearchModeChip search={search} />}
       </Stack>
 
       {/* 3. 컴포넌트 표 */}
@@ -592,7 +623,7 @@ export default function AdminDashboardPage() {
       <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, mb: 1.5 }}>
         점검 도구
       </Typography>
-      <ToolLinks />
+      <ToolLinks reindex={search?.reindex ?? false} />
     </Box>
   );
 }
@@ -733,8 +764,10 @@ function ActivityTarget({ item }: { item: ActivityItem }) {
 
 /* ────────────────────────── 점검 도구 ────────────────────────── */
 
-function ToolLinks() {
+function ToolLinks({ reindex }: { reindex: boolean }) {
   const links = React.useMemo(buildToolLinks, []);
+  // 설치 옵션에 없는 화면으로 가는 바로가기는 아예 그리지 않는다(눌러야 없는 걸 아는 링크 금지).
+  const product = links.product.filter((link) => !link.requiresReindex || reindex);
   return (
     <Paper variant="outlined" sx={{ p: 2 }}>
       <Stack spacing={2}>
@@ -743,7 +776,7 @@ function ToolLinks() {
             제품 관리 화면
           </Typography>
           <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-            {links.product.map((link) => (
+            {product.map((link) => (
               <ToolLinkButton key={link.href} link={link} />
             ))}
           </Stack>

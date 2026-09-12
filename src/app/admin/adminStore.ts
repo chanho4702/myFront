@@ -163,6 +163,87 @@ export function useAdminIdentity(): AdminIdentity & { loading: boolean } {
   };
 }
 
+/* ────────────────────────── 설치 옵션(기능 플래그) ────────────────────────── */
+
+/** 검색 설치 모드. 서버는 소문자 셋만 준다. */
+export type SearchMode = 'lite' | 'opensearch' | 'external';
+
+const SEARCH_MODES: readonly SearchMode[] = ['lite', 'opensearch', 'external'];
+
+export interface SearchFeatures {
+  mode: SearchMode;
+  /** 통합(cross-app) 검색 가능 여부. */
+  unified: boolean;
+  /** 색인 관리 화면을 띄울지 여부. */
+  reindex: boolean;
+}
+
+/** `GET /api/platform/features` 응답. 지금은 검색 축 하나뿐이다. */
+export interface PlatformFeatures {
+  search: SearchFeatures;
+}
+
+/**
+ * 물어보지 못했을 때의 값 — 가장 기능이 적은 설치로 읽는다.
+ *
+ * 게이트웨이가 이 API 를 갖기 전(404), 비로그인(401), PAT 로 들어온 경우(403), 네트워크 오류,
+ * 게이트웨이를 아예 거치지 않는 공개 문서 인스턴스까지 전부 이 규칙 하나로 맞다 — 없는 기능을
+ * 있다고 그리는 것보다 있는 기능을 감추는 쪽이 안전하다.
+ */
+const LITE_FEATURES: PlatformFeatures = {
+  search: { mode: 'lite', unified: false, reindex: false },
+};
+
+/** 모르는 mode 문자열은 lite 로 몰아 화면이 빈 라벨을 그리지 않게 한다. */
+function toPlatformFeatures(raw: unknown): PlatformFeatures {
+  if (!raw || typeof raw !== 'object') return LITE_FEATURES;
+  const search = (raw as { search?: unknown }).search;
+  if (!search || typeof search !== 'object') return LITE_FEATURES;
+  const s = search as Record<string, unknown>;
+  const mode = SEARCH_MODES.includes(s.mode as SearchMode) ? (s.mode as SearchMode) : 'lite';
+  // 서버가 mode 에서 파생해 주는 값이지만, 빠져 오면 같은 규칙으로 채운다.
+  const derived = mode !== 'lite';
+  return {
+    search: {
+      mode,
+      unified: typeof s.unified === 'boolean' ? s.unified : derived,
+      reindex: typeof s.reindex === 'boolean' ? s.reindex : derived,
+    },
+  };
+}
+
+// 값이 게이트웨이 기동 시 고정이라 세션당 1회면 충분하다. 화면 여럿이 물어봐도 in-flight 를 공유한다.
+let featuresPromise: Promise<PlatformFeatures> | null = null;
+
+/**
+ * `GET /api/platform/features`. **절대 던지지 않는다** — 실패는 전부 lite 로 읽는다.
+ *
+ * 실패한 결과는 캐시에 남기지 않는다(관리자 판정과 같은 규칙): 일시적인 오류 한 번으로 세션 내내
+ * 설치 옵션이 lite 로 굳어 색인 관리 링크가 사라지는 것을 막는다. 새로고침이 곧 재시도다.
+ */
+export function fetchPlatformFeatures(): Promise<PlatformFeatures> {
+  if (featuresPromise) return featuresPromise;
+  featuresPromise = (async (): Promise<PlatformFeatures> => {
+    try {
+      const res = await authClient.apiFetch('/api/platform/features');
+      if (!res.ok) {
+        featuresPromise = null;
+        return LITE_FEATURES;
+      }
+      return toPlatformFeatures(await res.json());
+    } catch {
+      featuresPromise = null;
+      return LITE_FEATURES;
+    }
+  })();
+  return featuresPromise;
+}
+
+/** 로그아웃·계정 전환 시 캐시를 버린다. */
+export function resetPlatformFeatures(): void {
+  featuresPromise = null;
+}
+
 /* ────────────────────────── 플랫폼 헬스 ────────────────────────── */
 
 export type ComponentStatus = 'UP' | 'DEGRADED' | 'DOWN' | 'UNKNOWN';

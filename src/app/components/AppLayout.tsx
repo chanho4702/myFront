@@ -28,7 +28,7 @@ import {
   treeViewCustomizations,
 } from '../../context/templates/dashboard/theme/customizations';
 import { useAuth } from '../../auth';
-import { resetAdminIdentity, useAdminIdentity } from '../admin/adminStore';
+import { resetAdminIdentity, resetPlatformFeatures, useAdminIdentity } from '../admin/adminStore';
 
 const xThemeComponents = {
   ...chartsCustomizations,
@@ -74,8 +74,9 @@ export default function AppLayout(props: { disableCustomTheme?: boolean }) {
 
   const handleLogout = async () => {
     await logout();
-    // 다음 로그인이 다른 계정일 수 있으므로 관리자 판정 캐시를 버린다.
+    // 다음 로그인이 다른 계정일 수 있으므로 세션 캐시를 버린다.
     resetAdminIdentity();
+    resetPlatformFeatures();
     navigate('/login', { replace: true });
   };
 
