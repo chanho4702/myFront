@@ -301,13 +301,25 @@ interface WikiAuditPage {
 export interface ActivityItem {
   key: string;
   source: 'WIKI' | 'ALM';
+  /**
+   * 서버의 이벤트 코드(예: `PAGE_TRASHED`). **한국어로 다시 매핑하지 않는다** — 사람이 읽을 문장은
+   * 서버가 `summary` 로 만들어 주고(`detail`), 프론트가 코드 목록을 따로 들면 서버가 이벤트를
+   * 추가할 때마다 조용히 어긋난다.
+   */
   action: string;
   target: string;
+  /** 서버가 만든 한국어 문구를 그대로 보여 준다. */
   detail: string;
   occurredAt: string; // ISO 또는 빈 문자열
-  actorId: number | null;
+  /** 백엔드는 숫자 PK 를 주지만 프론트는 id 를 항상 string 으로 들고 다닌다. */
+  actorId: string | null;
   /** 대상 화면으로 가는 절대 경로. 만들 수 없으면 null 이고 화면은 텍스트만 낸다. */
   href: string | null;
+}
+
+/** 백엔드 숫자 PK → 화면용 string. 경계에서만 변환한다. */
+function idToString(value: number | null | undefined): string | null {
+  return typeof value === 'number' && Number.isFinite(value) ? String(value) : null;
 }
 
 /**
@@ -320,13 +332,13 @@ export async function fetchAlmActivity(size = 20): Promise<ActivityItem[]> {
   );
   const items = Array.isArray(body?.items) ? body.items : [];
   return items.map((it) => ({
-    key: `alm-${it.id}`,
+    key: `alm-${String(it.id)}`,
     source: 'ALM' as const,
     action: it.eventType ?? '',
     target: it.targetKey ?? (it.projectId != null ? `프로젝트 #${it.projectId}` : ''),
     detail: it.summary ?? '',
     occurredAt: it.occurredAt ?? '',
-    actorId: it.actorId ?? null,
+    actorId: idToString(it.actorId),
     // ALM 은 이슈 키만 주고 프로젝트 경로를 주지 않아 링크를 만들지 않는다.
     href: null,
   }));
@@ -335,16 +347,47 @@ export async function fetchAlmActivity(size = 20): Promise<ActivityItem[]> {
 /**
  * 위키 페이지 링크. wiki-front 의 라우트는 `/spaces/:spaceId/pages/:pageId` 이고 `:spaceId` 는
  * 스페이스 **id** 다 — 키가 아니다(wiki-front `src/app/App.tsx`, `GlobalSidebar` 의 링크 생성과 동일).
- * 위키 SPA 는 base `/wiki/` 아래 뜨므로 그 접두사를 붙인다. 둘 중 하나라도 없으면 링크를 만들지 않는다.
+ * 위키 SPA 는 base `/wiki/` 아래 뜨므로 그 접두사를 붙인다.
+ *
+ * `pageId` 는 대상이 페이지일 때만 오고(`targetType=PAGE`) 스페이스·템플릿·첨부 이벤트에는 없다.
+ * `spaceKey` 는 이미 지워진 스페이스면 null 이다. 그래서 둘 중 하나라도 없으면 링크를 만들지 않고
+ * 화면은 텍스트만 낸다 — 열리지 않는 주소를 걸지 않는다.
  */
-function wikiPageHref(spaceId: number | null, pageId: number | null): string | null {
-  if (spaceId == null || pageId == null) return null;
+function wikiPageHref(spaceId: string | null, pageId: string | null): string | null {
+  if (spaceId === null || pageId === null) return null;
   return `/wiki/spaces/${spaceId}/pages/${pageId}`;
 }
 
 /**
- * 위키의 전역 감사 최근 n건(`GET /api/wiki/audit`). 아직 배포되지 않은 서버는 404 를 주므로
- * 그때는 "ALM 만 보인다"는 뜻이 드러나는 문구로 바꿔 던진다 — 화면이 경고 배너로 받는다.
+ * 위키 감사 실패를 사유별로 다시 쓴다 — 화면이 403(사람이 고쳐야 함)과 503(일시적)을 구분해
+ * 보여 줄 수 있게 한다.
+ *
+ * 403 의 문구는 **서버 것을 그대로 둔다**: 전역 관리자가 아닌 경우 말고도 계정 상태(정지·비활성 등)
+ * 사유가 문장으로 담겨 오므로, 프론트가 "권한이 없습니다"로 덮으면 원인이 사라진다.
+ */
+function toWikiActivityError(e: unknown): unknown {
+  if (!(e instanceof AdminApiError)) return e;
+  if (e.status === 404) {
+    return new AdminApiError(404, '위키 감사 피드가 아직 배포되지 않았습니다. ALM 활동만 표시합니다.');
+  }
+  if (e.status === 403) return e; // 계정 상태 사유 문구 보존
+  if (e.status === 503) {
+    return new AdminApiError(
+      503,
+      e.code === 'org_unavailable'
+        ? '권한 서비스(org)에 연결할 수 없어 위키 감사를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
+        : '위키 서비스에 연결할 수 없어 감사를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.',
+      e.code,
+    );
+  }
+  return e;
+}
+
+/**
+ * 위키의 전역 감사 최근 n건(`GET /api/wiki/audit`).
+ *
+ * `type` 필터는 보내지 않는다 — 서버가 모르는 값에 400 을 내고, 대시보드는 전체 이벤트를 본다.
+ * 이벤트 코드를 프론트에서 한국어로 옮기지도 않는다(`ActivityItem.action` 주석 참조).
  */
 export async function fetchWikiActivity(size = 20): Promise<ActivityItem[]> {
   let body: WikiAuditPage;
@@ -354,21 +397,20 @@ export async function fetchWikiActivity(size = 20): Promise<ActivityItem[]> {
       '위키 활동 기록을 불러오지 못했습니다.',
     );
   } catch (e: unknown) {
-    if (e instanceof AdminApiError && e.status === 404) {
-      throw new AdminApiError(404, '위키 감사 피드가 아직 배포되지 않았습니다. ALM 활동만 표시합니다.');
-    }
-    throw e;
+    throw toWikiActivityError(e);
   }
   const items = Array.isArray(body?.items) ? body.items : [];
-  return items.map((it) => ({
-    key: `wiki-${it.id}`,
-    source: 'WIKI' as const,
-    action: it.eventType ?? '',
-    target:
-      it.targetTitle ?? it.spaceKey ?? (it.spaceId != null ? `스페이스 #${it.spaceId}` : ''),
-    detail: it.summary ?? '',
-    occurredAt: it.occurredAt ?? '',
-    actorId: it.actorId ?? null,
-    href: wikiPageHref(it.spaceId ?? null, it.pageId ?? null),
-  }));
+  return items.map((it) => {
+    const spaceId = idToString(it.spaceId);
+    return {
+      key: `wiki-${String(it.id)}`,
+      source: 'WIKI' as const,
+      action: it.eventType ?? '',
+      target: it.targetTitle ?? it.spaceKey ?? (spaceId !== null ? `스페이스 #${spaceId}` : ''),
+      detail: it.summary ?? '',
+      occurredAt: it.occurredAt ?? '',
+      actorId: idToString(it.actorId),
+      href: wikiPageHref(spaceId, idToString(it.pageId)),
+    };
+  });
 }

@@ -32,6 +32,7 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import {
+  AdminApiError,
   fetchAlmActivity,
   fetchAlmStats,
   fetchOrgStats,
@@ -598,10 +599,18 @@ export default function AdminDashboardPage() {
 
 /* ────────────────────────── 최근 활동 ────────────────────────── */
 
+/** 한 제품의 감사만 실패했을 때의 안내 한 줄. */
+interface ActivityFailure {
+  source: 'WIKI' | 'ALM';
+  message: string;
+  /** 403 은 사람이 고쳐야 하는 상태라 에러로, 404·503 같은 일시적/미배포는 경고로 낸다. */
+  severity: 'error' | 'warning';
+}
+
 interface ActivityResult {
   items: ActivityItem[];
   /** 일부 소스만 실패했을 때의 안내(전부 실패면 useAsyncData 가 에러로 처리한다). */
-  partial: string | null;
+  failures: ActivityFailure[];
 }
 
 /**
@@ -614,36 +623,54 @@ async function loadActivity(): Promise<ActivityResult> {
     fetchWikiActivity(ACTIVITY_LIMIT),
   ]);
 
-  const failures: string[] = [];
+  const failures: ActivityFailure[] = [];
   const lists: ActivityItem[][] = [];
 
   if (almResult.status === 'fulfilled') lists.push(almResult.value);
-  else failures.push(reasonOf(almResult.reason, 'ALM 활동 기록을 불러오지 못했습니다.'));
+  else failures.push(failureOf('ALM', almResult.reason, 'ALM 활동 기록을 불러오지 못했습니다.'));
 
   if (wikiResult.status === 'fulfilled') lists.push(wikiResult.value);
-  else failures.push(reasonOf(wikiResult.reason, '위키 활동 기록을 불러오지 못했습니다.'));
+  else failures.push(failureOf('WIKI', wikiResult.reason, '위키 활동 기록을 불러오지 못했습니다.'));
 
-  if (lists.length === 0) throw new Error(failures.join(' / '));
+  if (lists.length === 0) throw new Error(failures.map((f) => f.message).join(' / '));
 
+  return { items: mergeActivity(lists, ACTIVITY_LIMIT), failures };
+}
+
+function failureOf(
+  source: ActivityFailure['source'],
+  reason: unknown,
+  fallback: string,
+): ActivityFailure {
+  const status = reason instanceof AdminApiError ? reason.status : 0;
   return {
-    items: mergeActivity(lists, ACTIVITY_LIMIT),
-    partial: failures.length > 0 ? failures.join(' / ') : null,
+    source,
+    message: reason instanceof Error ? reason.message : fallback,
+    severity: status === 403 ? 'error' : 'warning',
   };
 }
 
-function reasonOf(reason: unknown, fallback: string): string {
-  return reason instanceof Error ? reason.message : fallback;
+const SOURCE_LABEL: Record<ActivityFailure['source'], string> = { WIKI: '위키', ALM: 'ALM' };
+
+/** 소스별 실패 안내. 위키 403(계정 상태)과 503(일시적)이 한 줄로 뭉치지 않게 따로 낸다. */
+function ActivityFailures({ failures }: { failures: ActivityFailure[] }) {
+  if (failures.length === 0) return null;
+  return (
+    <>
+      {failures.map((f) => (
+        <Alert key={f.source} severity={f.severity} variant="outlined" sx={{ m: 2 }}>
+          {SOURCE_LABEL[f.source]} 활동 — {f.message}
+        </Alert>
+      ))}
+    </>
+  );
 }
 
 function ActivityList({ result }: { result: ActivityResult }) {
   if (result.items.length === 0) {
     return (
       <>
-        {result.partial && (
-          <Alert severity="warning" variant="outlined" sx={{ m: 2 }}>
-            {result.partial}
-          </Alert>
-        )}
+        <ActivityFailures failures={result.failures} />
         <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'center', py: 5 }}>
           최근 활동이 없습니다.
         </Typography>
@@ -652,11 +679,7 @@ function ActivityList({ result }: { result: ActivityResult }) {
   }
   return (
     <>
-      {result.partial && (
-        <Alert severity="warning" variant="outlined" sx={{ m: 2 }}>
-          {result.partial}
-        </Alert>
-      )}
+      <ActivityFailures failures={result.failures} />
       <Table size="small">
         <TableHead>
           <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600 } }}>
