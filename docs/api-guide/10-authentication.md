@@ -72,7 +72,7 @@ curl -H "Authorization: Bearer chanho_pat_…" \
 | `org:write` | `/api/org/**` | 전부 (읽기 포함) |
 | `board:read` | `/api/board/**` | `GET` · `HEAD` · `OPTIONS` |
 | `board:write` | `/api/board/**` | 전부 (읽기 포함) |
-| `search:read` | `/api/search/**` | 전부 — 검색은 쓰기 스코프가 없다 |
+| `search:read` | `/api/search/**` | 전부 — 검색은 GraphQL `POST`지만 읽기 스코프로 허용한다(쓰기 스코프 없음) |
 | `admin` | `/api/wiki/admin/**` · `/api/alm/admin/**` · `/api/org/admin/**` · `/api/board/admin/**` · `/api/search/admin/**` · `/api/migration/**` · `/api/agent/**` | 해당 경로에 **추가로** 필요 |
 
 규칙 넷만 기억하면 된다.
