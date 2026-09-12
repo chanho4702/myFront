@@ -247,7 +247,7 @@
   {
     "url": "/docs/spaces/3/folder/76",
     "title": "설계 스펙",
-    "lastmod": "2026-09-06"
+    "lastmod": "2026-09-12"
   },
   {
     "url": "/docs/spaces/3/pages/100",
@@ -347,7 +347,7 @@
   {
     "url": "/docs/spaces/3/pages/121",
     "title": "alm-backend",
-    "lastmod": "2026-09-06"
+    "lastmod": "2026-09-12"
   },
   {
     "url": "/docs/spaces/3/pages/122",
@@ -377,12 +377,12 @@
   {
     "url": "/docs/spaces/3/pages/127",
     "title": "platform-backend",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-09-12"
   },
   {
     "url": "/docs/spaces/3/pages/128",
     "title": "wiki-backend",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-09-12"
   },
   {
     "url": "/docs/spaces/3/pages/129",
@@ -417,7 +417,7 @@
   {
     "url": "/docs/spaces/3/pages/136",
     "title": "인증 — 개인 API 토큰",
-    "lastmod": "2026-09-06"
+    "lastmod": "2026-09-12"
   },
   {
     "url": "/docs/spaces/3/pages/137",
@@ -780,14 +780,19 @@
     "lastmod": "2026-09-06"
   },
   {
+    "url": "/docs/spaces/3/pages/214",
+    "title": "2026-09-12 ALM 후속 배치 — 해결일(resolved)·저장 필터 서버 저장·소소한 정리 4건 (2026-09-12)",
+    "lastmod": "2026-09-12"
+  },
+  {
     "url": "/docs/spaces/3/pages/36",
     "title": "플랫폼 개요",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-09-12"
   },
   {
     "url": "/docs/spaces/3/pages/37",
     "title": "에이전트 규약",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-09-12"
   },
   {
     "url": "/docs/spaces/3/pages/38",
@@ -947,7 +952,7 @@
   {
     "url": "/docs/spaces/3/pages/77",
     "title": "디자인 시스템 (@chanho/react 0.11.0 / @chanho/tokens 0.4.0)",
-    "lastmod": "2026-09-06"
+    "lastmod": "2026-09-12"
   },
   {
     "url": "/docs/spaces/3/pages/78",
@@ -957,7 +962,7 @@
   {
     "url": "/docs/spaces/3/pages/79",
     "title": "검색 (스마트 쿼리 + 검색 화면)",
-    "lastmod": "2026-09-06"
+    "lastmod": "2026-09-12"
   },
   {
     "url": "/docs/spaces/3/pages/80",
@@ -967,7 +972,7 @@
   {
     "url": "/docs/spaces/3/pages/81",
     "title": "스토어 (도메인 데이터 계층)",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-09-12"
   },
   {
     "url": "/docs/spaces/3/pages/82",
@@ -987,7 +992,7 @@
   {
     "url": "/docs/spaces/3/pages/85",
     "title": "진행 현황",
-    "lastmod": "2026-09-06"
+    "lastmod": "2026-09-12"
   },
   {
     "url": "/docs/spaces/3/pages/86",
