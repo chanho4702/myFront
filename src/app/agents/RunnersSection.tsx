@@ -24,7 +24,10 @@ import Typography from '@mui/material/Typography';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import BlockRoundedIcon from '@mui/icons-material/BlockRounded';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import DnsRoundedIcon from '@mui/icons-material/DnsRounded';
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
+import FolderRoundedIcon from '@mui/icons-material/FolderRounded';
+import PublicRoundedIcon from '@mui/icons-material/PublicRounded';
 import RadioButtonUncheckedRoundedIcon from '@mui/icons-material/RadioButtonUncheckedRounded';
 import WifiOffRoundedIcon from '@mui/icons-material/WifiOffRounded';
 import WifiRoundedIcon from '@mui/icons-material/WifiRounded';
@@ -55,9 +58,12 @@ const STATUS_CHIP: Record<
   REVOKED: { label: '철회됨', color: 'default', icon: <BlockRoundedIcon /> },
 };
 
-function scopeLabel(runner: Runner): string {
-  if (runner.kind === 'PLATFORM') return '플랫폼(서버)';
-  return runner.projectId === null ? '전역' : `프로젝트 #${runner.projectId}`;
+/** 러너 범위 — 값은 아이콘 + 텍스트 */
+function scopeChip(runner: Runner): { label: string; icon: React.ReactElement } {
+  if (runner.kind === 'PLATFORM') return { label: '플랫폼(서버)', icon: <DnsRoundedIcon /> };
+  return runner.projectId === null
+    ? { label: '전역', icon: <PublicRoundedIcon /> }
+    : { label: `프로젝트 #${runner.projectId}`, icon: <FolderRoundedIcon /> };
 }
 
 function envText(runner: Runner): string {
@@ -173,7 +179,7 @@ export default function RunnersSection() {
                           <Typography variant="body2" sx={{ fontWeight: 500 }}>
                             {runner.name}
                           </Typography>
-                          <Chip size="small" variant="outlined" label={scopeLabel(runner)} />
+                          <Chip size="small" variant="outlined" icon={scopeChip(runner).icon} label={scopeChip(runner).label} />
                         </Stack>
                         {runner.tokenPrefix && (
                           <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace' }}>

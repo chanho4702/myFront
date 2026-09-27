@@ -479,7 +479,9 @@ export default function AgentsPage() {
                   <TableRow key={token.id} hover sx={{ '&:last-child td': { border: 0 } }}>
                     <TableCell sx={{ fontWeight: 500 }}>
                       {token.label || '—'}
-                      {isRun && <Chip size="small" variant="outlined" label="실행용" sx={{ ml: 1 }} />}
+                      {isRun && (
+                        <Chip size="small" variant="outlined" icon={<SmartToyRoundedIcon />} label="실행용" sx={{ ml: 1 }} />
+                      )}
                     </TableCell>
                     <TableCell sx={{ color: 'text.secondary' }}>{formatDate(token.createdAt)}</TableCell>
                     <TableCell sx={{ color: 'text.secondary' }}>
