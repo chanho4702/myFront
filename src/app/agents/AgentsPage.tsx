@@ -25,6 +25,7 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded';
 import CreatePersonaDialog from './CreatePersonaDialog';
 import IssueAgentTokenDialog from './IssueAgentTokenDialog';
+import PlatformCredentialCard from './PlatformCredentialCard';
 // 발급 직후 1회 표시 다이얼로그는 개인 API 토큰 화면 것을 그대로 쓴다 — 같은 위험(다시 못 봄)에
 // 같은 2단계 닫기·복사 동작이 필요하다.
 import TokenRevealDialog from '../tokens/TokenRevealDialog';
@@ -86,12 +87,12 @@ function createdTokenView(created: CreatedAgentToken, expiresAt: string): Create
 /**
  * AI 에이전트 관리 화면(`/app/agents`) — 전역 관리자 전용.
  *
- * agent-service 가 지금 주는 것만 다룬다: 페르소나 목록·부트스트랩, 토큰 목록·발급·폐기.
+ * agent-service 가 지금 주는 것만 다룬다: 전역 LLM 키, 페르소나 목록·부트스트랩, 토큰 목록·발급·폐기.
  * 페르소나 수정·비활성화·삭제 API 는 없어 화면에도 두지 않는다.
  */
 export default function AgentsPage() {
   const notify = useNotify();
-  const { isGlobalAdmin, loading: identityLoading, error: identityError } = useAdminIdentity();
+  const { me, isGlobalAdmin, loading: identityLoading, error: identityError } = useAdminIdentity();
 
   const [personas, setPersonas] = React.useState<Persona[]>([]);
   const [personasLoading, setPersonasLoading] = React.useState(true);
@@ -273,6 +274,12 @@ export default function AgentsPage() {
           </Button>
         </Stack>
       </Stack>
+
+      {/* 0. 전역 LLM 키 */}
+      <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, mb: 1.5 }}>
+        전역 LLM 키
+      </Typography>
+      <PlatformCredentialCard me={me} />
 
       {/* 1. 페르소나 */}
       <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, mb: 1.5 }}>

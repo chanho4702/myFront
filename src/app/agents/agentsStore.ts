@@ -309,6 +309,66 @@ export async function revokeAgentToken(id: string): Promise<void> {
   throw await toApiError(res, '토큰을 폐기하지 못했습니다.');
 }
 
+/* ────────────────────────── 전역 LLM 키 ────────────────────────── */
+
+// 계약(agent-service AGP-66 P3h, 전역 ADMIN):
+//   GET    /api/agent/credentials/platform → PlatformCredential
+//   PUT    /api/agent/credentials/platform {provider, apiKey, validate?} → PlatformCredential
+//          400(키 형식·검증 실패) · 503(마스터 키 미설정·Anthropic 불가) {"error"}
+//   DELETE /api/agent/credentials/platform → 204
+// 응답에는 원문 키가 없다(끝 4자 `keyHint` 뿐). 화면도 원문을 상태·로그에 남기지 않는다.
+
+export type LlmProvider = 'ANTHROPIC';
+
+export interface PlatformCredential {
+  set: boolean;
+  provider: LlmProvider | null;
+  /** 키 끝 4자 — 화면이 앞에 "…" 를 붙인다. */
+  keyHint: string | null;
+  /** 마지막으로 저장한 멤버 id(백엔드 Long → string). */
+  updatedBy: string | null;
+  updatedAt: string | null; // ISO
+}
+
+export interface PlatformCredentialInput {
+  apiKey: string;
+  /** 저장 전에 저비용 호출로 키를 검증할지. */
+  validate: boolean;
+}
+
+function toPlatformCredential(raw: unknown): PlatformCredential {
+  const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  return {
+    set: r.set === true,
+    provider: r.provider === 'ANTHROPIC' ? 'ANTHROPIC' : null,
+    keyHint: nullableText(r.keyHint),
+    updatedBy: idToString(r.updatedBy),
+    updatedAt: nullableText(r.updatedAt),
+  };
+}
+
+export async function getPlatformCredential(): Promise<PlatformCredential> {
+  const res = await authClient.apiFetch('/api/agent/credentials/platform');
+  if (!res.ok) throw await toApiError(res, '전역 LLM 키 설정을 불러오지 못했습니다.');
+  return toPlatformCredential(await res.json());
+}
+
+export async function savePlatformCredential(input: PlatformCredentialInput): Promise<PlatformCredential> {
+  const res = await authClient.apiFetch('/api/agent/credentials/platform', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ provider: 'ANTHROPIC', apiKey: input.apiKey, validate: input.validate }),
+  });
+  if (!res.ok) throw await toApiError(res, '전역 LLM 키를 저장하지 못했습니다.');
+  return toPlatformCredential(await res.json());
+}
+
+export async function deletePlatformCredential(): Promise<void> {
+  const res = await authClient.apiFetch('/api/agent/credentials/platform', { method: 'DELETE' });
+  if (res.status === 204 || res.ok) return;
+  throw await toApiError(res, '전역 LLM 키를 삭제하지 못했습니다.');
+}
+
 /* ────────────────────────── 표시용 계산 ────────────────────────── */
 
 export type AgentTokenStatus = 'active' | 'expiring' | 'expired' | 'revoked';
