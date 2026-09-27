@@ -23,9 +23,11 @@ import Typography from '@mui/material/Typography';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded';
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import CreatePersonaDialog from './CreatePersonaDialog';
 import IssueAgentTokenDialog from './IssueAgentTokenDialog';
 import PlatformCredentialCard from './PlatformCredentialCard';
+import RunnersSection from './RunnersSection';
 // 발급 직후 1회 표시 다이얼로그는 개인 API 토큰 화면 것을 그대로 쓴다 — 같은 위험(다시 못 봄)에
 // 같은 2단계 닫기·복사 동작이 필요하다.
 import TokenRevealDialog from '../tokens/TokenRevealDialog';
@@ -160,6 +162,8 @@ export default function AgentsPage() {
     const map = new Map<string, AgentToken[]>();
     for (const token of tokens) {
       if (!token.personaSlug) continue;
+      // run 토큰(P4a)은 실행마다 생겼다 철회된다 — 사람이 발급한 토큰만 센다
+      if (token.kind === 'RUN') continue;
       const list = map.get(token.personaSlug);
       if (list) list.push(token);
       else map.set(token.personaSlug, [token]);
@@ -173,7 +177,13 @@ export default function AgentsPage() {
     [tokens, personas],
   );
 
-  const selectedTokens = selected ? (tokensBySlug.get(selected.slug) ?? []) : [];
+  // 사람 토큰 먼저, 그 페르소나의 run 토큰(실행용)은 뒤에 표시만 한다
+  const selectedTokens = selected
+    ? [
+        ...(tokensBySlug.get(selected.slug) ?? []),
+        ...tokens.filter((t) => t.kind === 'RUN' && t.personaSlug === selected.slug),
+      ]
+    : [];
 
   const handlePersonaCreated = (result: { persona: Persona; created: boolean }) => {
     setCreateOpen(false);
@@ -188,7 +198,9 @@ export default function AgentsPage() {
 
   const handleTokenCreated = (created: CreatedAgentToken, expiresAt: string) => {
     setIssueTarget(null);
-    setRevealed(createdTokenView(created, expiresAt));
+    // 서버가 만료 시각을 주면(P4a) 그것이 정본 — 무기한이면 null → 빈 값(대시)
+    const shown = created.expiresAt === undefined ? expiresAt : (created.expiresAt ?? '');
+    setRevealed(createdTokenView(created, shown));
   };
 
   // 1회 표시 다이얼로그를 닫은 뒤에 목록을 새로 고친다(방금 만든 토큰이 표에 들어온다).
@@ -280,6 +292,9 @@ export default function AgentsPage() {
         전역 LLM 키
       </Typography>
       <PlatformCredentialCard me={me} />
+
+      {/* 0-1. 러너(P4a) */}
+      <RunnersSection />
 
       {/* 1. 페르소나 */}
       <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, mb: 1.5 }}>
@@ -457,13 +472,33 @@ export default function AgentsPage() {
               selectedTokens.map((token) => {
                 const status = agentTokenStatus(token);
                 const chip = STATUS_CHIP[status];
-                const canRevoke = status !== 'revoked';
+                const isRun = token.kind === 'RUN';
+                // run 토큰은 실행이 끝나면 서버가 철회한다 — 손으로 철회하면 돌던 워커가 끊긴다(취소는 ALM 실행 상세)
+                const canRevoke = status !== 'revoked' && !isRun;
                 return (
                   <TableRow key={token.id} hover sx={{ '&:last-child td': { border: 0 } }}>
-                    <TableCell sx={{ fontWeight: 500 }}>{token.label || '—'}</TableCell>
+                    <TableCell sx={{ fontWeight: 500 }}>
+                      {token.label || '—'}
+                      {isRun && <Chip size="small" variant="outlined" label="실행용" sx={{ ml: 1 }} />}
+                    </TableCell>
                     <TableCell sx={{ color: 'text.secondary' }}>{formatDate(token.createdAt)}</TableCell>
                     <TableCell sx={{ color: 'text.secondary' }}>
-                      {token.expiresAt ? formatDate(token.expiresAt) : '만료 없음'}
+                      {isRun ? (
+                        '실행 끝나면 철회'
+                      ) : token.expiresAt ? (
+                        formatDate(token.expiresAt)
+                      ) : status === 'revoked' ? (
+                        '무기한'
+                      ) : (
+                        // 무기한 사람용 토큰(D-P4-3b) — 새어 나가면 철회 전까지 유효하다
+                        <Chip
+                          size="small"
+                          variant="outlined"
+                          color="warning"
+                          icon={<WarningAmberRoundedIcon />}
+                          label="무기한"
+                        />
+                      )}
                     </TableCell>
                     <TableCell sx={{ color: 'text.secondary' }}>{formatDate(token.lastUsedAt)}</TableCell>
                     <TableCell>

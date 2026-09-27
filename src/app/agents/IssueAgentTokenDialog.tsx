@@ -20,7 +20,7 @@ import {
 } from './agentsStore';
 import { useNotify } from '../../notifications';
 
-/** `없음` 은 서버에 expiresInDays 를 아예 보내지 않는다(만료 없는 토큰). */
+/** `무기한` 은 서버에 noExpiry 를 보낸다(P4a — 생략하면 서버 기본 90일). 전역 관리자만 허용된다. */
 const NEVER = 'never';
 const EXPIRY_OPTIONS = [30, 90, 180, 365];
 const DEFAULT_EXPIRY = '90';
@@ -116,14 +116,20 @@ export default function IssueAgentTokenDialog({ persona, onClose, onCreated }: P
             >
               {EXPIRY_OPTIONS.map((days) => (
                 <MenuItem key={days} value={String(days)}>
-                  {days}일
+                  {String(days) === DEFAULT_EXPIRY ? `${days}일 (기본)` : `${days}일`}
                 </MenuItem>
               ))}
-              <MenuItem value={NEVER}>만료 없음</MenuItem>
+              <MenuItem value={NEVER}>무기한</MenuItem>
             </TextField>
+            {expiry === NEVER && (
+              <Alert severity="warning" variant="outlined">
+                무기한 토큰은 폐기하기 전까지 계속 유효합니다. 새어 나가면 누구든 이 페르소나로 접속할 수 있으니 꼭 필요할
+                때만 쓰세요.
+              </Alert>
+            )}
             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              대상 페르소나 {persona?.slug} · 토큰은 {AGENT_TOKEN_PREFIX} 로 시작합니다 · 만료 없음을
-              고르면 폐기할 때까지 유효합니다.
+              대상 페르소나 {persona?.slug} · 토큰은 {AGENT_TOKEN_PREFIX} 로 시작합니다 · 만료 7일 전에 발급자에게
+              알림 메일이 갑니다.
             </Typography>
           </Stack>
         </DialogContent>

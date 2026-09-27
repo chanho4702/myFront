@@ -11,6 +11,9 @@
 //   GET    /api/agent/tokens        → PatSummaryResponse[] (해시·원문 없음, 전체 목록)
 //   POST   /api/agent/tokens        → 201 PatCreatedResponse (원문 token 은 이 응답에만, ROLE_ADMIN)
 //   DELETE /api/agent/tokens/{id}   → 204 (멱등, ROLE_ADMIN)
+//   GET    /api/agent/runners       → RunnerResponse[] (projectId 없이 = 전역 관리자 전체, PLATFORM 포함 — P4a)
+//   POST   /api/agent/runners       → 201 {…, token}(원문 agr_ 은 이 응답에만) · projectId null = 전역 러너
+//   DELETE /api/agent/runners/{id}  → 204 (멱등, PLATFORM 은 409)
 //
 // 오류 계약은 common-starter 의 `{"error": "한국어 메시지"}` 다. 게이트웨이·인증만 기계 코드를 준다.
 
@@ -49,6 +52,9 @@ export interface Persona {
   active: boolean;
 }
 
+/** 토큰 종류(P4a D-P4-3b) — HUMAN = 사람이 발급한 토큰, RUN = run 마다 시스템이 발급하고 종료 시 철회하는 임시 토큰. */
+export type AgentTokenKind = 'HUMAN' | 'RUN';
+
 /** `PatSummaryResponse` — 토큰 해시·원문은 절대 담기지 않는다. */
 export interface AgentToken {
   id: string;
@@ -59,6 +65,12 @@ export interface AgentToken {
   expiresAt: string | null; // ISO, null 이면 만료 없음
   lastUsedAt: string | null; // ISO
   revoked: boolean;
+  /** P4a 이전 서버는 필드가 없다 — HUMAN 으로 본다. */
+  kind: AgentTokenKind;
+  /** 무기한 사람용 토큰 — 화면이 경고를 단다. */
+  noExpiry: boolean;
+  /** 서버 판정 7일 안 만료. */
+  expiringSoon: boolean;
 }
 
 export interface PersonaGrantInput {
@@ -88,7 +100,10 @@ export interface PersonaCreateResult {
 export interface AgentTokenCreateInput {
   label: string;
   personaSlug: string;
-  /** null 이면 만료 없음(서버가 expiresAt 을 비워 둔다). */
+  /**
+   * 1~365. null 이면 무기한 — P4a 부터 서버는 expiresInDays 를 생략하면 90일이므로 무기한은
+   * `noExpiry: true` 로 명시한다(전역 관리자만, 이 화면은 전역 관리자 전용).
+   */
   expiresInDays: number | null;
 }
 
@@ -98,6 +113,8 @@ export interface CreatedAgentToken {
   label: string;
   personaSlug: string | null;
   token: string;
+  /** 서버가 준 만료 시각(무기한이면 null). 구 서버처럼 필드가 없으면 undefined. */
+  expiresAt?: string | null;
 }
 
 /* ────────────────────────── 서버와 맞춘 상한값 ────────────────────────── */
@@ -218,6 +235,9 @@ function toAgentToken(raw: unknown): AgentToken | null {
     expiresAt: nullableText(r.expiresAt),
     lastUsedAt: nullableText(r.lastUsedAt),
     revoked: r.revoked === true,
+    kind: r.kind === 'RUN' ? 'RUN' : 'HUMAN',
+    noExpiry: r.noExpiry === true,
+    expiringSoon: r.expiringSoon === true,
   };
 }
 
@@ -279,8 +299,9 @@ export async function createAgentToken(input: AgentTokenCreateInput): Promise<Cr
     label: input.label,
     personaSlug: input.personaSlug,
   };
-  // 서버는 @Positive Integer 라 null 을 "만료 없음"으로 읽는다 — 0 이나 빈 문자열을 보내면 400.
-  if (input.expiresInDays !== null) payload.expiresInDays = input.expiresInDays;
+  // P4a(D-P4-3b): 생략하면 서버 기본 90일, 무기한은 noExpiry 로만 — 둘을 함께 보내면 400.
+  if (input.expiresInDays === null) payload.noExpiry = true;
+  else payload.expiresInDays = input.expiresInDays;
 
   const res = await authClient.apiFetch('/api/agent/tokens', {
     method: 'POST',
@@ -297,6 +318,7 @@ export async function createAgentToken(input: AgentTokenCreateInput): Promise<Cr
     label: text(r.label),
     personaSlug: nullableText(r.personaSlug),
     token,
+    ...('expiresAt' in r ? { expiresAt: nullableText(r.expiresAt) } : {}),
   };
 }
 
@@ -307,6 +329,111 @@ export async function revokeAgentToken(id: string): Promise<void> {
   });
   if (res.status === 204 || res.ok) return;
   throw await toApiError(res, '토큰을 폐기하지 못했습니다.');
+}
+
+/* ────────────────────────── 러너(P4a AGP-69) ────────────────────────── */
+
+// 러너 = 사용자 PC(LOCAL) 또는 플랫폼 러너 컨테이너(PLATFORM)가 AI 직원 작업을 대신 실행하는 프로그램.
+// 이 화면(전역 관리자)은 projectId 없이 조회해 PLATFORM 포함 전체를 보고, 전역 LOCAL 러너(projectId null)를 발급한다.
+// 프로젝트 러너 발급·실행 위치 설정은 ALM 프로젝트 설정 "AI 팀" 몫이다.
+
+export type RunnerKind = 'PLATFORM' | 'LOCAL';
+export type RunnerStatus = 'ONLINE' | 'OFFLINE' | 'NEVER_CONNECTED' | 'REVOKED';
+
+export interface Runner {
+  id: string;
+  kind: RunnerKind;
+  name: string;
+  /** null = 플랫폼 전역 */
+  projectId: string | null;
+  tokenPrefix: string | null;
+  createdAt: string | null;
+  lastHeartbeatAt: string | null;
+  version: string | null;
+  os: string | null;
+  maxConcurrency: number | null;
+  status: RunnerStatus;
+  currentRunIds: string[];
+}
+
+export interface CreatedRunner {
+  id: string;
+  name: string;
+  token: string;
+}
+
+/** 러너 jar 최신 릴리스(러너 CI 가 `runner-latest` 태그에 올린다). */
+export const RUNNER_JAR_URL =
+  'https://github.com/chanho4702/agent-service/releases/download/runner-latest/agent-runner.jar';
+export const RUNNER_NAME_MAX = 80;
+
+/** 러너 실행 명령 — 서버 주소는 지금 보고 있는 플랫폼(nginx 앞단). */
+export function runnerCommand(token: string, origin: string = window.location.origin): string {
+  return `java -jar agent-runner.jar --server ${origin} --token ${token}`;
+}
+
+const RUNNER_STATUSES: readonly RunnerStatus[] = ['ONLINE', 'OFFLINE', 'NEVER_CONNECTED', 'REVOKED'];
+
+function toRunner(raw: unknown): Runner | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Record<string, unknown>;
+  const id = idToString(r.id);
+  if (id === null) return null;
+  const lastHeartbeatAt = nullableText(r.lastHeartbeatAt);
+  // 모르는 상태를 온라인으로 보이지 않게 — 철회 시각·heartbeat 로 다시 판정한다.
+  const status: RunnerStatus = nullableText(r.revokedAt)
+    ? 'REVOKED'
+    : RUNNER_STATUSES.includes(r.status as RunnerStatus)
+      ? (r.status as RunnerStatus)
+      : lastHeartbeatAt
+        ? 'OFFLINE'
+        : 'NEVER_CONNECTED';
+  return {
+    id,
+    kind: r.kind === 'PLATFORM' ? 'PLATFORM' : 'LOCAL',
+    name: text(r.name).trim() || `러너 #${id}`,
+    projectId: idToString(r.projectId),
+    tokenPrefix: nullableText(r.tokenPrefix),
+    createdAt: nullableText(r.createdAt),
+    lastHeartbeatAt,
+    version: nullableText(r.version),
+    os: nullableText(r.os),
+    maxConcurrency: typeof r.maxConcurrency === 'number' ? r.maxConcurrency : null,
+    status,
+    currentRunIds: Array.isArray(r.currentRunIds)
+      ? r.currentRunIds.map(idToString).filter((v): v is string => v !== null)
+      : [],
+  };
+}
+
+/** 전체 러너(전역 관리자). null = 러너 기능이 없는 구 서버(404). */
+export async function listRunners(): Promise<Runner[] | null> {
+  const res = await authClient.apiFetch('/api/agent/runners');
+  if (res.status === 404) return null;
+  if (!res.ok) throw await toApiError(res, '러너 목록을 불러오지 못했습니다.');
+  const body: unknown = await res.json();
+  return (Array.isArray(body) ? body : []).map(toRunner).filter((v): v is Runner => v !== null);
+}
+
+/** 전역 LOCAL 러너 발급 — 응답의 token(agr_)은 호출자가 한 번만 보여주고 버린다. */
+export async function createRunner(name: string): Promise<CreatedRunner> {
+  const res = await authClient.apiFetch('/api/agent/runners', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: name.trim(), projectId: null }),
+  });
+  if (!res.ok) throw await toApiError(res, '러너를 발급하지 못했습니다.');
+  const r = ((await res.json()) ?? {}) as Record<string, unknown>;
+  const token = text(r.token);
+  if (!token) throw new AgentApiError(res.status, '서버가 러너 토큰 원문을 주지 않았습니다.');
+  return { id: idToString(r.id) ?? '', name: text(r.name) || name.trim(), token };
+}
+
+/** 러너 철회(204, 멱등). PLATFORM 은 409 — 서버 env(AGENT_PLATFORM_RUNNER_TOKEN)로만 관리한다. */
+export async function revokeRunner(id: string): Promise<void> {
+  const res = await authClient.apiFetch(`/api/agent/runners/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  if (res.status === 204 || res.ok) return;
+  throw await toApiError(res, '러너를 철회하지 못했습니다.');
 }
 
 /* ────────────────────────── 전역 LLM 키 ────────────────────────── */
@@ -384,8 +511,21 @@ export function agentTokenStatus(token: AgentToken, now: number = Date.now()): A
   const expires = Date.parse(token.expiresAt);
   if (Number.isNaN(expires)) return 'active';
   if (expires <= now) return 'expired';
-  if (expires - now <= EXPIRING_SOON_DAYS * 24 * 60 * 60 * 1000) return 'expiring';
+  // 서버 판정(expiringSoon, P4a)이 오면 그것을 따르고, 구 서버는 시각으로 계산한다.
+  if (token.expiringSoon || expires - now <= EXPIRING_SOON_DAYS * 24 * 60 * 60 * 1000) return 'expiring';
   return 'active';
+}
+
+/** "12초 전"·"3분 전"·"2시간 전"·날짜 — 러너 마지막 신호. 값이 없거나 깨졌으면 대시. */
+export function relativeTime(iso: string | null, now: number = Date.now()): string {
+  if (!iso) return '—';
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return '—';
+  const sec = Math.max(0, Math.floor((now - t) / 1000));
+  if (sec < 60) return `${sec}초 전`;
+  if (sec < 3600) return `${Math.floor(sec / 60)}분 전`;
+  if (sec < 86400) return `${Math.floor(sec / 3600)}시간 전`;
+  return formatDate(iso);
 }
 
 /** ISO → `2026. 9. 12.`. 값이 없거나 깨졌으면 대시(Invalid Date 방지). */
