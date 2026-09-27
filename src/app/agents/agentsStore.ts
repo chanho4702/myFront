@@ -19,7 +19,8 @@ import { authClient } from '../../auth';
 /* ────────────────────────── 도메인 타입 ────────────────────────── */
 
 /** agent-service `PersonaRole` — 하네스 6롤과 같다. */
-export const PERSONA_ROLES = ['PLANNER', 'DESIGNER', 'FRONTEND', 'BACKEND', 'OPS', 'REVIEWER'] as const;
+// MANAGER: P3c 관리 에이전트(agent-service PersonaRole과 동기 — 보드 순찰·보고, 실무 안 함)
+export const PERSONA_ROLES = ['PLANNER', 'DESIGNER', 'FRONTEND', 'BACKEND', 'OPS', 'REVIEWER', 'MANAGER'] as const;
 export type PersonaRole = (typeof PERSONA_ROLES)[number];
 
 export const PERSONA_ROLE_LABEL: Record<PersonaRole, string> = {
@@ -29,6 +30,7 @@ export const PERSONA_ROLE_LABEL: Record<PersonaRole, string> = {
   BACKEND: '백엔드',
   OPS: '운영',
   REVIEWER: '리뷰',
+  MANAGER: '매니저',
 };
 
 /**
