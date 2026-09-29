@@ -14,6 +14,7 @@
 //   GET    /api/agent/runners       → RunnerResponse[] (projectId 없이 = 전역 관리자 전체, PLATFORM 포함 — P4a)
 //   POST   /api/agent/runners       → 201 {…, token}(원문 agr_ 은 이 응답에만) · projectId null = 전역 러너
 //   DELETE /api/agent/runners/{id}  → 204 (멱등, PLATFORM 은 409)
+//   GET/PUT/DELETE /api/agent/review-settings/platform → 전역 리뷰어 지정(P4b, 전역 관리자 — 조회 포함)
 //
 // 오류 계약은 common-starter 의 `{"error": "한국어 메시지"}` 다. 게이트웨이·인증만 기계 코드를 준다.
 
@@ -50,6 +51,8 @@ export interface Persona {
   name: string;
   emoji: string | null;
   active: boolean;
+  /** 소속 프로젝트(P3f). null = 전사 공용 — 전역 리뷰어는 공용만 지정할 수 있다. 구 서버는 필드가 없다(= 공용). */
+  projectId: string | null;
 }
 
 /** 토큰 종류(P4a D-P4-3b) — HUMAN = 사람이 발급한 토큰, RUN = run 마다 시스템이 발급하고 종료 시 철회하는 임시 토큰. */
@@ -219,6 +222,7 @@ function toPersona(raw: unknown): Persona | null {
     name: text(r.name),
     emoji: nullableText(r.emoji),
     active: r.active !== false, // 서버가 필드를 빼면 활성으로 본다(비활성 표시가 거짓이 되지 않게).
+    projectId: idToString(r.projectId),
   };
 }
 
@@ -494,6 +498,84 @@ export async function deletePlatformCredential(): Promise<void> {
   const res = await authClient.apiFetch('/api/agent/credentials/platform', { method: 'DELETE' });
   if (res.status === 204 || res.ok) return;
   throw await toApiError(res, '전역 LLM 키를 삭제하지 못했습니다.');
+}
+
+/* ────────────────────────── 전역 리뷰어(P4b AGP-59) ────────────────────────── */
+
+// AI 작업(TASK)은 다른 AI 리뷰어가 검증해야 done 이 된다. 리뷰어 해석(서버 ReviewerResolver):
+// 프로젝트 지정 > 전역 지정 > 서버 env(REVIEW_PERSONA) > 자동(활성 REVIEWER 중 id 최소) > 없음.
+// 이 화면은 전역 지정만 다룬다 — 프로젝트 지정은 ALM 프로젝트 설정 "AI 팀" 몫이다.
+//   GET    /api/agent/review-settings/platform → {setting, effective}
+//   PUT    /api/agent/review-settings/platform {personaId} → 같은 shape · 400 = 공용 활성 REVIEWER 아님
+//   DELETE /api/agent/review-settings/platform → 204(멱등)
+
+/** 전역 GET 의 effective 는 프로젝트 축 없이 풀린다 — PROJECT 는 오지 않는다(모르는 값은 NONE). */
+export type ReviewerSource = 'PLATFORM' | 'ENV' | 'AUTO' | 'NONE';
+
+export interface ReviewerRef {
+  personaId: string;
+  /** 지정한 페르소나가 없어졌으면 null. */
+  slug: string | null;
+  name: string | null;
+}
+
+export interface PlatformReviewSetting {
+  /** 저장된 전역 지정 — null 이면 서버 env·자동을 따른다. */
+  setting: ReviewerRef | null;
+  /** 지금 실제로 쓰일 리뷰어. NONE 이면 id·슬러그·이름 모두 null. */
+  effective: { personaId: string | null; slug: string | null; name: string | null; source: ReviewerSource };
+}
+
+const REVIEWER_SOURCES: readonly ReviewerSource[] = ['PLATFORM', 'ENV', 'AUTO', 'NONE'];
+
+/** 출처를 모르거나 id 가 없으면 NONE — "리뷰어 있음"으로 잘못 안심시키는 쪽보다 경고가 뜨는 쪽이 낫다. */
+function toPlatformReviewSetting(raw: unknown): PlatformReviewSetting {
+  const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  const s = (r.setting && typeof r.setting === 'object' ? r.setting : null) as Record<string, unknown> | null;
+  const e = (r.effective && typeof r.effective === 'object' ? r.effective : {}) as Record<string, unknown>;
+  const settingId = s ? idToString(s.personaId) : null;
+  const effectiveId = idToString(e.personaId);
+  const source: ReviewerSource =
+    effectiveId !== null && REVIEWER_SOURCES.includes(e.source as ReviewerSource) ? (e.source as ReviewerSource) : 'NONE';
+  const none = source === 'NONE';
+  return {
+    setting: settingId === null ? null : { personaId: settingId, slug: nullableText(s?.slug), name: nullableText(s?.name) },
+    effective: {
+      personaId: none ? null : effectiveId,
+      slug: none ? null : nullableText(e.slug),
+      name: none ? null : nullableText(e.name),
+      source,
+    },
+  };
+}
+
+/** null = 리뷰어 지정 기능이 없는 구 서버(404). */
+export async function getPlatformReviewSetting(): Promise<PlatformReviewSetting | null> {
+  const res = await authClient.apiFetch('/api/agent/review-settings/platform');
+  if (res.status === 404) return null;
+  if (!res.ok) throw await toApiError(res, '전역 리뷰어 설정을 불러오지 못했습니다.');
+  return toPlatformReviewSetting(await res.json());
+}
+
+export async function savePlatformReviewSetting(personaId: string): Promise<PlatformReviewSetting> {
+  const res = await authClient.apiFetch('/api/agent/review-settings/platform', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ personaId: Number(personaId) }),
+  });
+  if (!res.ok) throw await toApiError(res, '전역 리뷰어를 지정하지 못했습니다.');
+  return toPlatformReviewSetting(await res.json());
+}
+
+export async function clearPlatformReviewSetting(): Promise<void> {
+  const res = await authClient.apiFetch('/api/agent/review-settings/platform', { method: 'DELETE' });
+  if (res.status === 204 || res.ok) return;
+  throw await toApiError(res, '전역 리뷰어 지정을 해제하지 못했습니다.');
+}
+
+/** 전역 리뷰어로 지정할 수 있는가 — 공용(projectId null)·활성·REVIEWER. 서버가 다시 판정한다. */
+export function isPlatformReviewerCandidate(persona: Persona): boolean {
+  return persona.role === 'REVIEWER' && persona.active && persona.projectId === null;
 }
 
 /* ────────────────────────── 표시용 계산 ────────────────────────── */

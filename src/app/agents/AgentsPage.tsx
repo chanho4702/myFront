@@ -27,6 +27,7 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import CreatePersonaDialog from './CreatePersonaDialog';
 import IssueAgentTokenDialog from './IssueAgentTokenDialog';
 import PlatformCredentialCard from './PlatformCredentialCard';
+import PlatformReviewerCard from './PlatformReviewerCard';
 import RunnersSection from './RunnersSection';
 // 발급 직후 1회 표시 다이얼로그는 개인 API 토큰 화면 것을 그대로 쓴다 — 같은 위험(다시 못 봄)에
 // 같은 2단계 닫기·복사 동작이 필요하다.
@@ -99,6 +100,8 @@ export default function AgentsPage() {
   const [personas, setPersonas] = React.useState<Persona[]>([]);
   const [personasLoading, setPersonasLoading] = React.useState(true);
   const [personasError, setPersonasError] = React.useState<string | null>(null);
+  /** 페르소나를 다시 받을 때마다 올라간다 — 전역 리뷰어 카드가 자동 선택 결과를 다시 받는다. */
+  const [personasVersion, setPersonasVersion] = React.useState(0);
 
   const [tokens, setTokens] = React.useState<AgentToken[]>([]);
   const [tokensLoading, setTokensLoading] = React.useState(true);
@@ -116,6 +119,7 @@ export default function AgentsPage() {
     setPersonasError(null);
     try {
       setPersonas(await listPersonas());
+      setPersonasVersion((v) => v + 1);
     } catch (e: unknown) {
       setPersonas([]);
       setPersonasError(e instanceof Error ? e.message : '페르소나 목록을 불러오지 못했습니다.');
@@ -292,6 +296,12 @@ export default function AgentsPage() {
         전역 LLM 키
       </Typography>
       <PlatformCredentialCard me={me} />
+
+      {/* 0-0. 전역 리뷰어(P4b) */}
+      <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, mb: 1.5 }}>
+        전역 리뷰어
+      </Typography>
+      <PlatformReviewerCard personas={personas} personasVersion={personasVersion} />
 
       {/* 0-1. 러너(P4a) */}
       <RunnersSection />
