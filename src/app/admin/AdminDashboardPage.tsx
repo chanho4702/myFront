@@ -32,6 +32,8 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import StopCircleRoundedIcon from '@mui/icons-material/StopCircleRounded';
+import { fetchAgentOverview, formatUsd, type AgentOverview } from '../agents/agentsStore';
 import {
   AdminApiError,
   fetchAlmActivity,
@@ -197,18 +199,35 @@ function StatRow({ label, value }: { label: string; value: string }) {
 function StatCard({
   title,
   state,
+  to,
   children,
 }: {
   title: string;
   state: { loading: boolean; error: string | null };
+  /** 있으면 제목 옆에 그 화면으로 가는 링크를 단다(이 앱 안의 라우트). */
+  to?: { href: string; label: string };
   children: React.ReactNode;
 }) {
   return (
     <Card variant="outlined" sx={{ height: '100%' }}>
       <CardContent>
-        <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 700, mb: 1.5 }}>
-          {title}
-        </Typography>
+        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 1.5, gap: 1 }}>
+          <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 700 }}>
+            {title}
+          </Typography>
+          {to && (
+            <Link
+              component={RouterLink}
+              to={to.href}
+              underline="hover"
+              variant="body2"
+              sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}
+            >
+              {to.label}
+              <ArrowForwardRoundedIcon fontSize="small" aria-hidden />
+            </Link>
+          )}
+        </Stack>
         {state.loading && (
           <Stack sx={{ alignItems: 'center', py: 4 }}>
             <CircularProgress size={24} />
@@ -389,6 +408,8 @@ export default function AdminDashboardPage() {
   const alm = useAsyncData(fetchAlmStats, reloadKey);
   const org = useAsyncData(fetchOrgStats, reloadKey);
   const tokens = useAsyncData(fetchTokenStats, reloadKey);
+  // AI 에이전트(F-20): agent-service 가 죽어도 이 카드만 "확인 불가"가 된다.
+  const agents = useAsyncData(loadAgentOverview, reloadKey);
   // 설치 옵션. 이 호출은 던지지 않고 실패를 lite 로 돌려주므로 에러 상태가 없다.
   const features = useAsyncData(fetchPlatformFeatures, reloadKey);
   const search = features.data?.search ?? null;
@@ -562,7 +583,7 @@ export default function AdminDashboardPage() {
 
       {/* 4. 현황 카드 3열 */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <StatCard title="WIKI" state={wiki}>
             <StatRow label="스페이스" value={formatCount(wiki.data?.spaces)} />
             <StatRow label="페이지" value={formatCount(wiki.data?.pages)} />
@@ -576,7 +597,7 @@ export default function AdminDashboardPage() {
             <StatRow label="최근 7일 편집" value={formatCount(wiki.data?.editsLast7Days)} />
           </StatCard>
         </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <StatCard title="ALM" state={alm}>
             <StatRow label="프로젝트" value={formatCount(alm.data?.projects)} />
             <StatRow label="이슈" value={formatCount(alm.data?.issues)} />
@@ -587,7 +608,7 @@ export default function AdminDashboardPage() {
             <StatRow label="감사 로그" value={formatCount(alm.data?.auditEntries)} />
           </StatCard>
         </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <StatCard
             title="조직 · 토큰"
             state={{
@@ -609,6 +630,27 @@ export default function AdminDashboardPage() {
             <StatRow label="활성 API 토큰" value={formatCount(tokens.data?.activeTokens)} />
             <StatRow label="토큰 보유 사용자" value={formatCount(tokens.data?.usersWithTokens)} />
             <StatRow label="7일 내 만료" value={formatCount(tokens.data?.expiringWithin7Days)} />
+          </StatCard>
+        </Grid>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+          <StatCard title="AI 에이전트" state={agents} to={{ href: '/app/agents', label: '관리' }}>
+            <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', py: 0.5 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                킬 스위치
+              </Typography>
+              {agents.data?.killSwitch ? (
+                <Chip size="small" color="error" icon={<StopCircleRoundedIcon />} label="정지됨" />
+              ) : (
+                <Chip size="small" color="success" variant="outlined" icon={<CheckCircleRoundedIcon />} label="정상" />
+              )}
+            </Stack>
+            <StatRow
+              label="월 비용 / 상한"
+              value={`${formatUsd(agents.data?.monthToDateUsd)} / ${formatUsd(agents.data?.monthlyCapUsd)}`}
+            />
+            <StatRow label="실패 run" value={formatCount(agents.data?.failedRuns)} />
+            <StatRow label="차단 run" value={formatCount(agents.data?.blockedRuns)} />
+            <StatRow label="승인 대기 게이트" value={formatCount(agents.data?.pendingGates)} />
           </StatCard>
         </Grid>
       </Grid>
@@ -640,6 +682,17 @@ export default function AdminDashboardPage() {
       <ToolLinks reindex={search?.reindex ?? false} />
     </Box>
   );
+}
+
+/* ────────────────────────── AI 에이전트 ────────────────────────── */
+
+/** 실패 문구 앞에 "확인 불가"를 붙여, 다른 카드와 달리 서비스 하나가 응답하지 않는 상황임을 알린다. */
+async function loadAgentOverview(): Promise<AgentOverview> {
+  try {
+    return await fetchAgentOverview();
+  } catch (e: unknown) {
+    throw new Error(`확인 불가 — ${e instanceof Error ? e.message : '에이전트 서비스에 연결할 수 없습니다.'}`);
+  }
 }
 
 /* ────────────────────────── 최근 활동 ────────────────────────── */

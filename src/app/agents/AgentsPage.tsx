@@ -28,6 +28,7 @@ import CreatePersonaDialog from './CreatePersonaDialog';
 import IssueAgentTokenDialog from './IssueAgentTokenDialog';
 import PlatformCredentialCard from './PlatformCredentialCard';
 import PlatformReviewerCard from './PlatformReviewerCard';
+import KillSwitchCard from './KillSwitchCard';
 import RunnersSection from './RunnersSection';
 // 발급 직후 1회 표시 다이얼로그는 개인 API 토큰 화면 것을 그대로 쓴다 — 같은 위험(다시 못 봄)에
 // 같은 2단계 닫기·복사 동작이 필요하다.
@@ -290,6 +291,12 @@ export default function AgentsPage() {
           </Button>
         </Stack>
       </Stack>
+
+      {/* 00. 킬 스위치(F-15) */}
+      <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, mb: 1.5 }}>
+        킬 스위치
+      </Typography>
+      <KillSwitchCard />
 
       {/* 0. 전역 LLM 키 */}
       <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, mb: 1.5 }}>

@@ -335,6 +335,100 @@ export async function revokeAgentToken(id: string): Promise<void> {
   throw await toApiError(res, '토큰을 폐기하지 못했습니다.');
 }
 
+/* ────────────────────────── 예산·킬 스위치·감독 지표(F-15·F-20) ────────────────────────── */
+
+// 계약(agent-service BudgetController·RunController·GateController):
+//   GET  /api/agent/kill-switch          → {on: boolean}                       (인증 사용자 누구나)
+//   POST /api/agent/kill-switch {on}     → 204 (ROLE_ADMIN — 켜면 실행 중 run 을 전부 취소, O-09 DB 영속)
+//   GET  /api/agent/budget               → {monthlyCapUsd, platformMonthToDateUsd, killSwitch}
+//   GET  /api/agent/runs?status=&size=1  → {items, page, size, total, hasNext}  (전역 관리자는 전체 범위)
+//   GET  /api/agent/gates?pending=true   → GateSummaryResponse[]               (결정 안 된 전체)
+
+/** 킬 스위치 상태. */
+export async function getKillSwitch(): Promise<boolean> {
+  const res = await authClient.apiFetch('/api/agent/kill-switch');
+  if (!res.ok) throw await toApiError(res, '킬 스위치 상태를 불러오지 못했습니다.');
+  const body: unknown = await res.json();
+  return !!body && typeof body === 'object' && (body as { on?: unknown }).on === true;
+}
+
+/** 킬 스위치 켜기·끄기(204). 켜면 서버가 실행 중 run 을 모두 취소하고 새 실행을 막는다. */
+export async function setKillSwitch(on: boolean): Promise<void> {
+  const res = await authClient.apiFetch('/api/agent/kill-switch', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ on }),
+  });
+  if (res.status === 204 || res.ok) return;
+  throw await toApiError(res, on ? '킬 스위치를 켜지 못했습니다.' : '킬 스위치를 끄지 못했습니다.');
+}
+
+/** 관리자 대시보드의 "AI 에이전트" 카드 값. 숫자는 서버가 주지 않으면 null(0 으로 속이지 않는다). */
+export interface AgentOverview {
+  monthlyCapUsd: number | null;
+  monthToDateUsd: number | null;
+  killSwitch: boolean;
+  failedRuns: number | null;
+  blockedRuns: number | null;
+  pendingGates: number | null;
+}
+
+/** BigDecimal 은 JSON 숫자로 오지만 문자열 직렬화 설정도 견딘다. */
+function toNumber(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim() !== '' && Number.isFinite(Number(value))) return Number(value);
+  return null;
+}
+
+async function countRuns(status: 'FAILED' | 'BLOCKED'): Promise<number | null> {
+  const res = await authClient.apiFetch(`/api/agent/runs?status=${status}&page=0&size=1`);
+  if (!res.ok) throw await toApiError(res, 'run 목록을 불러오지 못했습니다.');
+  const body: unknown = await res.json();
+  return body && typeof body === 'object' ? toNumber((body as { total?: unknown }).total) : null;
+}
+
+async function countPendingGates(): Promise<number | null> {
+  const res = await authClient.apiFetch('/api/agent/gates?pending=true');
+  if (!res.ok) throw await toApiError(res, '승인 대기 목록을 불러오지 못했습니다.');
+  const body: unknown = await res.json();
+  return Array.isArray(body) ? body.length : null;
+}
+
+/**
+ * 대시보드 카드용 묶음 조회. 예산(킬 스위치 포함)이 실패하면 카드 전체를 "확인 불가"로 던진다.
+ * run·게이트 수는 하나가 실패해도 그 칸만 null(—)로 두고 나머지를 보여 준다.
+ */
+export async function fetchAgentOverview(): Promise<AgentOverview> {
+  const budgetPromise = (async () => {
+    const res = await authClient.apiFetch('/api/agent/budget');
+    if (!res.ok) throw await toApiError(res, '에이전트 예산을 불러오지 못했습니다.');
+    return (await res.json()) as Record<string, unknown> | null;
+  })();
+  const [budget, failed, blocked, gates] = await Promise.allSettled([
+    budgetPromise,
+    countRuns('FAILED'),
+    countRuns('BLOCKED'),
+    countPendingGates(),
+  ]);
+  if (budget.status === 'rejected') throw budget.reason;
+  const b = budget.value ?? {};
+  const settled = (r: PromiseSettledResult<number | null>) => (r.status === 'fulfilled' ? r.value : null);
+  return {
+    monthlyCapUsd: toNumber(b.monthlyCapUsd),
+    monthToDateUsd: toNumber(b.platformMonthToDateUsd),
+    killSwitch: b.killSwitch === true,
+    failedRuns: settled(failed),
+    blockedRuns: settled(blocked),
+    pendingGates: settled(gates),
+  };
+}
+
+/** `$12.34`. 값이 없으면 대시. */
+export function formatUsd(value: number | null | undefined): string {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return '—';
+  return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 /* ────────────────────────── 러너(P4a AGP-69) ────────────────────────── */
 
 // 러너 = 사용자 PC(LOCAL) 또는 플랫폼 러너 컨테이너(PLATFORM)가 AI 직원 작업을 대신 실행하는 프로그램.
