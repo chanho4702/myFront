@@ -20,12 +20,15 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
+import DeleteSweepRoundedIcon from '@mui/icons-material/DeleteSweepRounded';
 import CreateTokenDialog from './CreateTokenDialog';
 import TokenRevealDialog from './TokenRevealDialog';
+import RenameTokenDialog from './RenameTokenDialog';
 import {
   ApiError,
   formatDate,
   listTokens,
+  revokeAllTokens,
   revokeToken,
   tokenStatus,
   TOKEN_PREFIX,
@@ -48,7 +51,7 @@ const STATUS_CHIP: Record<TokenStatus, { label: string; color: 'success' | 'warn
 /**
  * 개인 API 토큰 관리 화면(`/app/tokens`).
  *
- * 목록·발급·폐기만 한다. 원문 토큰은 발급 응답에만 실리므로 발급 직후 1회 표시 다이얼로그에서만
+ * 목록·발급·라벨 변경·폐기(한 개 / 전부)를 한다. 원문 토큰은 발급 응답에만 실리므로 발급 직후 1회 표시 다이얼로그에서만
  * 보여주고 상태에 남기지 않는다(닫으면 버린다).
  */
 export default function TokensPage() {
@@ -60,6 +63,9 @@ export default function TokensPage() {
   const [revealed, setRevealed] = React.useState<CreatedToken | null>(null);
   const [revokeTarget, setRevokeTarget] = React.useState<ApiToken | null>(null);
   const [revoking, setRevoking] = React.useState(false);
+  const [renameTarget, setRenameTarget] = React.useState<ApiToken | null>(null);
+  const [revokeAllOpen, setRevokeAllOpen] = React.useState(false);
+  const [revokingAll, setRevokingAll] = React.useState(false);
 
   const reload = React.useCallback(async () => {
     setLoading(true);
@@ -107,6 +113,33 @@ export default function TokensPage() {
     }
   };
 
+  // 라벨 변경은 응답(토큰 메타)으로 그 행만 바꿔 즉시 반영한다.
+  const handleRenamed = (updated: ApiToken) => {
+    setRenameTarget(null);
+    setTokens((prev) => prev.map((t) => (t.id === updated.id ? { ...t, ...updated } : t)));
+  };
+
+  const handleRevokeAll = async () => {
+    setRevokingAll(true);
+    try {
+      await revokeAllTokens();
+      setRevokeAllOpen(false);
+      notify.success('토큰을 모두 폐기했습니다.');
+    } catch (e: unknown) {
+      notify.error(e instanceof Error ? e.message : '토큰을 모두 폐기하지 못했습니다.');
+      setRevokeAllOpen(false);
+    } finally {
+      setRevokingAll(false);
+      await reload();
+    }
+  };
+
+  // 아직 쓸 수 있는(폐기·만료 전) 토큰 수 — "모두 폐기" 버튼과 확인 문구에 쓴다.
+  const usableCount = tokens.filter((t) => {
+    const status = tokenStatus(t);
+    return status === 'active' || status === 'expiring';
+  }).length;
+
   const isEmpty = !loading && !error && tokens.length === 0;
 
   return (
@@ -125,9 +158,20 @@ export default function TokensPage() {
             개인 토큰입니다.
           </Typography>
         </Box>
-        <Button variant="contained" startIcon={<AddRoundedIcon />} onClick={() => setCreateOpen(true)}>
-          새 토큰
-        </Button>
+        <Stack direction="row" spacing={1}>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<DeleteSweepRoundedIcon />}
+            disabled={loading || usableCount === 0}
+            onClick={() => setRevokeAllOpen(true)}
+          >
+            모두 폐기
+          </Button>
+          <Button variant="contained" startIcon={<AddRoundedIcon />} onClick={() => setCreateOpen(true)}>
+            새 토큰
+          </Button>
+        </Stack>
       </Stack>
 
       {isEmpty ? (
@@ -164,14 +208,14 @@ export default function TokensPage() {
           <Table>
             <TableHead>
               <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600 } }}>
-                <TableCell>라벨</TableCell>
+                <TableCell sx={{ minWidth: 160 }}>라벨</TableCell>
                 <TableCell width={220}>토큰</TableCell>
                 <TableCell width={130}>만든 날</TableCell>
                 <TableCell width={130}>만료</TableCell>
                 <TableCell width={130}>마지막 사용</TableCell>
                 <TableCell width={220}>권한</TableCell>
                 <TableCell width={110}>상태</TableCell>
-                <TableCell width={100} align="right">
+                <TableCell width={170} align="right">
                   관리
                 </TableCell>
               </TableRow>
@@ -198,7 +242,14 @@ export default function TokensPage() {
                       <TableCell>
                         <Chip size="small" variant="outlined" label={chip.label} color={chip.color} />
                       </TableCell>
-                      <TableCell align="right">
+                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                        <Button
+                          size="small"
+                          onClick={() => setRenameTarget(token)}
+                          aria-label={`${token.label} 라벨 변경`}
+                        >
+                          라벨 변경
+                        </Button>
                         <Button
                           size="small"
                           color="error"
@@ -240,6 +291,30 @@ export default function TokensPage() {
         onCreated={handleCreated}
       />
       <TokenRevealDialog token={revealed} onClose={handleRevealClose} />
+
+      <RenameTokenDialog
+        token={renameTarget}
+        onClose={() => setRenameTarget(null)}
+        onRenamed={handleRenamed}
+      />
+
+      <Dialog open={revokeAllOpen} onClose={() => !revokingAll && setRevokeAllOpen(false)}>
+        <DialogTitle>토큰을 모두 폐기할까요?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            아직 쓸 수 있는 토큰 {usableCount}개를 한 번에 폐기합니다. 되돌릴 수 없고, 게이트웨이 캐시 때문에 최대
+            5분 안에 모두 차단됩니다. 이 토큰들을 쓰는 스크립트·CI는 인증에 실패합니다.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRevokeAllOpen(false)} disabled={revokingAll}>
+            취소
+          </Button>
+          <Button color="error" variant="contained" onClick={() => void handleRevokeAll()} disabled={revokingAll}>
+            모두 폐기
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={Boolean(revokeTarget)} onClose={() => !revoking && setRevokeTarget(null)}>
         <DialogTitle>토큰을 폐기할까요?</DialogTitle>

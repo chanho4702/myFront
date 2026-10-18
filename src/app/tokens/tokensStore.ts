@@ -8,6 +8,8 @@
 //   GET    /api/auth/tokens        → ApiToken[]        (본인 것만, 최신순)
 //   POST   /api/auth/tokens        → 201 CreatedToken  (원문 token 은 이 응답에만)
 //   DELETE /api/auth/tokens/{id}   → 204               (이미 폐기면 멱등, 남의 것이면 404)
+//   PATCH  /api/auth/tokens/{id}   → 200 ApiToken      (F-21 이름 변경. 본문 {name}, 규칙은 발급 label 과 같다 — 1~100자)
+//   DELETE /api/auth/tokens        → 204               (F-21 내 토큰 전부 폐기, 멱등)
 
 import { authClient } from '../../auth';
 
@@ -53,6 +55,9 @@ export const TOKEN_LIMIT = 25;
 
 /** 만료 임박으로 볼 남은 일수. */
 export const EXPIRING_SOON_DAYS = 7;
+
+/** 라벨(이름) 최대 길이 — 서버 PersonalAccessTokenService.MAX_LABEL_LENGTH 와 같다. */
+export const LABEL_MAX = 100;
 
 /** 상태코드 + 서버 오류 코드를 들고 다니는 에러 — 화면에서 401/403/409 를 구분한다. */
 export class ApiError extends Error {
@@ -126,6 +131,24 @@ export async function revokeToken(id: string): Promise<void> {
   });
   if (res.status === 204 || res.ok) return;
   throw await toApiError(res, '토큰을 폐기하지 못했습니다.');
+}
+
+/** 토큰 이름(라벨) 변경. 토큰 값은 그대로라 쓰던 스크립트는 영향이 없다. */
+export async function renameToken(id: string, name: string): Promise<ApiToken> {
+  const res = await authClient.apiFetch(`/api/auth/tokens/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+  if (!res.ok) throw await toApiError(res, '토큰 이름을 바꾸지 못했습니다.');
+  return (await res.json()) as ApiToken;
+}
+
+/** 내 토큰 전부 폐기(204, 멱등). 유출이 의심될 때 한 번에 끊는다. */
+export async function revokeAllTokens(): Promise<void> {
+  const res = await authClient.apiFetch('/api/auth/tokens', { method: 'DELETE' });
+  if (res.status === 204 || res.ok) return;
+  throw await toApiError(res, '토큰을 모두 폐기하지 못했습니다.');
 }
 
 export type TokenStatus = 'active' | 'expiring' | 'expired' | 'revoked';
