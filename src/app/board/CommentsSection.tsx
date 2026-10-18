@@ -144,8 +144,13 @@ export default function CommentsSection({ postId }: { postId: number }) {
     setDeleting(true);
     try {
       await deleteComment(deleteTarget.id);
-      setComments((prev) => prev.filter((p) => p.id !== deleteTarget.id));
-      setTotal((t) => Math.max(0, t - 1));
+      if (nextPage === null) {
+        setComments((prev) => prev.filter((p) => p.id !== deleteTarget.id));
+        setTotal((t) => Math.max(0, t - 1));
+      } else {
+        // 아직 안 받은 페이지가 있으면 오프셋이 한 칸씩 당겨져 다음 "더 보기"가 댓글 하나를 건너뛴다 — 처음부터 다시 받는다.
+        await load();
+      }
       notify.success('댓글을 삭제했습니다.');
     } catch (e: unknown) {
       notify.error(e instanceof Error ? e.message : '댓글을 삭제하지 못했습니다.');
