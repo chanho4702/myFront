@@ -16,6 +16,7 @@ import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import { deletePost, getPost, type Post } from './boardStore';
+import CommentsSection from './CommentsSection';
 import { useAuth } from '../../auth';
 import { useNotify } from '../../notifications';
 
@@ -140,6 +141,9 @@ export default function BoardDetailPage() {
           </Stack>
         )}
       </Stack>
+
+      {/* 댓글(F-22) — 본문과 따로 불러와 댓글 API 가 실패해도 본문은 그대로다. */}
+      <CommentsSection postId={post.id} />
 
       <Dialog open={confirmOpen} onClose={() => !deleting && setConfirmOpen(false)}>
         <DialogTitle>글을 삭제할까요?</DialogTitle>
