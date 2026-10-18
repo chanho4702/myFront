@@ -111,12 +111,12 @@ test('AI 에이전트 사실은 products.ts 의 ai-agent 스펙과 같다', () =
   const products = read('site/content/products.ts');
   assert.ok(products.includes(`slug: '${AI_AGENT.slug}'`), `products.ts 에 ${AI_AGENT.slug} 제품이 없다`);
   assert.ok(products.includes(AI_AGENT.endpoint), `products.ts 에 MCP 엔드포인트(${AI_AGENT.endpoint})가 없다`);
-  assert.ok(products.includes('18종'), 'products.ts 에 도구 수(18종)가 없다 — llms.txt 와 화면이 다른 수를 말하면 안 된다');
+  assert.ok(products.includes('24종'), 'products.ts 에 도구 수(24종)가 없다 — llms.txt 와 화면이 다른 수를 말하면 안 된다');
 });
 
-test('도구 수 표기(18종)는 실제 도구 목록과 같다', () => {
-  assert.equal(AI_AGENT.tools.length, 18, 'agent-service 의 도구가 늘거나 줄면 화면의 "18종" 표기도 함께 고쳐야 한다');
-  assert.equal(new Set(AI_AGENT.tools).size, 18, '도구 이름이 중복된다');
+test('도구 수 표기(24종)는 실제 도구 목록과 같다', () => {
+  assert.equal(AI_AGENT.tools.length, 24, 'agent-service 의 도구가 늘거나 줄면 화면의 "24종" 표기도 함께 고쳐야 한다');
+  assert.equal(new Set(AI_AGENT.tools).size, 24, '도구 이름이 중복된다');
 });
 
 test('시나리오의 도구 흐름은 실재하는 MCP 도구 이름만 쓴다', () => {

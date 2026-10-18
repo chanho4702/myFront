@@ -49,11 +49,11 @@ export const AI_AGENT = {
   slug: 'ai-agent',
   endpoint: '/api/agent/mcp',
   summary:
-    'MCP(streamable-HTTP) 서버로 AI 코딩 에이전트를 붙인다. 도구 18종으로 ALM 이슈를 만들고 전이하고 위키에 작업 보고서를 쓰며, 모든 기록은 조직 멤버(kind=AGENT) 페르소나 명의로 남는다.',
+    'MCP(streamable-HTTP) 서버로 AI 코딩 에이전트를 붙인다. 도구 24종으로 ALM 이슈를 만들고 전이하고 위키에 작업 보고서를 쓰며, 모든 기록은 조직 멤버(kind=AGENT) 페르소나 명의로 남는다.',
   guide: { title: 'API 가이드', path: '/docs/spaces/3/pages/135' },
   /**
-   * agent-service `src/main/java/com/platform/agentservice/tools/` 에 실제로 등록된 도구 18종.
-   * 화면의 "18종" 표기와 시나리오 카드의 도구 이름이 이 목록을 벗어나지 않는지 테스트가 대조한다 —
+   * agent-service `src/main/java/com/platform/agentservice/tools/` 에 실제로 등록된 도구 24종.
+   * 화면의 "24종" 표기와 시나리오 카드의 도구 이름이 이 목록을 벗어나지 않는지 테스트가 대조한다 —
    * 있지도 않은 도구 이름을 활용 예에 적는 것이 가장 하기 쉬운 거짓말이다.
    */
   tools: [
@@ -65,7 +65,9 @@ export const AI_AGENT = {
     'get_issue',
     'create_issue',
     'claim_issue',
+    'update_issue',
     'update_issue_status',
+    'assign_issue',
     'add_comment',
     'log_work',
     'link_pr',
@@ -75,6 +77,10 @@ export const AI_AGENT = {
     'create_page',
     'update_page',
     'append_to_page',
+    'report_progress',
+    'request_gate',
+    'report_result',
+    'get_harness_bundle',
   ],
   /**
    * 활용 시나리오 요약. src/site/content/products.ts 의 `scenarios` 카드와 같은 사실이어야 한다 —
