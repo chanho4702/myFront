@@ -86,9 +86,10 @@ npm run sync:docs     # 3. 문서 위키 dev 스페이스 "API 레퍼런스" 폴
 > 3개를 Windows Terminal 탭(:5173 / :5174 / :5175, `--strictPort`)으로 연다. 백엔드는
 > 각 repo의 IntelliJ 공유 Run Config로 기동한다. 상세는 상위 README 참고.
 
-> **백엔드가 필요하다.** 인증·게시판이 실제로 동작하려면 게이트웨이(:8000) 뒤로
-> auth-server(:9000)·board-service(:9100)가 떠 있어야 한다. 연동 주소는 `.env` 의
-> `VITE_API_BASE` 로 지정한다(개발 기본값 `http://localhost:8000`).
+> **백엔드가 필요하다.** 인증·게시판이 실제로 동작하려면 게이트웨이 뒤로
+> auth-server·board-service가 떠 있어야 한다. 연동 주소는 `.env` 의 `VITE_API_BASE` 로 지정한다
+> (개발 기본값 `http://localhost:18000` — dev 오프셋 클러스터 게이트웨이, `../scripts/dev-up-local.ps1`).
+> 도커 게이트웨이는 호스트 포트를 발행하지 않으므로 옛 기본값 `:8000` 으로는 붙지 않는다.
 
 ---
 
@@ -99,7 +100,8 @@ npm run sync:docs     # 3. 문서 위키 dev 스페이스 "API 레퍼런스" 폴
 
 | 파일 | 값 | 용도 |
 | --- | --- | --- |
-| `.env` | `VITE_API_BASE=http://localhost:8000` | 개발 — 로컬 게이트웨이 직접 호출 |
+| `.env` | `VITE_API_BASE=http://localhost:18000` | 개발 — dev 오프셋 게이트웨이 직접 호출 |
+| `.env.devlocal` | `VITE_API_BASE=http://localhost:18000` | `--mode devlocal`(dev-up-local.ps1) — 지금은 `.env` 와 같은 값 |
 | `.env.production` | `VITE_API_BASE=` (빈 값) | nginx 통합배포 — 같은 오리진 상대경로로 호출 |
 
 프로덕션에서 값을 비우면 요청이 `/api/...` 상대경로로 나가, nginx가 단일 오리진에서

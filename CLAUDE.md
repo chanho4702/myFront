@@ -16,13 +16,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev      # Vite dev server with HMR → http://localhost:5173 (NOT VSCode Live Server)
-npm run build    # tsc -b (typecheck) && vite build — typecheck is part of build, so it gates builds
-npm run preview  # serve the production build locally
+npm run dev           # Vite dev server with HMR → http://localhost:5173 (NOT VSCode Live Server)
+npm run build         # tsc -b (typecheck) && vite build — typecheck is part of build, so it gates builds
+npm run preview       # serve the production build locally
+npm run test:scripts  # node --test — scripts/ 아래 생성기(노트·문서·SEO·API 레퍼런스) 단위 테스트
 ```
 
-There is no test runner, linter, or formatter configured. Type errors are the primary build gate
-(`tsc -b` with `strict`, `noUnusedLocals`, `noUnusedParameters`). Requires Node 20+ (24 recommended).
+There is no UI test runner (vitest 등), linter, or formatter configured — 도입하려면 사용자와 먼저 합의한다.
+Type errors are the primary build gate (`tsc -b` with `strict`, `noUnusedLocals`, `noUnusedParameters`);
+`npm run test:scripts` covers only the Node scripts. Requires Node 20+ (24 recommended).
+
+`.env` 의 `VITE_API_BASE` 기본값은 dev 오프셋 게이트웨이 `http://localhost:18000` 이다(도커 게이트웨이는
+호스트 포트를 발행하지 않는다 — 브라우저는 nginx :80 경유). `.env.production` 은 빈 값(같은 오리진 상대경로).
 
 ## Architecture
 
@@ -40,26 +45,32 @@ Routing is centralized in `src/main.tsx` (`createBrowserRouter`); the whole tree
 - `src/pages/` (Home hub, ComponentsCatalog, ComponentsShowcase) and `src/showcase/` are a component
   browser, separate from both.
 
-### Reusable `src/auth/` module (OAuth + OIDC + 자체 JWT)
+### Reusable `src/auth/` module (Keycloak OIDC 리다이렉트 + 백채널 로그아웃)
 
-Self-contained auth module wired to the `oauth-oidc-login` backend. **Copy the whole `src/auth/`
+Self-contained auth module wired to auth-server (게이트웨이 경유). **Copy the whole `src/auth/`
 folder into another project and only `VITE_API_BASE` (or `authClient.ts`'s `baseUrl`) needs to change.**
 Always import from the barrel `src/auth` — never reach into internal files.
 
+로그인은 **Keycloak 리다이렉트(OIDC) + 구글**로 확정이다(루트 CLAUDE.md 확정 설계 결정). 이메일/비밀번호 폼·
+회원가입 화면·ROPC 를 다시 만들지 않는다.
+
 - `client.ts` — `createAuthClient({ baseUrl })` factory. Each instance owns its own in-memory access
   token + in-flight refresh dedup (no module-level singletons), so multiple backends can coexist.
-  Methods: `login`/`signup`/`logout`/`refresh`/`fetchMe`/`apiFetch` (Bearer auto-attach + one 401→refresh
-  retry)/`googleLoginUrl`. AT lives in memory; RT is the backend's HttpOnly cookie.
+  Methods: `loginUrl`/`googleLoginUrl`(`{base}/oauth2/authorization/keycloak`, 구글은 `?kc_idp_hint=google`)/
+  `apiFetch` (Bearer auto-attach + one 401→refresh retry)/`tryRefresh`/`fetchMe`/`logout`.
+  AT lives in memory; RT is auth-server's HttpOnly cookie.
+- `logout()` — `POST /api/auth/logout` 로 auth-server 가 **백채널(서버-서버)** 로 Keycloak 세션을 끊는다.
+  프론트채널 `id_token_hint` 리다이렉트로 되돌리지 않는다.
 - `authClient.ts` — this app's default instance (`baseUrl: VITE_API_BASE`).
 - `AuthContext.tsx` — `AuthProvider` (accepts an optional `client` prop, defaults to `authClient`) +
-  `useAuth()` → `{ user, isAuthenticated, loading, loginWithPassword, signUp, completeOAuthLogin, logout }`.
-  Silent session restore on load via `tryRefresh`.
+  `useAuth()` → `{ user, isAuthenticated, loading, logout }`. Silent session restore on load via `tryRefresh`.
+- `returnTo.ts` — `rememberReturnTo(path)` 가 돌아올 경로를 일회용 쿠키에 심는다(auth-server 가 로그인 후 읽음).
 - `ProtectedRoute.tsx` / `GuestRoute.tsx` — guards (auth-only / guest-only). Both take a `fallback`
   prop for the restore state; the app passes the themed `AuthLoadingScreen` (no white flash).
-- Real auth pages live in `src/app/pages/`: `LoginPage` (`/login`, form + Google), `SignUpPage`
-  (`/register`, email + password×2, auto-login on success). There is **no** OAuth callback page —
-  the backend redirects straight to `/app` and `AuthProvider`'s mount-time silent refresh restores
-  the session. The MUI `/sign-in` `/sign-up` routes are untouched **reference** templates.
+- The only auth page is `src/app/pages/LoginPage.tsx` (`/login`) — "로그인"·"Google 로그인" 버튼이 브라우저를
+  Keycloak 으로 통째로 보낸다. There is **no** OAuth callback page — auth-server redirects straight back
+  (보통 `/app`) and `AuthProvider`'s mount-time silent refresh restores the session. The MUI `/sign-in`
+  `/sign-up` routes are untouched **reference** templates, not real auth.
 
 ### Reusable `src/notifications/` module (toasts)
 
@@ -67,11 +78,15 @@ Always import from the barrel `src/auth` — never reach into internal files.
 a queued MUI Snackbar/Alert. Copy the folder to reuse. Route-level errors render via `RouteErrorPage`
 (`errorElement` on every route) and unknown paths hit `NotFoundPage` (`path: '*'`).
 
-### Demo data layer (swap for a real API)
+### Data layer (`src/app/<feature>/<feature>Store.ts`)
 
-- `src/app/board/boardStore.ts` — full CRUD over `localStorage` key `myfornt.board.posts`
-  (`listPosts`/`getPost`/`createPost`/`updatePost`/`deletePost`/`incrementViews`). Replace the function
-  bodies with API calls.
+화면은 fetch 를 직접 부르지 않고 각 기능의 store 모듈만 거친다. 전부 게이트웨이 REST 다.
+
+- `board/boardStore.ts` — board-service: 글 목록(`q` 검색 포함)·CRUD + 댓글 CRUD.
+- `tokens/tokensStore.ts` — auth-server 개인 API 토큰(`/api/auth/tokens`): 목록·발급·라벨 변경·폐기(단건/전부).
+- `admin/adminStore.ts` — 관리자 대시보드(헬스·제품 통계·감사), `agents/agentsStore.ts` — agent-service
+  (페르소나·에이전트 토큰·러너·킬 스위치·예산/run/게이트 지표).
+- `designs/`·`profile/` 은 localStorage 데모 store 다.
 
 ### Theme
 
