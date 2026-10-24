@@ -23,8 +23,8 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import ExpandLessRoundedIcon from '@mui/icons-material/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
-import AppTheme from '../../context/templates/shared-theme/AppTheme';
-import ColorModeIconDropdown from '../../context/templates/shared-theme/ColorModeIconDropdown';
+import PlatformTheme from '../theme/PlatformTheme';
+import ColorModeMenu from '../components/ColorModeMenu';
 import { useAuth } from '../../auth';
 import { listDesigns, DESIGN_CATEGORIES } from './designsStore';
 
@@ -147,7 +147,7 @@ export default function DesignsLayout() {
   );
 
   return (
-    <AppTheme>
+    <PlatformTheme>
       <CssBaseline enableColorScheme />
       <Box sx={{ display: 'flex' }}>
         <AppBar
@@ -189,7 +189,7 @@ export default function DesignsLayout() {
                 새 문서
               </Button>
             )}
-            <ColorModeIconDropdown />
+            <ColorModeMenu />
           </Toolbar>
         </AppBar>
 
@@ -226,6 +226,6 @@ export default function DesignsLayout() {
           <Outlet />
         </Box>
       </Box>
-    </AppTheme>
+    </PlatformTheme>
   );
 }

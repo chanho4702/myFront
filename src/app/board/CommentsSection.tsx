@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -26,6 +25,8 @@ import {
   type Comment,
 } from './boardStore';
 import { useAuth } from '../../auth';
+import { useAdminIdentity } from '../admin/adminStore';
+import BoardErrorAlert, { toBoardLoadError, type BoardLoadError } from './BoardErrorAlert';
 import { useNotify } from '../../notifications';
 
 /** ISO → 로케일 시각. 값이 없거나 깨졌으면 빈 문자열(Invalid Date 방지). */
@@ -37,19 +38,20 @@ function formatDateTime(iso: string | null | undefined): string {
 
 /**
  * 게시글 댓글 영역(F-22). 본문과 따로 불러온다 — board-service 댓글 API 가 실패해도 본문은
- * 그대로이고 이 영역만 오류 문구를 보인다. 수정·삭제 버튼은 작성자 본인 또는 ADMIN 에게만
+ * 그대로이고 이 영역만 오류 문구를 보인다. 수정·삭제 버튼은 작성자 본인 또는 전역 관리자(org GLOBAL ADMIN)에게만
  * 보인다(서버 AccessGuard 와 같은 규칙, 서버가 최종 강제).
  */
 export default function CommentsSection({ postId }: { postId: number }) {
   const notify = useNotify();
   const { user } = useAuth();
+  const { isGlobalAdmin } = useAdminIdentity();
 
   const [comments, setComments] = React.useState<Comment[]>([]);
   const [total, setTotal] = React.useState(0);
   const [nextPage, setNextPage] = React.useState<number | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [loadingMore, setLoadingMore] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<BoardLoadError | null>(null);
 
   const [draft, setDraft] = React.useState('');
   const [posting, setPosting] = React.useState(false);
@@ -70,7 +72,7 @@ export default function CommentsSection({ postId }: { postId: number }) {
       setTotal(page.totalElements ?? 0);
       setNextPage(page.number + 1 < page.totalPages ? page.number + 1 : null);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : '댓글을 불러오지 못했습니다.');
+      setError(toBoardLoadError(e, '댓글을 불러오지 못했습니다.'));
     } finally {
       setLoading(false);
     }
@@ -97,8 +99,8 @@ export default function CommentsSection({ postId }: { postId: number }) {
     }
   };
 
-  const canManage = (c: Comment) =>
-    !!user && (user.sub === String(c.authorId) || user.role === 'ADMIN');
+  // 관리자 판정은 org GLOBAL ADMIN — board-service AccessGuard 와 같은 기준(Keycloak user.role 아님).
+  const canManage = (c: Comment) => !!user && (user.sub === String(c.authorId) || isGlobalAdmin);
 
   const handlePost = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -175,19 +177,7 @@ export default function CommentsSection({ postId }: { postId: number }) {
         </Stack>
       )}
 
-      {!loading && error && (
-        <Alert
-          severity="error"
-          variant="outlined"
-          action={
-            <Button color="inherit" size="small" onClick={() => void load()}>
-              다시 시도
-            </Button>
-          }
-        >
-          {error}
-        </Alert>
-      )}
+      {!loading && error && <BoardErrorAlert error={error} onRetry={() => void load()} />}
 
       {!loading && !error && (
         <>
@@ -264,7 +254,7 @@ export default function CommentsSection({ postId }: { postId: number }) {
                         </Stack>
                       </Stack>
                     ) : (
-                      <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', mt: 0.5, lineHeight: 1.7 }}>
+                      <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', mt: 0.5, lineHeight: 1.7 }}>
                         {c.content}
                       </Typography>
                     )}

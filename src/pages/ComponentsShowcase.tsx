@@ -11,8 +11,8 @@ import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded';
-import AppTheme from '../context/templates/shared-theme/AppTheme';
-import ColorModeIconDropdown from '../context/templates/shared-theme/ColorModeIconDropdown';
+import PlatformTheme from '../app/theme/PlatformTheme';
+import ColorModeMenu from '../app/components/ColorModeMenu';
 import InputsSection from '../showcase/InputsSection';
 import DataDisplaySection from '../showcase/DataDisplaySection';
 import FeedbackSection from '../showcase/FeedbackSection';
@@ -31,7 +31,7 @@ const anchors = [
 
 export default function ComponentsShowcase(props: { disableCustomTheme?: boolean }) {
   return (
-    <AppTheme {...props}>
+    <PlatformTheme {...props}>
       <CssBaseline enableColorScheme />
       <AppBar
         position="sticky"
@@ -54,7 +54,7 @@ export default function ComponentsShowcase(props: { disableCustomTheme?: boolean
           >
             레퍼런스
           </Button>
-          <ColorModeIconDropdown />
+          <ColorModeMenu />
         </Toolbar>
       </AppBar>
 
@@ -96,6 +96,6 @@ export default function ComponentsShowcase(props: { disableCustomTheme?: boolean
           <LayoutSection />
         </Box>
       </Container>
-    </AppTheme>
+    </PlatformTheme>
   );
 }

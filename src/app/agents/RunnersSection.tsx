@@ -153,9 +153,9 @@ export default function RunnersSection() {
         </Alert>
       ) : (
         <TableContainer component={Paper} variant="outlined" sx={{ mb: 4 }}>
-          <Table size="small" aria-label="러너">
+          <Table size="small" aria-label="러너" sx={{ minWidth: 860 }}>
             <TableHead>
-              <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600 } }}>
+              <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600, whiteSpace: 'nowrap' } }}>
                 <TableCell>이름</TableCell>
                 <TableCell width={130}>상태</TableCell>
                 <TableCell width={130}>마지막 신호</TableCell>

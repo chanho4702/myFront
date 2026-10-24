@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Link from '@mui/material/Link';
-import AppTheme from '../../context/templates/shared-theme/AppTheme';
+import PlatformTheme from '../../app/theme/PlatformTheme';
 import SiteHeader from './SiteHeader';
 import SiteFooter from './SiteFooter';
 
@@ -39,7 +39,7 @@ function useHashScroll() {
 export default function SitePage({ children }: { children: React.ReactNode }) {
   useHashScroll();
   return (
-    <AppTheme>
+    <PlatformTheme>
       <CssBaseline enableColorScheme />
       <Link
         href="#main-content"
@@ -81,6 +81,6 @@ export default function SitePage({ children }: { children: React.ReactNode }) {
         {children}
       </Box>
       <SiteFooter />
-    </AppTheme>
+    </PlatformTheme>
   );
 }

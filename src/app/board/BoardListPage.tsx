@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
+import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -22,6 +23,7 @@ import SearchOffRoundedIcon from '@mui/icons-material/SearchOffRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import { listPosts, SEARCH_MAX, type Page, type PostSummary } from './boardStore';
+import BoardErrorAlert, { toBoardLoadError, type BoardLoadError } from './BoardErrorAlert';
 
 const PAGE_SIZE = 10;
 
@@ -38,7 +40,9 @@ export default function BoardListPage() {
   const setPage = (next: number) => setPageState({ query, page: next });
   const [data, setData] = React.useState<Page<PostSummary> | null>(null);
   const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<BoardLoadError | null>(null);
+  // "다시 시도" — 같은 페이지·검색어로 다시 부른다.
+  const [reloadKey, setReloadKey] = React.useState(0);
 
   React.useEffect(() => {
     let alive = true;
@@ -49,7 +53,7 @@ export default function BoardListPage() {
         if (alive) setData(res);
       })
       .catch((e: unknown) => {
-        if (alive) setError(e instanceof Error ? e.message : '목록을 불러오지 못했습니다.');
+        if (alive) setError(toBoardLoadError(e, '목록을 불러오지 못했습니다.'));
       })
       .finally(() => {
         if (alive) setLoading(false);
@@ -57,7 +61,7 @@ export default function BoardListPage() {
     return () => {
       alive = false;
     };
-  }, [page, query]);
+  }, [page, query, reloadKey]);
 
   // 주소의 검색어가 바뀌면(뒤로 가기 포함) 입력창을 맞춘다.
   React.useEffect(() => {
@@ -151,7 +155,10 @@ export default function BoardListPage() {
         </Button>
       </Box>
 
-      {isEmpty && searching ? (
+      {!loading && error ? (
+        // 승인 대기·일시 장애·그 밖의 실패를 표 안 한 줄이 아니라 상태별 안내로 보인다.
+        <BoardErrorAlert error={error} onRetry={() => setReloadKey((k) => k + 1)} />
+      ) : isEmpty && searching ? (
         <Paper
           variant="outlined"
           sx={{
@@ -206,14 +213,14 @@ export default function BoardListPage() {
         </Paper>
       ) : (
         <TableContainer component={Paper} variant="outlined">
-          <Table>
+          <Table sx={{ minWidth: 440 }}>
             <TableHead>
-              <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600 } }}>
+              <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600, whiteSpace: 'nowrap' } }}>
                 <TableCell width={72} align="center">
                   번호
                 </TableCell>
                 <TableCell>제목</TableCell>
-                <TableCell width={160}>작성자</TableCell>
+                <TableCell sx={{ width: { xs: 96, sm: 160 } }}>작성자</TableCell>
                 <TableCell width={140} align="right">
                   작성일
                 </TableCell>
@@ -229,12 +236,32 @@ export default function BoardListPage() {
                     onClick={() => navigate(`/app/board/${post.id}`)}
                     sx={{ cursor: 'pointer', '&:last-child td': { border: 0 } }}
                   >
-                    <TableCell align="center" sx={{ color: 'text.secondary' }}>
+                    <TableCell align="center" sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>
                       {total - (page * PAGE_SIZE + index)}
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 500 }}>{post.title}</TableCell>
-                    <TableCell sx={{ color: 'text.secondary' }}>{post.authorName}</TableCell>
-                    <TableCell align="right" sx={{ color: 'text.secondary' }}>
+                    {/*
+                      행 클릭은 마우스 전용이라 제목을 실제 링크로도 둔다(키보드 Tab·Enter 로 글을 열 수 있게).
+                      긴 영문·URL 제목은 칸 안에서 끊어 다른 열을 밀어내지 않는다.
+                    */}
+                    <TableCell sx={{ fontWeight: 500, overflowWrap: 'anywhere' }}>
+                      <Link
+                        component={RouterLink}
+                        to={`/app/board/${post.id}`}
+                        color="inherit"
+                        // 행 onClick 이 한 번 더 navigate 하면 히스토리에 같은 글이 두 번 쌓인다.
+                        onClick={(e) => e.stopPropagation()}
+                        sx={{ '&::before': { display: 'none' } }}
+                      >
+                        {post.title}
+                      </Link>
+                    </TableCell>
+                    <TableCell
+                      sx={{ color: 'text.secondary', maxWidth: { xs: 96, sm: 160 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                      title={post.authorName}
+                    >
+                      {post.authorName}
+                    </TableCell>
+                    <TableCell align="right" sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>
                       {new Date(post.createdAt).toLocaleDateString('ko-KR')}
                     </TableCell>
                   </TableRow>
@@ -246,19 +273,12 @@ export default function BoardListPage() {
                   </TableCell>
                 </TableRow>
               )}
-              {!loading && error && (
-                <TableRow>
-                  <TableCell colSpan={4} align="center" sx={{ py: 6, border: 0, color: 'error.main' }}>
-                    {error}
-                  </TableCell>
-                </TableRow>
-              )}
             </TableBody>
           </Table>
         </TableContainer>
       )}
 
-      {!isEmpty && (
+      {!isEmpty && !error && (
         <Stack sx={{ alignItems: 'center', mt: 3 }}>
           <Pagination
             count={pageCount}

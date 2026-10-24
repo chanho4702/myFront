@@ -50,6 +50,8 @@ function FlowChips({ flow }: { flow: string[] }) {
                 borderColor: aside ? 'divider' : brand(0.35),
                 bgcolor: aside ? 'transparent' : brand(0.08),
                 color: aside ? 'text.secondary' : 'primary.main',
+                // 다크의 primary.main 은 이 작은 글씨(11.5px)에서 4.2:1 이라 AA 미달 — 한 단계 밝은 light 로 올린다.
+                ...(!aside && { '[data-mui-color-scheme="dark"] &': { color: 'primary.light' } }),
                 fontFamily: aside ? undefined : MONO,
                 fontSize: aside ? '0.75rem' : '0.72rem',
                 lineHeight: 1.4,

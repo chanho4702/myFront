@@ -10,7 +10,7 @@ import Drawer from '@mui/material/Drawer';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import ColorModeIconDropdown from '../../context/templates/shared-theme/ColorModeIconDropdown';
+import ColorModeMenu from '../../app/components/ColorModeMenu';
 import { HEADER_H } from '../ui';
 import { BRAND, BRAND_TAGLINE, GITHUB_URL, START_URL, hero } from '../content';
 import BrandLogo from './BrandLogo';
@@ -73,7 +73,14 @@ export default function SiteHeader() {
       >
         <Container maxWidth="lg">
           <Stack direction="row" sx={{ height: HEADER_H, alignItems: 'center', justifyContent: 'space-between' }}>
-            <Link component={RouterLink} to="/" underline="none" aria-label={`${BRAND} 홈 — ${BRAND_TAGLINE}`} sx={{ display: 'flex' }}>
+            {/* 원본 테마의 MuiLink 는 ::before 로 밑줄을 그린다 — 로고 아래에 선이 생기지 않게 끈다. */}
+            <Link
+              component={RouterLink}
+              to="/"
+              underline="none"
+              aria-label={`${BRAND} 홈 — ${BRAND_TAGLINE}`}
+              sx={{ display: 'flex', '&::before': { display: 'none' } }}
+            >
               <BrandLogo />
             </Link>
 
@@ -82,14 +89,14 @@ export default function SiteHeader() {
               <IconButton component="a" href={GITHUB_URL} target="_blank" rel="noopener" aria-label="GitHub" size="small">
                 <GitHubIcon fontSize="small" />
               </IconButton>
-              <ColorModeIconDropdown size="small" />
+              <ColorModeMenu />
               <Button href={START_URL} variant="contained" size="small" sx={{ borderRadius: 999, px: 2.25 }}>
                 {hero.cta}
               </Button>
             </Stack>
 
             <Stack direction="row" spacing={0.5} sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center' }}>
-              <ColorModeIconDropdown size="small" />
+              <ColorModeMenu />
               <IconButton onClick={() => setOpen(true)} aria-label="메뉴 열기" size="small">
                 <MenuRoundedIcon />
               </IconButton>

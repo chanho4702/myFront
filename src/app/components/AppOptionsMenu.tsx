@@ -35,7 +35,7 @@ export default function AppOptionsMenu({ onLogout }: { onLogout: () => void }) {
   return (
     <React.Fragment>
       <MenuButton
-        aria-label="Open menu"
+        aria-label="계정 메뉴"
         onClick={handleClick}
         sx={{ borderColor: 'transparent' }}
       >

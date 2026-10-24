@@ -17,6 +17,8 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import { deletePost, getPost, type Post } from './boardStore';
 import CommentsSection from './CommentsSection';
+import BoardErrorAlert, { toBoardLoadError, type BoardLoadError } from './BoardErrorAlert';
+import { useAdminIdentity } from '../admin/adminStore';
 import { useAuth } from '../../auth';
 import { useNotify } from '../../notifications';
 
@@ -24,12 +26,14 @@ export default function BoardDetailPage() {
   const navigate = useNavigate();
   const notify = useNotify();
   const { user } = useAuth();
+  const { isGlobalAdmin } = useAdminIdentity();
   const { id } = useParams<{ id: string }>();
   const postId = Number(id);
 
   const [post, setPost] = React.useState<Post | undefined>(undefined);
   const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<BoardLoadError | null>(null);
+  const [reloadKey, setReloadKey] = React.useState(0);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
 
@@ -42,7 +46,7 @@ export default function BoardDetailPage() {
         if (alive) setPost(p);
       })
       .catch((e: unknown) => {
-        if (alive) setError(e instanceof Error ? e.message : '글을 불러오지 못했습니다.');
+        if (alive) setError(toBoardLoadError(e, '글을 불러오지 못했습니다.'));
       })
       .finally(() => {
         if (alive) setLoading(false);
@@ -50,11 +54,12 @@ export default function BoardDetailPage() {
     return () => {
       alive = false;
     };
-  }, [postId]);
+  }, [postId, reloadKey]);
 
-  // 본인 글이거나 ADMIN 일 때만 수정/삭제 노출(서버도 동일하게 강제함).
-  const canEdit =
-    !!post && !!user && (user.sub === String(post.authorId) || user.role === 'ADMIN');
+  // 본인 글이거나 전역 관리자일 때만 수정/삭제 노출(서버도 동일하게 강제함).
+  // 관리자 판정은 org GLOBAL ADMIN(`/api/org/me` 의 globalRoles) 이다 — board-service 가 같은 기준으로 바꿨고,
+  // Keycloak 역할(user.role)로 판정하면 서버가 거부할 버튼을 보이거나, 허용할 버튼을 숨기게 된다.
+  const canEdit = !!post && !!user && (user.sub === String(post.authorId) || isGlobalAdmin);
 
   const handleDelete = async () => {
     setDeleting(true);
@@ -82,9 +87,13 @@ export default function BoardDetailPage() {
   if (error || !post) {
     return (
       <Box sx={{ width: '100%', maxWidth: 900 }}>
-        <Typography color="text.secondary" sx={{ py: 6, textAlign: 'center' }}>
-          {error ?? '존재하지 않는 글입니다.'}
-        </Typography>
+        {error && error.kind !== 'notFound' ? (
+          <BoardErrorAlert error={error} onRetry={() => setReloadKey((k) => k + 1)} sx={{ my: 3 }} />
+        ) : (
+          <Typography color="text.secondary" sx={{ py: 6, textAlign: 'center' }}>
+            {error?.message ?? '존재하지 않는 글입니다.'}
+          </Typography>
+        )}
         <Stack sx={{ alignItems: 'center' }}>
           <Button startIcon={<ArrowBackRoundedIcon />} onClick={() => navigate('/app/board')}>
             목록으로
@@ -97,7 +106,7 @@ export default function BoardDetailPage() {
   return (
     <Box sx={{ width: '100%', maxWidth: 900 }}>
       <Paper variant="outlined" sx={{ p: { xs: 2.5, md: 4 } }}>
-        <Typography variant="h5" component="h1" sx={{ fontWeight: 700, mb: 1.5 }}>
+        <Typography variant="h5" component="h1" sx={{ fontWeight: 700, mb: 1.5, overflowWrap: 'anywhere' }}>
           {post.title}
         </Typography>
         <Stack
@@ -111,7 +120,8 @@ export default function BoardDetailPage() {
         <Divider sx={{ my: 2.5 }} />
         <Typography
           variant="body1"
-          sx={{ whiteSpace: 'pre-wrap', minHeight: 160, lineHeight: 1.8 }}
+          // 긴 URL·공백 없는 문자열이 본문 밖으로 넘쳐 포털 전체가 옆으로 스크롤되던 것을 칸 안에서 끊는다.
+          sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', minHeight: 160, lineHeight: 1.8 }}
         >
           {post.content}
         </Typography>

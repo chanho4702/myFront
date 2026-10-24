@@ -204,10 +204,11 @@ export default function TokensPage() {
           </Button>
         </Paper>
       ) : (
+        // 좁은 화면에서 열이 글자 폭으로 찌그러지지 않게 최소 폭을 두고 표 안에서 가로 스크롤한다.
         <TableContainer component={Paper} variant="outlined">
-          <Table>
+          <Table sx={{ minWidth: 1080 }}>
             <TableHead>
-              <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600 } }}>
+              <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600, whiteSpace: 'nowrap' } }}>
                 <TableCell sx={{ minWidth: 160 }}>라벨</TableCell>
                 <TableCell width={220}>토큰</TableCell>
                 <TableCell width={130}>만든 날</TableCell>
@@ -229,13 +230,13 @@ export default function TokensPage() {
                   const canRevoke = status === 'active' || status === 'expiring';
                   return (
                     <TableRow key={token.id} hover sx={{ '&:last-child td': { border: 0 } }}>
-                      <TableCell sx={{ fontWeight: 500 }}>{token.label}</TableCell>
-                      <TableCell sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
+                      <TableCell sx={{ fontWeight: 500, overflowWrap: 'anywhere' }}>{token.label}</TableCell>
+                      <TableCell sx={{ fontFamily: 'monospace', color: 'text.secondary', whiteSpace: 'nowrap' }}>
                         {TOKEN_PREFIX}…{token.hint}
                       </TableCell>
-                      <TableCell sx={{ color: 'text.secondary' }}>{formatDate(token.createdAt)}</TableCell>
-                      <TableCell sx={{ color: 'text.secondary' }}>{formatDate(token.expiresAt)}</TableCell>
-                      <TableCell sx={{ color: 'text.secondary' }}>{formatDate(token.lastUsedAt)}</TableCell>
+                      <TableCell sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>{formatDate(token.createdAt)}</TableCell>
+                      <TableCell sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>{formatDate(token.expiresAt)}</TableCell>
+                      <TableCell sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>{formatDate(token.lastUsedAt)}</TableCell>
                       <TableCell>
                         <ScopeChips scopes={token.scopes} />
                       </TableCell>

@@ -5,11 +5,11 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-import AppTheme from '../../context/templates/shared-theme/AppTheme';
-import ColorModeIconDropdown from '../../context/templates/shared-theme/ColorModeIconDropdown';
+import PlatformTheme from '../theme/PlatformTheme';
+import ColorModeMenu from './ColorModeMenu';
 
 // /app 밖의 공개 페이지 공용 셸. AppLayout이 없는 standalone 화면이므로 여기서
-// 테마(AppTheme)를 한 번 감싸고, 홈 복귀 링크 + 색상모드 토글을 상단에 둔다.
+// 테마(PlatformTheme)를 한 번 감싸고, 홈 복귀 링크 + 색상모드 토글을 상단에 둔다.
 export default function PublicPageShell({
   children,
   maxWidth = 'lg',
@@ -18,7 +18,7 @@ export default function PublicPageShell({
   maxWidth?: 'sm' | 'md' | 'lg';
 }) {
   return (
-    <AppTheme>
+    <PlatformTheme>
       <CssBaseline enableColorScheme />
       <Container maxWidth={maxWidth} sx={{ py: { xs: 3, md: 5 } }}>
         <Stack
@@ -28,10 +28,10 @@ export default function PublicPageShell({
           <Button component={RouterLink} to="/" startIcon={<HomeRoundedIcon />}>
             홈
           </Button>
-          <ColorModeIconDropdown />
+          <ColorModeMenu />
         </Stack>
         {children}
       </Container>
-    </AppTheme>
+    </PlatformTheme>
   );
 }

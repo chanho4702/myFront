@@ -17,8 +17,8 @@ import ViewSidebarRoundedIcon from '@mui/icons-material/ViewSidebarRounded';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
-import AppTheme from '../context/templates/shared-theme/AppTheme';
-import ColorModeIconDropdown from '../context/templates/shared-theme/ColorModeIconDropdown';
+import PlatformTheme from '../app/theme/PlatformTheme';
+import ColorModeMenu from '../app/components/ColorModeMenu';
 import { totalComponentCount } from '../data/components';
 
 interface HubCard {
@@ -76,10 +76,10 @@ const cards: HubCard[] = [
 
 export default function TemplatesHub(props: { disableCustomTheme?: boolean }) {
   return (
-    <AppTheme {...props}>
+    <PlatformTheme {...props}>
       <CssBaseline enableColorScheme />
       <Box sx={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 10 }}>
-        <ColorModeIconDropdown />
+        <ColorModeMenu />
       </Box>
       <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
         <Button component={RouterLink} to="/" startIcon={<HomeRoundedIcon />} sx={{ mb: 3 }}>
@@ -123,6 +123,6 @@ export default function TemplatesHub(props: { disableCustomTheme?: boolean }) {
           ))}
         </Grid>
       </Container>
-    </AppTheme>
+    </PlatformTheme>
   );
 }

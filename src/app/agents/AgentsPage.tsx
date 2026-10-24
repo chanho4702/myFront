@@ -348,10 +348,11 @@ export default function AgentsPage() {
           </Button>
         </Paper>
       ) : (
+        // 좁은 화면에서는 열을 찌그러뜨리지 않고 표 안에서 가로 스크롤한다.
         <TableContainer component={Paper} variant="outlined" sx={{ mb: 4 }}>
-          <Table size="small">
+          <Table size="small" sx={{ minWidth: 860 }}>
             <TableHead>
-              <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600 } }}>
+              <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600, whiteSpace: 'nowrap' } }}>
                 <TableCell width={180}>슬러그</TableCell>
                 <TableCell>이름</TableCell>
                 <TableCell width={130}>역할</TableCell>
@@ -470,9 +471,9 @@ export default function AgentsPage() {
       )}
 
       <TableContainer component={Paper} variant="outlined" sx={{ mb: 4 }}>
-        <Table size="small">
+        <Table size="small" sx={{ minWidth: 860 }}>
           <TableHead>
-            <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600 } }}>
+            <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600, whiteSpace: 'nowrap' } }}>
               <TableCell>라벨</TableCell>
               <TableCell width={140}>만든 날</TableCell>
               <TableCell width={140}>만료</TableCell>

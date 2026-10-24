@@ -11,9 +11,11 @@ import Button from '@mui/material/Button';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import MenuButton from '../../context/templates/dashboard/components/MenuButton';
-import CardAlert from '../../context/templates/dashboard/components/CardAlert';
-import { CustomIcon } from '../../context/templates/dashboard/components/AppNavbar';
-import ColorModeIconDropdown from '../../context/templates/shared-theme/ColorModeIconDropdown';
+import { Link as RouterLink } from 'react-router-dom';
+import Link from '@mui/material/Link';
+import ColorModeMenu from './ColorModeMenu';
+import BrandLogo from '../../site/components/BrandLogo';
+import { BRAND } from '../../site/content';
 import AppMenuContent from './AppMenuContent';
 import { useAuth } from '../../auth';
 
@@ -53,14 +55,12 @@ export default function AppNavbar({ onLogout }: { onLogout: () => void }) {
     >
       <Toolbar variant="regular">
         <Stack direction="row" sx={{ alignItems: 'center', flexGrow: 1, width: '100%', gap: 1 }}>
-          <Stack direction="row" spacing={1} sx={{ justifyContent: 'center', mr: 'auto' }}>
-            <CustomIcon />
-            <Typography variant="h4" component="h1" sx={{ color: 'text.primary' }}>
-              chanho.dev
-            </Typography>
-          </Stack>
-          <ColorModeIconDropdown />
-          <MenuButton aria-label="menu" onClick={toggleDrawer(true)}>
+          {/* 데스크톱 사이드 메뉴·공개 사이트와 같은 로고(원본 템플릿 아이콘 + "chanho.dev" 대신). */}
+          <Link component={RouterLink} to="/" aria-label={`${BRAND} 홈으로`} sx={{ display: 'flex', mr: 'auto', '&::before': { display: 'none' } }}>
+            <BrandLogo />
+          </Link>
+          <ColorModeMenu size="medium" />
+          <MenuButton aria-label="메뉴 열기" aria-expanded={open} onClick={toggleDrawer(true)}>
             <MenuRoundedIcon />
           </MenuButton>
         </Stack>
@@ -89,7 +89,6 @@ export default function AppNavbar({ onLogout }: { onLogout: () => void }) {
             <AppMenuContent onNavigate={toggleDrawer(false)} />
             <Divider />
           </Stack>
-          <CardAlert />
           <Stack sx={{ p: 2 }}>
             <Button variant="outlined" fullWidth startIcon={<LogoutRoundedIcon />} onClick={onLogout}>
               로그아웃

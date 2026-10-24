@@ -6,6 +6,9 @@
 // 게이트웨이가 /api/board/** 를 board-service 로 라우팅하며 쿠키를 안 쓴다(Bearer 전용).
 
 import { authClient } from '../../auth';
+import { describeBoardError, type BoardErrorKind } from './boardErrors';
+
+export type { BoardErrorKind } from './boardErrors';
 
 const BASE = (import.meta.env.VITE_API_BASE as string).replace(/\/+$/, '');
 
@@ -42,12 +45,29 @@ export interface Page<T> {
   size: number;
 }
 
-/** 상태코드를 들고 다니는 에러 — 페이지에서 404/403 을 구분해 처리한다. */
+/**
+ * 상태코드 + 종류를 들고 다니는 에러. `kind` 로 화면이 승인 대기(account)·일시 장애(unavailable)를
+ * 일반 실패와 다르게 그린다. 문구는 서버 message 가 우선이다(boardErrors.ts).
+ */
 export class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  public kind: BoardErrorKind;
+  constructor(public status: number, message: string, kind: BoardErrorKind = 'other') {
     super(message);
     this.name = 'ApiError';
+    this.kind = kind;
   }
+}
+
+/** 실패 응답 → ApiError. 본문이 비었거나 JSON 이 아니어도(프록시 502/504) 던지지 않고 상태별 문구로 떨어진다. */
+async function toApiError(res: Response, fallback: string, byStatus: Partial<Record<number, string>> = {}): Promise<ApiError> {
+  let body: unknown = null;
+  try {
+    body = await res.json();
+  } catch {
+    // 본문 없음/비 JSON
+  }
+  const { kind, message } = describeBoardError(res.status, body, fallback, byStatus);
+  return new ApiError(res.status, message, kind);
 }
 
 async function boardFetch(path: string, init: RequestInit = {}): Promise<Response> {
@@ -84,36 +104,31 @@ export async function listPosts(page: number, size = 10, q = ''): Promise<Page<P
   const query = q.trim();
   if (query) params.set('q', query);
   const res = await boardFetch(`/api/board/posts?${params.toString()}`);
-  if (!res.ok) throw new ApiError(res.status, '목록을 불러오지 못했습니다.');
+  if (!res.ok) throw await toApiError(res, '목록을 불러오지 못했습니다.', { 401: '로그인이 필요합니다.' });
   return (await res.json()) as Page<PostSummary>;
 }
 
 export async function getPost(id: number): Promise<Post> {
   const res = await boardFetch(`/api/board/posts/${id}`);
-  if (res.status === 404) throw new ApiError(404, '존재하지 않는 글입니다.');
-  if (!res.ok) throw new ApiError(res.status, '글을 불러오지 못했습니다.');
+  if (!res.ok) throw await toApiError(res, '글을 불러오지 못했습니다.', { 401: '로그인이 필요합니다.', 404: '존재하지 않는 글입니다.' });
   return (await res.json()) as Post;
 }
 
 export async function createPost(input: PostInput): Promise<Post> {
   const res = await boardFetch('/api/board/posts', jsonInit('POST', input));
-  if (res.status === 401) throw new ApiError(401, '로그인이 필요합니다.');
-  if (!res.ok) throw new ApiError(res.status, '등록에 실패했습니다.');
+  if (!res.ok) throw await toApiError(res, '등록에 실패했습니다.', { 401: '로그인이 필요합니다.' });
   return (await res.json()) as Post;
 }
 
 export async function updatePost(id: number, input: PostInput): Promise<Post> {
   const res = await boardFetch(`/api/board/posts/${id}`, jsonInit('PUT', input));
-  if (res.status === 403) throw new ApiError(403, '수정 권한이 없습니다.');
-  if (res.status === 404) throw new ApiError(404, '존재하지 않는 글입니다.');
-  if (!res.ok) throw new ApiError(res.status, '수정에 실패했습니다.');
+  if (!res.ok) throw await toApiError(res, '수정에 실패했습니다.', { 403: '수정 권한이 없습니다.', 404: '존재하지 않는 글입니다.' });
   return (await res.json()) as Post;
 }
 
 export async function deletePost(id: number): Promise<void> {
   const res = await boardFetch(`/api/board/posts/${id}`, { method: 'DELETE' });
-  if (res.status === 403) throw new ApiError(403, '삭제 권한이 없습니다.');
-  if (res.status !== 204 && !res.ok) throw new ApiError(res.status, '삭제에 실패했습니다.');
+  if (res.status !== 204 && !res.ok) throw await toApiError(res, '삭제에 실패했습니다.', { 403: '삭제 권한이 없습니다.' });
 }
 
 /* ────────────────────────── 댓글(F-22) ────────────────────────── */
@@ -139,29 +154,26 @@ export const COMMENT_PAGE_SIZE = 100;
 
 export async function listComments(postId: number, page = 0, size = COMMENT_PAGE_SIZE): Promise<Page<Comment>> {
   const res = await boardFetch(`/api/board/posts/${postId}/comments?page=${page}&size=${size}`);
-  if (!res.ok) throw new ApiError(res.status, '댓글을 불러오지 못했습니다.');
+  if (!res.ok) throw await toApiError(res, '댓글을 불러오지 못했습니다.', { 401: '로그인이 필요합니다.' });
   return (await res.json()) as Page<Comment>;
 }
 
 export async function createComment(postId: number, content: string): Promise<Comment> {
   const res = await boardFetch(`/api/board/posts/${postId}/comments`, jsonInit('POST', { content }));
-  if (res.status === 401) throw new ApiError(401, '로그인이 필요합니다.');
-  if (res.status === 404) throw new ApiError(404, '글이 삭제되어 댓글을 달 수 없습니다.');
-  if (!res.ok) throw new ApiError(res.status, '댓글을 등록하지 못했습니다.');
+  if (!res.ok) {
+    throw await toApiError(res, '댓글을 등록하지 못했습니다.', { 401: '로그인이 필요합니다.', 404: '글이 삭제되어 댓글을 달 수 없습니다.' });
+  }
   return (await res.json()) as Comment;
 }
 
 export async function updateComment(id: number, content: string): Promise<Comment> {
   const res = await boardFetch(`/api/board/comments/${id}`, jsonInit('PUT', { content }));
-  if (res.status === 403) throw new ApiError(403, '수정 권한이 없습니다.');
-  if (res.status === 404) throw new ApiError(404, '이미 삭제된 댓글입니다.');
-  if (!res.ok) throw new ApiError(res.status, '댓글을 수정하지 못했습니다.');
+  if (!res.ok) throw await toApiError(res, '댓글을 수정하지 못했습니다.', { 403: '수정 권한이 없습니다.', 404: '이미 삭제된 댓글입니다.' });
   return (await res.json()) as Comment;
 }
 
 export async function deleteComment(id: number): Promise<void> {
   const res = await boardFetch(`/api/board/comments/${id}`, { method: 'DELETE' });
-  if (res.status === 403) throw new ApiError(403, '삭제 권한이 없습니다.');
   if (res.status === 404) return; // 이미 지워졌으면 목표 상태와 같다.
-  if (res.status !== 204 && !res.ok) throw new ApiError(res.status, '댓글을 삭제하지 못했습니다.');
+  if (res.status !== 204 && !res.ok) throw await toApiError(res, '댓글을 삭제하지 못했습니다.', { 403: '삭제 권한이 없습니다.' });
 }

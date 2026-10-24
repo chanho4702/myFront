@@ -5,8 +5,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
-import AppTheme from '../../context/templates/shared-theme/AppTheme';
-import ColorModeSelect from '../../context/templates/shared-theme/ColorModeSelect';
+import PlatformTheme from '../theme/PlatformTheme';
+import ColorModeMenu from '../components/ColorModeMenu';
 
 // react-router 의 errorElement. 렌더링 중 던져진 예외나 라우트 로더 에러를
 // 흰 화면 대신 친절한 페이지로 잡아준다.
@@ -27,9 +27,9 @@ export default function RouteErrorPage(props: { disableCustomTheme?: boolean }) 
   }
 
   return (
-    <AppTheme {...props}>
+    <PlatformTheme {...props}>
       <CssBaseline enableColorScheme />
-      <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+      <ColorModeMenu size="medium" sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <Stack
         sx={{
           height: '100dvh',
@@ -56,6 +56,6 @@ export default function RouteErrorPage(props: { disableCustomTheme?: boolean }) 
           </Button>
         </Box>
       </Stack>
-    </AppTheme>
+    </PlatformTheme>
   );
 }

@@ -6,13 +6,13 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
-import AppTheme from '../../context/templates/shared-theme/AppTheme';
-import ColorModeSelect from '../../context/templates/shared-theme/ColorModeSelect';
-import {
-  GoogleIcon,
-  SitemarkIcon,
-} from '../../context/templates/sign-in/components/CustomIcons';
-import { useLocation } from 'react-router-dom';
+import Link from '@mui/material/Link';
+import PlatformTheme from '../theme/PlatformTheme';
+import ColorModeMenu from '../components/ColorModeMenu';
+import BrandLogo from '../../site/components/BrandLogo';
+import { BRAND } from '../../site/content';
+import { GoogleIcon } from '../../context/templates/sign-in/components/CustomIcons';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { loginUrl, googleLoginUrl, rememberReturnTo } from '../../auth';
 
 // Keycloak 기반 로그인. 버튼을 누르면 auth-server(:9000)의 OIDC 시작점으로 리다이렉트되고,
@@ -66,12 +66,15 @@ export default function LoginPage(props: { disableCustomTheme?: boolean }) {
   const from = (location.state as { from?: string } | null)?.from ?? '/app';
 
   return (
-    <AppTheme {...props}>
+    <PlatformTheme {...props}>
       <CssBaseline enableColorScheme />
-      <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+      <ColorModeMenu size="medium" sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <LoginContainer direction="column" sx={{ justifyContent: 'space-between' }}>
         <Card variant="outlined">
-          <SitemarkIcon />
+          {/* 원본 템플릿의 Sitemark 로고 대신 이 제품의 로고 — 누르면 소개 홈으로 돌아간다(로그인 화면의 유일한 탈출구). */}
+          <Link component={RouterLink} to="/" aria-label={`${BRAND} 홈으로`} sx={{ display: 'flex', '&::before': { display: 'none' } }}>
+            <BrandLogo />
+          </Link>
           <Typography
             component="h1"
             variant="h4"
@@ -108,6 +111,6 @@ export default function LoginPage(props: { disableCustomTheme?: boolean }) {
           </Box>
         </Card>
       </LoginContainer>
-    </AppTheme>
+    </PlatformTheme>
   );
 }

@@ -5,8 +5,10 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import SelectContent from '../../context/templates/dashboard/components/SelectContent';
-import CardAlert from '../../context/templates/dashboard/components/CardAlert';
+import { Link as RouterLink } from 'react-router-dom';
+import Link from '@mui/material/Link';
+import BrandLogo from '../../site/components/BrandLogo';
+import { BRAND } from '../../site/content';
 import AppOptionsMenu from './AppOptionsMenu';
 import AppMenuContent from './AppMenuContent';
 import { useAuth } from '../../auth';
@@ -39,13 +41,18 @@ export default function AppSideMenu({ onLogout }: { onLogout: () => void }) {
         },
       }}
     >
-      <Box sx={{ display: 'flex', mt: 'calc(var(--template-frame-height, 0px) + 4px)', p: 1.5 }}>
-        <SelectContent />
+      {/*
+        원본 템플릿의 "Sitemark-web" 회사 선택(가짜 데이터)·"Plan about to expire" 할인 카드는 이 제품과 무관한
+        견본이라 뺐다. 대신 공개 사이트와 같은 로고를 두어 포털에서도 브랜드가 하나로 보이고 소개 홈으로 돌아갈 수 있다.
+      */}
+      <Box sx={{ display: 'flex', alignItems: 'center', minHeight: 64, mt: 'var(--template-frame-height, 0px)', px: 2.5 }}>
+        <Link component={RouterLink} to="/" aria-label={`${BRAND} 홈으로`} sx={{ display: 'flex', '&::before': { display: 'none' } }}>
+          <BrandLogo />
+        </Link>
       </Box>
       <Divider />
       <Box sx={{ overflow: 'auto', height: '100%', display: 'flex', flexDirection: 'column' }}>
         <AppMenuContent />
-        <CardAlert />
       </Box>
       <Stack
         direction="row"
@@ -57,7 +64,7 @@ export default function AppSideMenu({ onLogout }: { onLogout: () => void }) {
           borderColor: 'divider',
         }}
       >
-        <Avatar sizes="small" sx={{ width: 36, height: 36 }}>
+        <Avatar sizes="small" sx={{ width: 36, height: 36, bgcolor: 'primary.dark', color: 'primary.contrastText' }}>
           {initial}
         </Avatar>
         <Box sx={{ mr: 'auto', minWidth: 0 }}>

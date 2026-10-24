@@ -12,15 +12,11 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
-import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import AppSideMenu from './AppSideMenu';
 import AppNavbar from './AppNavbar';
-import Search from '../../context/templates/dashboard/components/Search';
-import CustomDatePicker from '../../context/templates/dashboard/components/CustomDatePicker';
-import MenuButton from '../../context/templates/dashboard/components/MenuButton';
-import ColorModeIconDropdown from '../../context/templates/shared-theme/ColorModeIconDropdown';
-import AppTheme from '../../context/templates/shared-theme/AppTheme';
+import ColorModeMenu from './ColorModeMenu';
+import PlatformTheme from '../theme/PlatformTheme';
 import {
   chartsCustomizations,
   dataGridCustomizations,
@@ -81,7 +77,7 @@ export default function AppLayout(props: { disableCustomTheme?: boolean }) {
   };
 
   return (
-    <AppTheme {...props} themeComponents={xThemeComponents}>
+    <PlatformTheme {...props} themeComponents={xThemeComponents}>
       <CssBaseline enableColorScheme />
       <Box sx={{ display: 'flex' }}>
         <AppSideMenu onLogout={handleLogout} />
@@ -90,6 +86,8 @@ export default function AppLayout(props: { disableCustomTheme?: boolean }) {
           component="main"
           sx={(theme) => ({
             flexGrow: 1,
+            // 사이드 메뉴 옆 flex 항목 — 넓은 표가 main 을 밀어 가로로 넘치지 않게 최소 폭을 0 으로 둔다.
+            minWidth: 0,
             backgroundColor: theme.vars
               ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
               : alpha(theme.palette.background.default, 1),
@@ -130,13 +128,12 @@ export default function AppLayout(props: { disableCustomTheme?: boolean }) {
                   ),
                 )}
               </Breadcrumbs>
+              {/*
+                원본 대시보드 템플릿의 검색창(입력해도 아무 일 없음)·날짜 선택(2023년 고정값)·알림 버튼(가짜 빨간 점)은
+                동작하지 않는 장식이라 사용자를 속인다 — 실제로 동작하는 도구만 남긴다.
+              */}
               <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
-                <Search />
-                <CustomDatePicker />
-                <MenuButton showBadge aria-label="Open notifications">
-                  <NotificationsRoundedIcon />
-                </MenuButton>
-                <ColorModeIconDropdown />
+                <ColorModeMenu size="medium" />
                 <Button
                   variant="outlined"
                   size="small"
@@ -152,6 +149,6 @@ export default function AppLayout(props: { disableCustomTheme?: boolean }) {
           </Stack>
         </Box>
       </Box>
-    </AppTheme>
+    </PlatformTheme>
   );
 }

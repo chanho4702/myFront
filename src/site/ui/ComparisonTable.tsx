@@ -8,6 +8,18 @@ import Typography from '@mui/material/Typography';
 import type { ComparisonRow } from '../content/comparison';
 
 /**
+ * 행 이름 열 고정. 좁은 화면에서 표를 가로로 밀면 첫 열이 화면 밖으로 사라져 "지금 무슨 항목을 보고 있는지"를
+ * 잃는다 — 항목 이름을 왼쪽에 붙여 두고 값 열만 스크롤되게 한다. 넓은 화면(표가 다 보이는 폭)에서는 일반 열이다.
+ */
+const stickyCell = {
+  position: { xs: 'sticky', md: 'static' },
+  left: 0,
+  zIndex: 1,
+  bgcolor: 'background.default',
+  width: { xs: 112, sm: 148 },
+} as const;
+
+/**
  * 사실 대조표. SpecTable 과 같은 헤어라인 리듬을 쓰되, 값이 여러 열이라 MUI Table 을 쓴다.
  *
  * 좁은 화면에서는 표를 접거나 줄이지 않고 **가로 스크롤**한다 — 대조표는 같은 행을 나란히
@@ -25,7 +37,7 @@ export default function ComparisonTable({ columns, rows, caption }: { columns: s
         )}
         <TableHead>
           <TableRow>
-            <TableCell sx={{ width: 148, borderColor: 'divider', py: 1.75 }} />
+            <TableCell sx={{ ...stickyCell, borderColor: 'divider', py: 1.75 }} />
             {columns.map((col, i) => (
               <TableCell
                 key={col}
@@ -47,7 +59,7 @@ export default function ComparisonTable({ columns, rows, caption }: { columns: s
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.label}>
-              <TableCell component="th" scope="row" sx={{ borderColor: 'divider', py: 1.75, verticalAlign: 'top' }}>
+              <TableCell component="th" scope="row" sx={{ ...stickyCell, borderColor: 'divider', py: 1.75, verticalAlign: 'top' }}>
                 <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
                   {row.label}
                 </Typography>

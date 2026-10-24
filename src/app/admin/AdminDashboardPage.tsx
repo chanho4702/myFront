@@ -68,16 +68,17 @@ const HEALTH_POLL_MS = 60_000;
 /** 최근 활동 표시 건수. */
 const ACTIVITY_LIMIT = 20;
 
-type PaletteKey = 'success' | 'warning' | 'error' | 'info';
-
-const STATUS_META: Record<
-  ComponentStatus,
-  { label: string; color: PaletteKey; Icon: typeof CheckCircleRoundedIcon }
-> = {
-  UP: { label: '정상', color: 'success', Icon: CheckCircleRoundedIcon },
-  DEGRADED: { label: '저하', color: 'warning', Icon: WarningAmberRoundedIcon },
-  DOWN: { label: '중단', color: 'error', Icon: ErrorRoundedIcon },
-  UNKNOWN: { label: '알 수 없음', color: 'info', Icon: HelpOutlineRoundedIcon },
+/**
+ * 상태 표시. 색은 아이콘에만 싣고 라벨은 본문색으로 둔다 — 작은 굵은 글씨에 상태색을 입히면
+ * 라이트의 초록·빨강이 4.5:1 경계에 걸리고, '알 수 없음'에 쓰던 info 는 다크에서 1.5:1 까지 떨어졌다.
+ * 상태는 아이콘 모양 + 글자로 이미 구분되므로(색만으로 구분하지 않음) 의미는 그대로다.
+ * '알 수 없음'은 경고도 정상도 아니므로 중립 회색이다.
+ */
+const STATUS_META: Record<ComponentStatus, { label: string; color: string; Icon: typeof CheckCircleRoundedIcon }> = {
+  UP: { label: '정상', color: 'success.main', Icon: CheckCircleRoundedIcon },
+  DEGRADED: { label: '저하', color: 'warning.main', Icon: WarningAmberRoundedIcon },
+  DOWN: { label: '중단', color: 'error.main', Icon: ErrorRoundedIcon },
+  UNKNOWN: { label: '알 수 없음', color: 'text.secondary', Icon: HelpOutlineRoundedIcon },
 };
 
 const GROUP_LABEL: Record<HealthComponent['group'], string> = {
@@ -134,9 +135,9 @@ function StatusCell({ status }: { status: ComponentStatus }) {
   const meta = STATUS_META[status];
   const Icon = meta.Icon;
   return (
-    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center' }}>
-      <Icon fontSize="small" aria-hidden sx={{ color: `${meta.color}.main` }} />
-      <Typography variant="body2" sx={{ fontWeight: 600, color: `${meta.color}.main` }}>
+    <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', whiteSpace: 'nowrap' }}>
+      <Icon fontSize="small" aria-hidden sx={{ color: meta.color }} />
+      <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
         {meta.label}
       </Typography>
     </Stack>
@@ -490,7 +491,6 @@ export default function AdminDashboardPage() {
         {summary.unknown > 0 && (
           <Chip
             size="small"
-            color="info"
             variant="outlined"
             icon={<HelpOutlineRoundedIcon />}
             label={`알 수 없음 ${summary.unknown}`}
@@ -506,10 +506,11 @@ export default function AdminDashboardPage() {
           {healthError}
         </Alert>
       )}
+      {/* 좁은 화면에서는 열을 글자 폭으로 찌그러뜨리지 않고 표 안에서 가로 스크롤한다. */}
       <TableContainer component={Paper} variant="outlined" sx={{ mb: 4 }}>
-        <Table size="small">
+        <Table size="small" sx={{ minWidth: 960 }}>
           <TableHead>
-            <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600 } }}>
+            <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600, whiteSpace: 'nowrap' } }}>
               <TableCell width={90}>구분</TableCell>
               <TableCell>컴포넌트</TableCell>
               <TableCell width={130}>상태</TableCell>
@@ -565,7 +566,7 @@ export default function AdminDashboardPage() {
                     <TableCell align="right" sx={{ color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
                       {formatLatency(c.latencyMs)}
                     </TableCell>
-                    <TableCell sx={{ color: 'text.secondary' }}>{c.version || '—'}</TableCell>
+                    <TableCell sx={{ color: 'text.secondary', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{c.version || '—'}</TableCell>
                     <TableCell sx={{ color: 'text.secondary' }}>{c.detail || '—'}</TableCell>
                   </TableRow>
                 );
@@ -778,39 +779,42 @@ function ActivityList({ result }: { result: ActivityResult }) {
   return (
     <>
       <ActivityFailures failures={result.failures} />
-      <Table size="small">
-        <TableHead>
-          <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600 } }}>
-            <TableCell width={80}>제품</TableCell>
-            <TableCell width={200}>동작</TableCell>
-            <TableCell width={180}>대상</TableCell>
-            <TableCell>내용</TableCell>
-            <TableCell width={170}>시각</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {result.items.map((item) => (
-            <TableRow key={item.key} hover sx={{ '&:last-child td': { border: 0 } }}>
-              <TableCell>
-                <Chip
-                  size="small"
-                  variant="outlined"
-                  color={item.source === 'WIKI' ? 'primary' : 'secondary'}
-                  label={item.source}
-                />
-              </TableCell>
-              <TableCell sx={{ fontFamily: 'monospace', fontSize: 12 }}>{item.action || '—'}</TableCell>
-              <TableCell sx={{ color: 'text.secondary' }}>
-                <ActivityTarget item={item} />
-              </TableCell>
-              <TableCell sx={{ color: 'text.secondary' }}>{item.detail || '—'}</TableCell>
-              <TableCell sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>
-                {formatDateTime(item.occurredAt)}
-              </TableCell>
+      {/* 표가 카드보다 넓어지면 이 상자 안에서만 가로 스크롤한다(전에는 포털 본문 전체가 옆으로 밀렸다). */}
+      <TableContainer>
+        <Table size="small" sx={{ minWidth: 860 }}>
+          <TableHead>
+            <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600, whiteSpace: 'nowrap' } }}>
+              <TableCell width={80}>제품</TableCell>
+              <TableCell width={200}>동작</TableCell>
+              <TableCell width={180}>대상</TableCell>
+              <TableCell>내용</TableCell>
+              <TableCell width={170}>시각</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {result.items.map((item) => (
+              <TableRow key={item.key} hover sx={{ '&:last-child td': { border: 0 } }}>
+                <TableCell>
+                  <Chip
+                    size="small"
+                    variant="outlined"
+                    color={item.source === 'WIKI' ? 'primary' : 'secondary'}
+                    label={item.source}
+                  />
+                </TableCell>
+                <TableCell sx={{ fontFamily: 'monospace', fontSize: 12, overflowWrap: 'anywhere' }}>{item.action || '—'}</TableCell>
+                <TableCell sx={{ color: 'text.secondary' }}>
+                  <ActivityTarget item={item} />
+                </TableCell>
+                <TableCell sx={{ color: 'text.secondary' }}>{item.detail || '—'}</TableCell>
+                <TableCell sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>
+                  {formatDateTime(item.occurredAt)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </>
   );
 }

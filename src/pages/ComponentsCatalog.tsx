@@ -22,8 +22,8 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
-import AppTheme from '../context/templates/shared-theme/AppTheme';
-import ColorModeIconDropdown from '../context/templates/shared-theme/ColorModeIconDropdown';
+import PlatformTheme from '../app/theme/PlatformTheme';
+import ColorModeMenu from '../app/components/ColorModeMenu';
 import { componentCategories, docUrl, totalComponentCount } from '../data/components';
 
 export default function ComponentsCatalog(props: { disableCustomTheme?: boolean }) {
@@ -45,7 +45,7 @@ export default function ComponentsCatalog(props: { disableCustomTheme?: boolean 
   const matchCount = filtered.reduce((sum, c) => sum + c.items.length, 0);
 
   return (
-    <AppTheme {...props}>
+    <PlatformTheme {...props}>
       <CssBaseline enableColorScheme />
       <AppBar position="sticky" color="default" elevation={0} sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Toolbar>
@@ -58,7 +58,7 @@ export default function ComponentsCatalog(props: { disableCustomTheme?: boolean 
           <Button component={RouterLink} to="/showcase" startIcon={<AutoAwesomeRoundedIcon />} sx={{ mr: 1 }}>
             라이브 데모
           </Button>
-          <ColorModeIconDropdown />
+          <ColorModeMenu />
         </Toolbar>
       </AppBar>
 
@@ -150,6 +150,6 @@ export default function ComponentsCatalog(props: { disableCustomTheme?: boolean 
           )}
         </Stack>
       </Container>
-    </AppTheme>
+    </PlatformTheme>
   );
 }

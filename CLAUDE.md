@@ -90,10 +90,13 @@ a queued MUI Snackbar/Alert. Copy the folder to reuse. Route-level errors render
 
 ### Theme
 
-Light/dark/system color modes come from `context/templates/shared-theme/AppTheme` (MUI CSS variables)
-+ `ColorModeIconDropdown`. `/app` wraps the theme **once** in `AppLayout`; standalone pages each wrap
-themselves in `AppTheme`. `AppLayout` also merges the MUI X customizations (charts/data-grid/
-date-pickers/tree-view) into the theme via `xThemeComponents`.
+Light/dark/system color modes come from `context/templates/shared-theme/AppTheme` (MUI CSS variables).
+화면은 원본 `AppTheme` 를 직접 쓰지 않고 **`src/app/theme/PlatformTheme`** 으로 감싼다 — 원본 위에 앱 공통 보정
+(칩 라벨 대비 AA, 한국어 어절 줄바꿈 `word-break: keep-all`)을 얹는 래퍼다. 색상 모드 버튼은 원본
+`ColorModeIconDropdown`(접근 이름 없음·메뉴 id 고정) 대신 `src/app/components/ColorModeMenu` 를 쓴다.
+`/app` wraps the theme **once** in `AppLayout`; standalone pages each wrap themselves in `PlatformTheme`.
+`AppLayout` also merges the MUI X customizations (charts/data-grid/date-pickers/tree-view) into the theme via
+`xThemeComponents`.
 
 ## Adding a feature page
 
