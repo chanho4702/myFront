@@ -649,6 +649,19 @@ export default function AdminDashboardPage() {
               label="월 비용 / 상한"
               value={`${formatUsd(agents.data?.monthToDateUsd)} / ${formatUsd(agents.data?.monthlyCapUsd)}`}
             />
+            {/* F-19 예산 임박·도달 경고 — 서버 alertLevel(0 · 임계% · 100) */}
+            {(agents.data?.alertLevel ?? 0) > 0 && (
+              <Alert
+                severity={(agents.data?.alertLevel ?? 0) >= 100 ? 'error' : 'warning'}
+                variant="outlined"
+                icon={(agents.data?.alertLevel ?? 0) >= 100 ? <ErrorRoundedIcon /> : <WarningAmberRoundedIcon />}
+                sx={{ my: 0.5, py: 0 }}
+              >
+                {(agents.data?.alertLevel ?? 0) >= 100
+                  ? '월 예산 상한 도달 — 새 run 대기'
+                  : `월 예산 ${agents.data?.alertPercent ?? 80}% 초과`}
+              </Alert>
+            )}
             <StatRow label="실패 run" value={formatCount(agents.data?.failedRuns)} />
             <StatRow label="차단 run" value={formatCount(agents.data?.blockedRuns)} />
             <StatRow label="승인 대기 게이트" value={formatCount(agents.data?.pendingGates)} />

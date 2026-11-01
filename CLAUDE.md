@@ -84,7 +84,7 @@ a queued MUI Snackbar/Alert. Copy the folder to reuse. Route-level errors render
 
 - `board/boardStore.ts` — board-service: 글 목록(`q` 검색 포함)·CRUD + 댓글 CRUD.
 - `tokens/tokensStore.ts` — auth-server 개인 API 토큰(`/api/auth/tokens`): 목록·발급·라벨 변경·폐기(단건/전부).
-- `admin/adminStore.ts` — 관리자 대시보드(헬스·제품 통계·감사), `agents/agentsStore.ts` — agent-service
+- `admin/adminStore.ts` — 관리자 대시보드(헬스·제품 통계·감사), `agents/agentsStore.ts`·`agents/agentOpsStore.ts`(예산 상한·감사 검색·run/게이트 결정·페르소나 편집) — agent-service
   (페르소나·에이전트 토큰·러너·킬 스위치·예산/run/게이트 지표).
 - `designs/`·`profile/` 은 localStorage 데모 store 다.
 

@@ -163,7 +163,7 @@ const ERROR_MESSAGES: Record<string, string> = {
  * 실패 응답을 AgentApiError 로 바꾼다. 본문이 JSON 이 아니거나 비어 있어도(프록시 오류·타임아웃)
  * 던지지 않고 상태코드 기반 메시지로 떨어진다.
  */
-async function toApiError(res: Response, fallback: string): Promise<AgentApiError> {
+export async function toApiError(res: Response, fallback: string): Promise<AgentApiError> {
   let code: string | undefined;
   let message: string | undefined;
   try {
@@ -195,7 +195,7 @@ async function toApiError(res: Response, fallback: string): Promise<AgentApiErro
 /* ────────────────────────── 경계 매퍼 ────────────────────────── */
 
 /** 백엔드 Long → 화면용 string. null/undefined 는 그대로 null 로 남긴다. */
-function idToString(value: unknown): string | null {
+export function idToString(value: unknown): string | null {
   if (typeof value === 'number' && Number.isFinite(value)) return String(value);
   if (typeof value === 'string' && value.trim() !== '') return value;
   return null;
@@ -205,7 +205,7 @@ function text(value: unknown): string {
   return typeof value === 'string' ? value : '';
 }
 
-function nullableText(value: unknown): string | null {
+export function nullableText(value: unknown): string | null {
   return typeof value === 'string' && value !== '' ? value : null;
 }
 
@@ -340,7 +340,8 @@ export async function revokeAgentToken(id: string): Promise<void> {
 // 계약(agent-service BudgetController·RunController·GateController):
 //   GET  /api/agent/kill-switch          → {on: boolean}                       (인증 사용자 누구나)
 //   POST /api/agent/kill-switch {on}     → 204 (ROLE_ADMIN — 켜면 실행 중 run 을 전부 취소, O-09 DB 영속)
-//   GET  /api/agent/budget               → {monthlyCapUsd, platformMonthToDateUsd, killSwitch}
+//   GET  /api/agent/budget               → {monthlyCapUsd, platformMonthToDateUsd, killSwitch, alertPercent, alertLevel}
+//   (상한 설정·프로젝트별 현황·감사 검색·run/게이트 결정·페르소나 편집은 agentOpsStore.ts)
 //   GET  /api/agent/runs?status=&size=1  → {items, page, size, total, hasNext}  (전역 관리자는 전체 범위)
 //   GET  /api/agent/gates?pending=true   → GateSummaryResponse[]               (결정 안 된 전체)
 
@@ -368,13 +369,16 @@ export interface AgentOverview {
   monthlyCapUsd: number | null;
   monthToDateUsd: number | null;
   killSwitch: boolean;
+  /** F-19: 0 평온 · alertPercent 임박 · 100 도달. 구 서버는 필드가 없다(0). */
+  alertLevel: number;
+  alertPercent: number;
   failedRuns: number | null;
   blockedRuns: number | null;
   pendingGates: number | null;
 }
 
 /** BigDecimal 은 JSON 숫자로 오지만 문자열 직렬화 설정도 견딘다. */
-function toNumber(value: unknown): number | null {
+export function toNumber(value: unknown): number | null {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (typeof value === 'string' && value.trim() !== '' && Number.isFinite(Number(value))) return Number(value);
   return null;
@@ -417,6 +421,8 @@ export async function fetchAgentOverview(): Promise<AgentOverview> {
     monthlyCapUsd: toNumber(b.monthlyCapUsd),
     monthToDateUsd: toNumber(b.platformMonthToDateUsd),
     killSwitch: b.killSwitch === true,
+    alertLevel: toNumber(b.alertLevel) ?? 0,
+    alertPercent: toNumber(b.alertPercent) ?? 80,
     failedRuns: settled(failed),
     blockedRuns: settled(blocked),
     pendingGates: settled(gates),

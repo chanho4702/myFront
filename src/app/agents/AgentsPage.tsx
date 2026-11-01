@@ -29,6 +29,10 @@ import IssueAgentTokenDialog from './IssueAgentTokenDialog';
 import PlatformCredentialCard from './PlatformCredentialCard';
 import PlatformReviewerCard from './PlatformReviewerCard';
 import KillSwitchCard from './KillSwitchCard';
+import BudgetCard from './BudgetCard';
+import AuditSection from './AuditSection';
+import RunsGatesSection from './RunsGatesSection';
+import EditPersonaDialog from './EditPersonaDialog';
 import RunnersSection from './RunnersSection';
 // 발급 직후 1회 표시 다이얼로그는 개인 API 토큰 화면 것을 그대로 쓴다 — 같은 위험(다시 못 봄)에
 // 같은 2단계 닫기·복사 동작이 필요하다.
@@ -111,6 +115,7 @@ export default function AgentsPage() {
   const [selectedSlug, setSelectedSlug] = React.useState<string | null>(null);
   const [createOpen, setCreateOpen] = React.useState(false);
   const [issueTarget, setIssueTarget] = React.useState<Persona | null>(null);
+  const [editTarget, setEditTarget] = React.useState<Persona | null>(null);
   const [revealed, setRevealed] = React.useState<CreatedToken | null>(null);
   const [revokeTarget, setRevokeTarget] = React.useState<AgentToken | null>(null);
   const [revoking, setRevoking] = React.useState(false);
@@ -298,6 +303,18 @@ export default function AgentsPage() {
       </Typography>
       <KillSwitchCard />
 
+      {/* 00-1. 예산 상한(F-19) */}
+      <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, mb: 1.5 }}>
+        예산
+      </Typography>
+      <BudgetCard />
+
+      {/* 00-2. 전 프로젝트 run·대기 게이트(F-18) */}
+      <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, mb: 1.5 }}>
+        실행·승인
+      </Typography>
+      <RunsGatesSection personas={personas} />
+
       {/* 0. 전역 LLM 키 */}
       <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, mb: 1.5 }}>
         전역 LLM 키
@@ -358,7 +375,7 @@ export default function AgentsPage() {
                 <TableCell width={130}>역할</TableCell>
                 <TableCell width={110}>상태</TableCell>
                 <TableCell width={110}>멤버 id</TableCell>
-                <TableCell width={200} align="right">
+                <TableCell width={240} align="right">
                   토큰
                 </TableCell>
               </TableRow>
@@ -412,6 +429,9 @@ export default function AgentsPage() {
                             onClick={() => setIssueTarget(persona)}
                           >
                             발급
+                          </Button>
+                          <Button size="small" onClick={() => setEditTarget(persona)}>
+                            편집
                           </Button>
                         </Stack>
                       </TableCell>
@@ -572,6 +592,17 @@ export default function AgentsPage() {
         </Table>
       </TableContainer>
 
+      {/* 3. 도구 호출 감사 이력(F-17) */}
+      <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, mb: 1.5 }}>
+        감사 이력
+      </Typography>
+      <AuditSection personas={personas} />
+
+      <EditPersonaDialog
+        persona={editTarget}
+        onClose={() => setEditTarget(null)}
+        onSaved={() => void reloadPersonas()}
+      />
       <CreatePersonaDialog
         open={createOpen}
         onClose={() => setCreateOpen(false)}
