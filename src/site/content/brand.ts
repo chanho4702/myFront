@@ -18,3 +18,10 @@ export const CONTACT_EMAIL = 'chanho470@naver.com';
 
 /** "시작하기" CTA 목적지. nginx 단일 오리진(/wiki/)에서만 유효한 라이브 앱. */
 export const START_URL = '/wiki/';
+
+/**
+ * 상표 고지. 비교·설명에 다른 회사 제품명을 쓰는 화면(푸터·비교표)과 llms.txt 가 같은 문장을 쓴다 —
+ * scripts/seo/site.mjs 의 TRADEMARK_NOTICE 와 글자까지 같아야 한다(테스트가 대조).
+ * 다른 제품명은 "~ 대안 / ~와 비교" 같은 서술적 사용만 한다 — 우리 제품 이름·태그라인처럼 쓰지 않는다.
+ */
+export const TRADEMARK_NOTICE = 'Atlassian, Confluence, Jira 는 Atlassian Pty Ltd 의, Notion 은 Notion Labs, Inc. 의, MinIO 는 MinIO, Inc. 의 상표입니다. chanho 는 이들 회사와 제휴·후원 관계가 없으며, 다른 회사의 제품명은 비교·설명 목적으로만 씁니다.';

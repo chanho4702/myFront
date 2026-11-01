@@ -4,7 +4,7 @@ import type { SpecRow } from '../types';
  * "이렇게 씁니다" 한 장. 상황 → 도구 흐름 → 사람이 개입하는 지점의 세 칸으로 고정한다 —
  * 자동화 소개가 능력 자랑으로 흐르지 않게 하려면 마지막 칸이 항상 있어야 한다.
  *
- * `flow` 에는 **실재하는 MCP 도구 이름만** 적는다(agent-service `tools/` 의 24종).
+ * `flow` 에는 **실재하는 MCP 도구 이름만** 적는다(agent-service `tools/` 의 27종).
  * 도구가 아닌 단계(사람의 구현 작업 등)는 `~` 로 감싸 도구와 구분한다.
  */
 export interface Scenario {
@@ -68,7 +68,7 @@ export const products: Product[] = [
       'Claude Code 나 Codex 같은 AI 코딩 에이전트를 플랫폼에 붙이는 통로입니다. 에이전트는 채팅 밖에서 실제로 이슈를 만들고 상태를 옮기고 위키에 작업 보고서를 씁니다. 모든 기록은 사람 계정이 아니라 그 에이전트의 페르소나 명의로 남습니다.',
     spec: [
       { label: '접속', value: 'MCP streamable-HTTP — 게이트웨이 /api/agent/mcp 단일 진입점' },
-      { label: '도구', value: '24종 — 이슈 조회·생성·전이·코멘트·워크로그·PR 링크, 위키 페이지 조회·작성·이어쓰기, run 보고·승인 게이트, 하네스 번들' },
+      { label: '도구', value: '27종 — 이슈 조회·생성·전이(워크플로 전환)·코멘트·워크로그·PR·커밋 링크, 위키 페이지 조회·작성·이어쓰기, run 보고·승인 게이트, 하네스 번들' },
       { label: '신원', value: '페르소나 = 조직 멤버(kind=AGENT) — 사람 멤버(kind=USER)와 같은 자리에 다른 종류로 선다' },
       { label: '인증', value: '에이전트 전용 토큰(agp_ 접두사 · SHA-256 저장 · 페르소나에 바인딩)' },
       { label: '감사', value: '도구 호출마다 호출 도구 · 결과 · 페르소나가 감사 테이블에 적재' },
@@ -88,7 +88,7 @@ export const products: Product[] = [
       { label: '개인 API 토큰', href: '/app/tokens' },
     ],
     metaDescription:
-      'AI 코딩 에이전트를 MCP 로 위키·ALM 에 붙여 이슈를 맡기고, 회의록과 액션 아이템을 남기고, 백로그를 정리하고, 문서를 최신화합니다. 도구 24종 · 페르소나 명의 기록 · 승인 게이트. 연결은 세 단계면 됩니다.',
+      'AI 코딩 에이전트를 MCP 로 위키·ALM 에 붙여 이슈를 맡기고, 회의록과 액션 아이템을 남기고, 백로그를 정리하고, 문서를 최신화합니다. 도구 27종 · 페르소나 명의 기록 · 승인 게이트. 연결은 세 단계면 됩니다.',
     scenarios: [
       {
         id: 'issue-handoff',
@@ -181,7 +181,7 @@ curl -X POST https://<호스트>/api/agent/tokens \\
   {
     slug: 'wiki',
     name: 'WIKI',
-    tagline: 'Confluence 스타일 문서·위키',
+    tagline: '팀 문서·위키 — Confluence 대안',
     summary:
       '스페이스 단위로 문서를 쓰고 관리하는 위키. 편집은 TipTap 리치 에디터지만 저장 포맷은 마크다운 문자열이라, 문서가 특정 에디터에 갇히지 않는다.',
     spec: [
@@ -204,9 +204,9 @@ curl -X POST https://<호스트>/api/agent/tokens \\
   {
     slug: 'alm',
     name: 'ALM',
-    tagline: 'Jira 스타일 이슈·스프린트 관리',
+    tagline: '이슈·스프린트 관리 — Jira 대안',
     summary:
-      '지라의 검증된 구조 위에 한국어 스마트 검색과 필터 URL 공유를 얹은 이슈 트래커. 지라 클론이 아니라, 지라가 잘한 것을 가져오고 다른 지점을 의도적으로 다르게 만들었다.',
+      '널리 쓰이는 이슈 트래커(Jira 등)의 검증된 구조 위에 한국어 스마트 검색과 필터 URL 공유를 얹은 독자 이슈 트래커. 익숙한 구조는 따르되 다른 지점은 의도적으로 다르게 만들었다.',
     spec: [
       { label: 'Frontend', value: 'React · react-router · TipTap(설명·댓글, @멘션)' },
       { label: 'UI', value: '@chanho/react + @chanho/tokens (자체 디자인 시스템)' },

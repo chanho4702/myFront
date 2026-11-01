@@ -13,7 +13,7 @@ import {
   buildUrlset,
   xmlEscape,
 } from './generate.mjs';
-import { AI_AGENT, AI_AGENTS, DEFINITION, DISALLOWED, PRODUCTS, PUBLIC_ROUTES, REPOS } from './site.mjs';
+import { AI_AGENT, AI_AGENTS, DEFINITION, DISALLOWED, PRODUCTS, PUBLIC_ROUTES, REPOS, TRADEMARK_NOTICE } from './site.mjs';
 
 const SRC = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'src');
 const read = (rel) => readFileSync(path.join(SRC, rel), 'utf8');
@@ -88,6 +88,18 @@ test('llms.txt 는 H1 · 정의 인용문 · 제품/AI/문서/소스 절을 갖�
 // 스크립트(.mjs)는 앱(.ts)을 import 할 수 없어 문자열이 두 곳에 산다. 한쪽만 고치면
 // 사이트에 보이는 문장과 llms.txt·사이트맵이 다른 말을 하게 되므로 여기서 글자 단위로 대조한다.
 
+test('상표 고지는 brand.ts 와 글자까지 같고 llms.txt 에 실린다', () => {
+  const brand = read('site/content/brand.ts');
+  assert.ok(brand.includes(`'${TRADEMARK_NOTICE}'`), 'brand.ts 의 TRADEMARK_NOTICE 와 site.mjs 가 다르다');
+  assert.ok(buildLlmsTxt('https://example.com').includes(TRADEMARK_NOTICE), 'llms.txt 에 상표 고지가 없다');
+});
+
+test('다른 회사 제품명을 우리 제품 태그라인처럼 쓰지 않는다', () => {
+  for (const p of PRODUCTS) {
+    assert.ok(!/(Confluence|Jira|Notion)\s*스타일/.test(p.tagline), `태그라인이 남의 상표를 제품 스타일처럼 쓴다: ${p.slug}`);
+  }
+});
+
 test('정의문은 landing.ts 의 definition 과 글자까지 같다', () => {
   const landing = read('site/content/landing.ts');
   assert.ok(landing.includes(`'${DEFINITION}'`), 'landing.ts 의 definition 과 site.mjs 의 DEFINITION 이 다르다');
@@ -111,12 +123,12 @@ test('AI 에이전트 사실은 products.ts 의 ai-agent 스펙과 같다', () =
   const products = read('site/content/products.ts');
   assert.ok(products.includes(`slug: '${AI_AGENT.slug}'`), `products.ts 에 ${AI_AGENT.slug} 제품이 없다`);
   assert.ok(products.includes(AI_AGENT.endpoint), `products.ts 에 MCP 엔드포인트(${AI_AGENT.endpoint})가 없다`);
-  assert.ok(products.includes('24종'), 'products.ts 에 도구 수(24종)가 없다 — llms.txt 와 화면이 다른 수를 말하면 안 된다');
+  assert.ok(products.includes('27종'), 'products.ts 에 도구 수(27종)가 없다 — llms.txt 와 화면이 다른 수를 말하면 안 된다');
 });
 
-test('도구 수 표기(24종)는 실제 도구 목록과 같다', () => {
-  assert.equal(AI_AGENT.tools.length, 24, 'agent-service 의 도구가 늘거나 줄면 화면의 "24종" 표기도 함께 고쳐야 한다');
-  assert.equal(new Set(AI_AGENT.tools).size, 24, '도구 이름이 중복된다');
+test('도구 수 표기(27종)는 실제 도구 목록과 같다', () => {
+  assert.equal(AI_AGENT.tools.length, 27, 'agent-service 의 도구가 늘거나 줄면 화면의 "27종" 표기도 함께 고쳐야 한다');
+  assert.equal(new Set(AI_AGENT.tools).size, 27, '도구 이름이 중복된다');
 });
 
 test('시나리오의 도구 흐름은 실재하는 MCP 도구 이름만 쓴다', () => {

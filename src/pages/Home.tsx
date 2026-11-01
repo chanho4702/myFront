@@ -120,7 +120,7 @@ function FeatureBlock({ feature, flip }: { feature: Feature; flip: boolean }) {
 
 export default function Home() {
   useSeo({
-    title: 'chanho — 문서·이슈·협업을 한 곳에서 | 오픈소스 Confluence·Jira 대안',
+    title: 'chanho — 문서·이슈·협업을 한 곳에서 | Confluence·Jira 의 오픈소스 대안',
     description: definition,
     canonicalPath: '/',
     // 홈은 "제품이 무엇인가"와 "자주 묻는 질문" 둘 다를 답한다 — 답변 엔진이 두 스키마를 각각 쓴다.

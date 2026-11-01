@@ -7,9 +7,12 @@ export const BRAND = 'chanho';
 export const BRAND_TAGLINE = '문서·이슈·협업을 한 곳에서';
 export const GITHUB_URL = 'https://github.com/chanho4702';
 
+/** src/site/content/brand.ts 의 `TRADEMARK_NOTICE` 와 같은 문자열 — llms.txt 끝에 싣는다. */
+export const TRADEMARK_NOTICE = 'Atlassian, Confluence, Jira 는 Atlassian Pty Ltd 의, Notion 은 Notion Labs, Inc. 의, MinIO 는 MinIO, Inc. 의 상표입니다. chanho 는 이들 회사와 제휴·후원 관계가 없으며, 다른 회사의 제품명은 비교·설명 목적으로만 씁니다.';
+
 /** src/site/content/landing.ts 의 `definition` 과 같은 문자열. */
 export const DEFINITION =
-  'chanho 는 문서 위키(WIKI)와 이슈 트래커(ALM)를 하나의 로그인·게이트웨이 위에 올린 오픈소스 협업 플랫폼입니다. Confluence 와 Jira 가 나눠 하던 일을 한 플랫폼에서 합니다.';
+  'chanho 는 문서 위키(WIKI)와 이슈 트래커(ALM)를 하나의 로그인·게이트웨이 위에 올린 오픈소스 협업 플랫폼입니다. 문서 도구와 이슈 도구(예: Confluence·Jira)를 따로 쓰던 일을 한 플랫폼에서 합니다.';
 
 /** 프리렌더 대상이자 사이트맵에 싣는 공개 라우트. src/main.tsx 의 공개 라우트와 같아야 한다. */
 export const PUBLIC_ROUTES = [
@@ -30,8 +33,8 @@ export const PUBLIC_ROUTES = [
  */
 export const PRODUCTS = [
   { slug: 'ai-agent', name: 'AI Agent', tagline: 'MCP 로 위키·ALM 을 직접 다루는 AI 팀원' },
-  { slug: 'wiki', name: 'WIKI', tagline: 'Confluence 스타일 문서·위키', repoUrl: 'https://github.com/chanho4702/WIKI' },
-  { slug: 'alm', name: 'ALM', tagline: 'Jira 스타일 이슈·스프린트 관리', repoUrl: 'https://github.com/chanho4702/ALM' },
+  { slug: 'wiki', name: 'WIKI', tagline: '팀 문서·위키 — Confluence 대안', repoUrl: 'https://github.com/chanho4702/WIKI' },
+  { slug: 'alm', name: 'ALM', tagline: '이슈·스프린트 관리 — Jira 대안', repoUrl: 'https://github.com/chanho4702/ALM' },
   {
     slug: 'msa-platform-template',
     name: 'MSA Platform Template',
@@ -49,11 +52,11 @@ export const AI_AGENT = {
   slug: 'ai-agent',
   endpoint: '/api/agent/mcp',
   summary:
-    'MCP(streamable-HTTP) 서버로 AI 코딩 에이전트를 붙인다. 도구 24종으로 ALM 이슈를 만들고 전이하고 위키에 작업 보고서를 쓰며, 모든 기록은 조직 멤버(kind=AGENT) 페르소나 명의로 남는다.',
+    'MCP(streamable-HTTP) 서버로 AI 코딩 에이전트를 붙인다. 도구 27종으로 ALM 이슈를 만들고 전이하고 위키에 작업 보고서를 쓰며, 모든 기록은 조직 멤버(kind=AGENT) 페르소나 명의로 남는다.',
   guide: { title: 'API 가이드', path: '/docs/spaces/3/pages/135' },
   /**
-   * agent-service `src/main/java/com/platform/agentservice/tools/` 에 실제로 등록된 도구 24종.
-   * 화면의 "24종" 표기와 시나리오 카드의 도구 이름이 이 목록을 벗어나지 않는지 테스트가 대조한다 —
+   * agent-service `src/main/java/com/platform/agentservice/tools/` 에 실제로 등록된 도구 27종.
+   * 화면의 "27종" 표기와 시나리오 카드의 도구 이름이 이 목록을 벗어나지 않는지 테스트가 대조한다 —
    * 있지도 않은 도구 이름을 활용 예에 적는 것이 가장 하기 쉬운 거짓말이다.
    */
   tools: [
@@ -67,10 +70,13 @@ export const AI_AGENT = {
     'claim_issue',
     'update_issue',
     'update_issue_status',
+    'list_transitions',
+    'transition_issue',
     'assign_issue',
     'add_comment',
     'log_work',
     'link_pr',
+    'link_commits',
     'list_spaces',
     'find_pages',
     'get_page',

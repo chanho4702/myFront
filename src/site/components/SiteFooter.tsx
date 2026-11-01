@@ -6,7 +6,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import { MONO } from '../ui';
-import { BRAND, BRAND_TAGLINE, GITHUB_URL, CONTACT_EMAIL, products, openSource } from '../content';
+import { BRAND, BRAND_TAGLINE, GITHUB_URL, CONTACT_EMAIL, TRADEMARK_NOTICE, products, openSource } from '../content';
 import BrandLogo from './BrandLogo';
 
 interface FooterLink {
@@ -110,6 +110,9 @@ export default function SiteFooter() {
             </Link>
           </Stack>
         </Stack>
+        <Typography variant="caption" component="p" sx={{ color: 'text.secondary', mt: 1.5, maxWidth: 900 }}>
+          {TRADEMARK_NOTICE}
+        </Typography>
       </Container>
     </Box>
   );

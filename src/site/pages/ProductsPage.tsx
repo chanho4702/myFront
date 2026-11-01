@@ -7,7 +7,7 @@ import Chip from '@mui/material/Chip';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import SitePage from '../components/SitePage';
 import { GridSection, HairlineCard, ComparisonTable, MONO } from '../ui';
-import { products, comparison, type Product } from '../content';
+import { products, comparison, TRADEMARK_NOTICE, type Product } from '../content';
 import { useSeo } from '../seo';
 
 function ProductCard({ product }: { product: Product }) {
@@ -65,7 +65,7 @@ export default function ProductsPage() {
       </GridSection>
       {/* 대조표 — 답변 엔진이 "Confluence 대안" 질문에 인용할 사실을 한 표에 모아 둔다. */}
       <GridSection index="02" label="COMPARISON" title={comparison.title} caption={comparison.sub}>
-        <ComparisonTable columns={comparison.columns} rows={comparison.rows} caption="비교 대상 제품의 정보는 널리 알려진 공개 사실만 적었습니다. 요금·기능은 각 제품의 공식 페이지에서 확인하세요." />
+        <ComparisonTable columns={comparison.columns} rows={comparison.rows} caption={`비교 대상 제품의 정보는 널리 알려진 공개 사실만 적었습니다. 요금·기능은 각 제품의 공식 페이지에서 확인하세요. ${TRADEMARK_NOTICE}`} />
       </GridSection>
 
       <Box sx={{ borderTop: '1px solid', borderColor: 'divider' }} />
