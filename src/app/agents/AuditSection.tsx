@@ -66,12 +66,18 @@ export default function AuditSection({ personas }: { personas: Persona[] }) {
     for (const p of personas) map.set(p.id, p.name || p.slug);
     return map;
   }, [personas]);
+  /** 행위자(actorMemberId = 인증 사용자 id) → 페르소나 이름. 사람이면 id만 보인다(이름 조회 API가 이 화면에 없다). */
+  const memberName = React.useMemo(() => {
+    const map = new Map<string, string>();
+    for (const p of personas) if (p.memberId) map.set(p.memberId, p.name || p.slug);
+    return map;
+  }, [personas]);
 
+  // 기간 검증은 적용 전에 한다 — 잘못된 기간은 applied 로 넘어가지 않으므로 요청·로딩 상태가 엇갈리지 않는다.
   const rangeError =
-    applied.from && applied.to && applied.from > applied.to ? '시작일이 끝일보다 늦습니다.' : null;
+    draft.from && draft.to && draft.from > draft.to ? '시작일이 끝일보다 늦습니다.' : null;
 
   React.useEffect(() => {
-    if (rangeError) return;
     let cancelled = false;
     setLoading(true);
     setError(null);
@@ -99,16 +105,24 @@ export default function AuditSection({ personas }: { personas: Persona[] }) {
     return () => {
       cancelled = true;
     };
-  }, [applied, page, size, rangeError]);
+  }, [applied, page, size]);
+
+  const numeric = (v: string) => v === '' || /^\d+$/.test(v);
+  const draftInvalid = !numeric(draft.runId.trim()) || !numeric(draft.projectId.trim());
 
   const apply = (event?: React.FormEvent) => {
     event?.preventDefault();
+    if (rangeError || draftInvalid) return;
     setPage(0);
     setApplied({ ...draft });
   };
 
-  const numeric = (v: string) => v === '' || /^\d+$/.test(v);
-  const draftInvalid = !numeric(draft.runId.trim()) || !numeric(draft.projectId.trim());
+  /** 페르소나 행은 페르소나 이름, 페르소나 없는 서버 기록(예산·키 변경 등)은 행위자(actorMemberId). */
+  const actorLabel = (a: AuditItem): string => {
+    if (a.personaId) return personaName.get(a.personaId) ?? `페르소나 #${a.personaId}`;
+    if (a.actorMemberId) return memberName.get(a.actorMemberId) ?? `사용자 #${a.actorMemberId}`;
+    return '—';
+  };
 
   return (
     <Paper variant="outlined" sx={{ p: 2.5, mb: 4 }}>
@@ -217,7 +231,7 @@ export default function AuditSection({ personas }: { personas: Persona[] }) {
             error={!numeric(draft.projectId.trim())}
             sx={{ width: 120 }}
           />
-          <Button type="submit" variant="contained" startIcon={<SearchRoundedIcon />} disabled={draftInvalid}>
+          <Button type="submit" variant="contained" startIcon={<SearchRoundedIcon />} disabled={draftInvalid || rangeError !== null}>
             검색
           </Button>
           <Button
@@ -242,7 +256,7 @@ export default function AuditSection({ personas }: { personas: Persona[] }) {
             <TableHead>
               <TableRow sx={{ '& th': { bgcolor: 'action.hover', fontWeight: 600, whiteSpace: 'nowrap' } }}>
                 <TableCell width={150}>시각</TableCell>
-                <TableCell width={150}>페르소나</TableCell>
+                <TableCell width={150}>페르소나·행위자</TableCell>
                 <TableCell width={170}>도구</TableCell>
                 <TableCell width={100}>상태</TableCell>
                 <TableCell width={110}>출처</TableCell>
@@ -257,7 +271,7 @@ export default function AuditSection({ personas }: { personas: Persona[] }) {
                 data?.items.map((a) => (
                   <TableRow key={a.id} hover sx={{ '&:last-child td': { border: 0 } }}>
                     <TableCell sx={{ whiteSpace: 'nowrap', color: 'text.secondary' }}>{formatDateTime(a.createdAt)}</TableCell>
-                    <TableCell>{a.personaId ? (personaName.get(a.personaId) ?? `#${a.personaId}`) : '—'}</TableCell>
+                    <TableCell>{actorLabel(a)}</TableCell>
                     <TableCell sx={{ fontFamily: 'monospace' }}>{a.tool}</TableCell>
                     <TableCell>
                       {a.status === 'ERROR' ? (

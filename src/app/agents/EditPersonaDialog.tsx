@@ -69,13 +69,34 @@ export default function EditPersonaDialog({
     if (!persona || !form || nameError) return;
     setBusy(true);
     try {
-      await updatePersona(persona.id, { ...form, name: form.name.trim() });
-      if (active !== initialActive) await setPersonaActive(persona.id, active);
+      try {
+        await updatePersona(persona.id, { ...form, name: form.name.trim() });
+      } catch (e: unknown) {
+        notify.error(e instanceof Error ? e.message : '페르소나를 저장하지 못했습니다.');
+        return;
+      }
+      if (active !== initialActive) {
+        try {
+          await setPersonaActive(persona.id, active);
+        } catch (e: unknown) {
+          // 두 요청이라 부분 성공이 생긴다 — 프로필은 저장됐다고 분명히 알리고, 목록을 다시 불러 실제 상태를 보여 준다.
+          const reason = e instanceof Error ? e.message : '알 수 없는 오류';
+          notify.warning(`프로필은 저장했지만 ${active ? '활성화' : '비활성화'}하지 못했습니다: ${reason}`);
+          onSaved();
+          try {
+            const fresh = await getPersonaDetail(persona.id);
+            setActive(fresh.active);
+            setInitialActive(fresh.active);
+          } catch {
+            // 다시 읽지 못하면 토글을 서버에 보내기 전 값으로 되돌린다(목록은 위 onSaved 가 다시 불러온다).
+            setActive(initialActive);
+          }
+          return;
+        }
+      }
       notify.success('페르소나를 저장했습니다.');
       onSaved();
       onClose();
-    } catch (e: unknown) {
-      notify.error(e instanceof Error ? e.message : '페르소나를 저장하지 못했습니다.');
     } finally {
       setBusy(false);
     }

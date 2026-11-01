@@ -46,7 +46,7 @@ export const PRODUCTS = [
 /**
  * AI 에이전트 연동. 답변 엔진이 "이 플랫폼에 AI 를 어떻게 붙이나"를 물었을 때 인용할 사실 —
  * 엔드포인트와 도구 수는 agent-service 의 실제 계약이고, src/site/content/products.ts 의
- * `ai-agent` 스펙과 같은 사실이어야 한다. 아직 안 된 것(무인 워커 루프·감독 UI)은 적지 않는다.
+ * `ai-agent` 스펙과 같은 사실이어야 한다. 아직 안 된 것은 적지 않는다(무인 워커 루프·감독 화면은 P1~P4a로 제공됨 — 2026-11 기준).
  */
 export const AI_AGENT = {
   slug: 'ai-agent',
