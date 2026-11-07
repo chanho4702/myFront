@@ -217,42 +217,42 @@
   {
     "url": "/docs/spaces/3/folder/40",
     "title": "로드맵",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/folder/41",
     "title": "구현 계획",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/folder/42",
     "title": "설계 스펙",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/folder/73",
     "title": "영역 가이드",
-    "lastmod": "2026-09-06"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/folder/74",
     "title": "로드맵",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/folder/75",
     "title": "구현 계획",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/folder/76",
     "title": "설계 스펙",
-    "lastmod": "2026-09-12"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/100",
-    "title": "지라 셸 구조 분석 → ALM 레이아웃 재설계 (2026-07-17) (2026-07-17)",
-    "lastmod": "2026-09-04"
+    "title": "ALM 셸 구조 분석 → 레이아웃 재설계 (2026-07-17) (2026-07-17)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/101",
@@ -266,8 +266,8 @@
   },
   {
     "url": "/docs/spaces/3/pages/103",
-    "title": "설정 시스템 설계: 지라 구조 모방 — 전역 관리 + 스킴 배정 + 프로젝트 커스텀 (2026-07-18, v3) (2026-07-18)",
-    "lastmod": "2026-09-04"
+    "title": "설정 시스템 설계: 전역 관리 + 스킴 배정 + 프로젝트 커스텀 (2026-07-18, v3) (2026-07-18)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/104",
@@ -277,12 +277,12 @@
   {
     "url": "/docs/spaces/3/pages/105",
     "title": "프로젝트 요약(대시보드) 화면 설계 (2026-08-28)",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/106",
     "title": "스프린트 리포트 · 번다운 설계 (2026-08-29)",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/107",
@@ -291,13 +291,13 @@
   },
   {
     "url": "/docs/spaces/3/pages/108",
-    "title": "2026-09-04 화면 전반 UI/UX 손질 (지라 기준 밀도·헤더 정리) (2026-09-04)",
-    "lastmod": "2026-09-04"
+    "title": "2026-09-04 화면 전반 UI/UX 손질 (밀도·헤더 정리) (2026-09-04)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/109",
     "title": "디자인 시스템",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/112",
@@ -347,22 +347,22 @@
   {
     "url": "/docs/spaces/3/pages/121",
     "title": "alm-backend",
-    "lastmod": "2026-09-12"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/122",
     "title": "auth-server",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/123",
     "title": "board-service",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/124",
     "title": "collaboration-service",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/125",
@@ -372,32 +372,32 @@
   {
     "url": "/docs/spaces/3/pages/126",
     "title": "gateway-server",
-    "lastmod": "2026-09-12"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/127",
     "title": "platform-backend",
-    "lastmod": "2026-09-12"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/128",
     "title": "wiki-backend",
-    "lastmod": "2026-09-12"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/129",
     "title": "프론트 셸 (myFront)",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/131",
-    "title": "컨플루언스 설치형(Server/DC) 마이그레이션 모듈 — 기획 (2026-09-05) (2026-09-05)",
-    "lastmod": "2026-09-05"
+    "title": "설치형 위키 이관 모듈 — 기획 (2026-09-05) (2026-09-05)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/132",
-    "title": "컨플루언스 DC 마이그레이션 모듈 — M1 설계 (2026-09-05) (2026-09-05)",
-    "lastmod": "2026-09-05"
+    "title": "설치형 위키 이관 모듈 — M1 설계 (2026-09-05) (2026-09-05)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/133",
@@ -422,12 +422,12 @@
   {
     "url": "/docs/spaces/3/pages/137",
     "title": "이관 엔진 분리 — migration-service + 위키 import API (2026-09-05, A안) (2026-09-05)",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/138",
     "title": "개요",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/139",
@@ -701,8 +701,8 @@
   },
   {
     "url": "/docs/spaces/3/pages/197",
-    "title": "페이지 히스토리 화면 — 컨플루언스 충실 복제 (2026-09-06) (2026-09-06)",
-    "lastmod": "2026-09-05"
+    "title": "페이지 히스토리 화면 설계 (2026-09-06) (2026-09-06)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/198",
@@ -802,12 +802,12 @@
   {
     "url": "/docs/spaces/3/pages/36",
     "title": "플랫폼 개요",
-    "lastmod": "2026-09-12"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/37",
     "title": "에이전트 규약",
-    "lastmod": "2026-09-12"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/38",
@@ -817,12 +817,12 @@
   {
     "url": "/docs/spaces/3/pages/43",
     "title": "wiki-service 백엔드 요구사항 (2026-07-17)",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/44",
     "title": "W14 콘텐츠·공동편집·마이그레이션 아키텍처 결정 제안 (2026-08-16)",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/45",
@@ -831,13 +831,13 @@
   },
   {
     "url": "/docs/spaces/3/pages/46",
-    "title": "협업 문서 플랫폼 로드맵 (Notion + Confluence 지향) (2026-07-17)",
-    "lastmod": "2026-09-04"
+    "title": "협업 문서 플랫폼 로드맵 (2026-07-17)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/47",
-    "title": "위키(Confluence 클론) 기능 요구사항 원본 체크리스트 (2026-07-21)",
-    "lastmod": "2026-09-04"
+    "title": "위키 기능 요구사항 원본 체크리스트 (2026-07-21)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/48",
@@ -851,18 +851,18 @@
   },
   {
     "url": "/docs/spaces/3/pages/50",
-    "title": "Wiki 제품 요구사항 및 Notion·Confluence DC 갭 분석 (2026-08-16)",
-    "lastmod": "2026-09-04"
+    "title": "위키 제품 요구사항 및 갭 분석 (2026-08-16)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/51",
-    "title": "에디터 상세 갭 분석 — Notion·Confluence 동등성 (2026-08-23) (2026-08-23)",
-    "lastmod": "2026-09-04"
+    "title": "에디터 상세 갭 분석 (2026-08-23) (2026-08-23)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/52",
-    "title": "컨플루언스 기능요구사항 대비 갭 — 2026-08-28 실측 (2026-08-28)",
-    "lastmod": "2026-09-04"
+    "title": "위키 기능요구사항 대비 갭 — 2026-08-28 실측 (2026-08-28)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/53",
@@ -877,7 +877,7 @@
   {
     "url": "/docs/spaces/3/pages/55",
     "title": "W3: 버전 히스토리·코멘트·사이드바 검색 구현 계획 (MVP 마감) (2026-07-11)",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/56",
@@ -886,13 +886,13 @@
   },
   {
     "url": "/docs/spaces/3/pages/57",
-    "title": "블록 에디터 구현 계획 (노션풍 WYSIWYG, 마크다운 저장) (2026-07-17)",
-    "lastmod": "2026-09-04"
+    "title": "블록 에디터 구현 계획 (WYSIWYG, 마크다운 저장) (2026-07-17)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/58",
-    "title": "W6: 컨플루언스 크롬 정합 구현 계획 (2026-07-17)",
-    "lastmod": "2026-09-04"
+    "title": "W6: 편집 화면 크롬 정합 구현 계획 (2026-07-17)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/59",
@@ -906,8 +906,8 @@
   },
   {
     "url": "/docs/spaces/3/pages/61",
-    "title": "WIKI Front — 컨플루언스 클론 설계 문서 (2026-07-11)",
-    "lastmod": "2026-09-04"
+    "title": "WIKI Front — 위키 설계 문서 (2026-07-11)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/62",
@@ -916,8 +916,8 @@
   },
   {
     "url": "/docs/spaces/3/pages/63",
-    "title": "블록 에디터 설계 — 노션풍 WYSIWYG 편집 (마크다운 저장) (2026-07-17)",
-    "lastmod": "2026-09-04"
+    "title": "블록 에디터 설계 — WYSIWYG 편집 (마크다운 저장) (2026-07-17)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/64",
@@ -931,18 +931,18 @@
   },
   {
     "url": "/docs/spaces/3/pages/66",
-    "title": "위키 UI 개선 (Atlassian 정렬) — 설계 문서 (2026-07-21)",
-    "lastmod": "2026-09-04"
+    "title": "위키 UI 개선 (디자인 토큰 정렬) — 설계 문서 (2026-07-21)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/67",
-    "title": "컨플루언스 충실 복제 — 글로벌 셸 + 디렉토리 테이블 설계 (2026-07-22)",
-    "lastmod": "2026-09-04"
+    "title": "위키 글로벌 셸 구조 + 디렉토리 테이블 설계 (2026-07-22)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/68",
     "title": "wiki-front 디자인 재검토 — 충실 복제 · DS 정합 · 접근성 · 시각 완성도 (2026-07-22)",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/69",
@@ -966,28 +966,28 @@
   },
   {
     "url": "/docs/spaces/3/pages/77",
-    "title": "디자인 시스템 (@chanho/react 0.11.0 / @chanho/tokens 0.4.0)",
-    "lastmod": "2026-09-12"
+    "title": "디자인 시스템 (@chanho/react 0.15.0 / @chanho/tokens 0.7.0)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/78",
     "title": "화면 지도 (라우트 · 셸 · 페이지)",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/79",
     "title": "검색 (스마트 쿼리 + 검색 화면)",
-    "lastmod": "2026-09-12"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/80",
     "title": "설정 스킴 · 커스텀 워크플로",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/81",
     "title": "스토어 (도메인 데이터 계층)",
-    "lastmod": "2026-09-12"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/82",
@@ -997,22 +997,22 @@
   {
     "url": "/docs/spaces/3/pages/83",
     "title": "백로그",
-    "lastmod": "2026-09-05"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/84",
-    "title": "지라(Jira Software) 코어 기능 갭 분석 · 요구사항 (2026-08-28)",
-    "lastmod": "2026-09-04"
+    "title": "ALM 코어 기능 갭 분석 · 요구사항 (2026-08-28)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/85",
     "title": "진행 현황",
-    "lastmod": "2026-09-12"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/86",
     "title": "ALM Front W1 — 파운데이션 구현 계획 (2026-07-10)",
-    "lastmod": "2026-09-04"
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/87",
@@ -1041,8 +1041,8 @@
   },
   {
     "url": "/docs/spaces/3/pages/92",
-    "title": "Jira Clone 요구사항 갭 구현 계획 (2026-07-17)",
-    "lastmod": "2026-09-04"
+    "title": "이슈 트래커(ALM) 요구사항 갭 구현 계획 (2026-07-17)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/93",
@@ -1056,8 +1056,8 @@
   },
   {
     "url": "/docs/spaces/3/pages/95",
-    "title": "ALM Front — 지라 클론 설계 문서 (2026-07-06)",
-    "lastmod": "2026-09-04"
+    "title": "ALM Front — 이슈 트래커 설계 문서 (2026-07-06)",
+    "lastmod": "2026-11-07"
   },
   {
     "url": "/docs/spaces/3/pages/96",
@@ -1076,7 +1076,7 @@
   },
   {
     "url": "/docs/spaces/3/pages/99",
-    "title": "Jira Clone 요구사항 갭 구현 설계 (2026-07-17) (2026-07-17)",
-    "lastmod": "2026-09-04"
+    "title": "이슈 트래커(ALM) 요구사항 갭 구현 설계 (2026-07-17) (2026-07-17)",
+    "lastmod": "2026-11-07"
   }
 ]
